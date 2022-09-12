@@ -4,9 +4,14 @@ from typing import List
 
 import databases
 import sqlalchemy
-from fastapi import FastAPI, status
+from fastapi import FastAPI, status, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy import select, Table
 
 host_server = os.environ.get('host_server', 'localhost')
 db_server_port = urllib.parse.quote_plus(str(os.environ.get('db_server_port', '5432')))
@@ -34,6 +39,15 @@ engine = sqlalchemy.create_engine(
 )
 metadata.create_all(engine)
 
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 class NoteIn(BaseModel):
     text: str
     completed: bool
@@ -43,6 +57,9 @@ class Note(BaseModel):
     text: str
     completed: bool
 
+    class Config:
+        orm_mode = True
+
 app = FastAPI(title = "REST API using FastAPI PostgreSQL Async EndPoints")
 app.add_middleware(
     CORSMiddleware,
@@ -51,6 +68,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+templates = Jinja2Templates(directory="templates")
 
 @app.on_event("startup")
 async def startup():
@@ -65,10 +87,36 @@ async def read_notes(skip: int = 0, take: int = 20):
     query = notes.select().offset(skip).limit(take)
     return await database.fetch_all(query)
 
-@app.get("/notes/{note_id}/", response_model=Note, status_code = status.HTTP_200_OK)
-async def read_notes(note_id: int):
-    query = notes.select().where(notes.c.id == note_id)
-    return await database.fetch_one(query)
+@app.get("/notes/{note_id}/", response_class=HTMLResponse, response_model=Note, status_code = status.HTTP_200_OK)
+async def read_notes(request: Request,note_id: int, db: Session = Depends(get_db)):
+     connection = engine.connect()
+     #note = db.query(Note).filter(Note.id == note_id).first()
+     #print(note)
+     select()
+     query = f"SELECT text from notes where id={note_id}"
+     result = connection.execute(query)
+     values = result.fetchone()
+     #print(values[0])
+     return templates.TemplateResponse("item.html", {"request": request, "note_id": values})
+
+@app.get("/note/{note_id}/", response_class=HTMLResponse, response_model=Note, status_code = status.HTTP_200_OK)
+async def read_notes(request: Request,note_id: int, db: Session = Depends(get_db)):
+    connection = engine.connect()
+    #note = db.query(Note).filter(Note.id == note_id).first()
+    #print(note)
+    table = Table(
+        'notes',
+        metadata,
+        autoload=True,
+        autoload_with=engine
+    )
+    # value = result.first()
+    test = select([table.columns.text]).where(table.columns.id==note_id)
+    result = connection.execute(test).first()
+
+
+    #print(values[0])
+    return templates.TemplateResponse("item.html", {"request": request, "note_id": result})
 
 @app.post("/notes/", response_model=Note, status_code = status.HTTP_201_CREATED)
 async def create_note(note: NoteIn):
