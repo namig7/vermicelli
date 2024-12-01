@@ -1,0 +1,414 @@
+<!-- applications.html -->
+<div>
+    <!-- Header for Applications -->
+    <header class="flex justify-between items-center mb-4">
+        <!-- Navigation Tabs -->
+        <nav class="flex space-x-6 text-gray-700">
+             <a href="/applications" data-page="applications" class="tab-link active">Applications</a>
+            <a href="/projects" data-page="projects" class="tab-link">Projects</a> 
+        </nav>
+        <div class="flex items-center space-x-4">
+            <form id="searchForm" class="relative">
+                <input class="focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 focus:outline-none w-full text-sm text-black placeholder-gray-500 border border-gray-200 rounded-md py-2 pl-10" type="text" name="search" placeholder="Search applications..." value="" />
+                <svg width="20" height="20" fill="currentColor" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" />
+                </svg>
+            </form>
+            <button onclick="openModal()" class="hover:bg-yellow-200 hover:text-yellow-800 group flex items-center rounded-md bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2">
+                <svg class="group-hover:text-yellow-600 text-yellow-500 mr-2" width="12" height="20" fill="currentColor">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M6 5a1 1 0 011 1v3h3a1 1 0 110 2H7v3a1 1 0 11-2 0v-3H2a1 1 0 110-2h3V6a1 1 0 011-1z"/>
+                </svg>
+                New Application
+            </button>
+        </div>
+    </header>
+
+    <!-- Application List -->
+    <div class="flex flex-col" style="min-height: 500px;">
+        <div id="appListContainer" class="flex-grow">
+            <!-- Application list will be loaded here via AJAX -->
+        </div>
+
+        <!-- Pagination Controls -->
+        <div id="paginationControls" class="flex justify-between items-center mt-4">
+            <button id="prevPage" class="pagination-button px-3 py-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 focus:outline-none">Previous</button>
+            <div id="pageNumbers" class="flex items-center space-x-1">
+                <!-- Page numbers will be inserted here -->
+            </div>
+            <button id="nextPage" class="pagination-button px-3 py-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 focus:outline-none">Next</button>
+        </div>
+    </div>
+
+    <!-- New Application Modal -->
+    <div id="myModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 items-center justify-center flex">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto">
+            <div class="flex justify-between items-center p-4 border-b  border-gray-200 bg-gray-100">
+                <h3 class="text-lg font-bold text-gray-800">Create Application</h3>
+                <button class="close-modal text-gray-400 hover:text-gray-600 focus:outline-none" onclick="closeModal()">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
+                </svg>
+            </button>
+            </div>
+            <div class="p-6">
+                <form id="createForm">
+                    <div class="mb-4">
+                        <label for="name" class="block text-sm font-medium text-gray-700">Application Name</label>
+                        <input type="text" name="name" id="name" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="projectSelect" class="block text-sm font-medium text-gray-700">Projects</label>
+                        <select id="projectSelect" name="project_ids" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm" multiple>
+                            <!-- Options will be loaded via AJAX -->
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="link" class="block text-sm font-medium text-gray-700">Git Repository Link</label>
+                        <input type="url" name="link" id="link" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm">
+                    </div>
+                    <div class="mb-4">
+                        <label for="label" class="block text-sm font-medium text-gray-700">Label</label>
+                        <input type="text" name="label" id="label" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm">
+                    </div>
+                    <div id="appMessage" class="mt-2 text-sm"></div>
+                    <div class="mt-4">
+                        <button type="submit" class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Create Application</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include JavaScript for applications -->
+<script>
+    (function() {
+        // Variables for pagination and applications data
+        let appsData = [];
+        let currentPage = 1;
+        const appsPerPage = 5;
+
+        // Function to load applications data
+        function loadAppsData(searchQuery = '') {
+            // Show loading placeholder
+            $('#appListContainer').html('<div class="text-center py-20">Loading...</div>');
+
+            $.ajax({
+                url: '/get_applications_data',
+                type: 'GET',
+                data: { search: searchQuery },
+                success: function(data) {
+                    appsData = data;
+                    currentPage = 1; // Reset to first page on new search
+                    displayApps(currentPage);
+                    updatePaginationControls();
+                },
+                error: function() {
+                    $('#appListContainer').html('Error loading applications.');
+                }
+            });
+        }
+
+        // Function to display applications on the current page
+        function displayApps(page) {
+            let startIndex = (page - 1) * appsPerPage;
+            let endIndex = startIndex + appsPerPage;
+            let appsToShow = appsData.slice(startIndex, endIndex);
+
+            let appListHtml = `
+                <div class="bg-white shadow-md rounded my-6">
+                    <table class="text-left w-full border-collapse">
+                        <thead>
+                            <tr>
+                                <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">ID</th>
+                                <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Name</th>
+                                <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Latest Version</th>
+                                <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Date</th>
+                                <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            appsToShow.forEach(function(app) {
+                appListHtml += `
+                    <tr class="hover:bg-gray-50 app-row" data-id="${app.id}">
+                        <td class="text-lg text-gray-600 py-4 px-6 border-b border-gray-200">${app.id}</td>
+                        <td class="text-base text-gray-600 py-4 px-6 border-b border-gray-200">
+                            <a href="#" class="app-details-link text-yellow-500 hover:text-yellow-600" data-id="${app.id}">${app.name}</a>
+                        </td>
+                        <td class="text-base text-gray-600 py-4 px-6 border-b border-gray-200">${app.version_info}</td>
+                        <td class="text-base text-gray-600 py-4 px-6 border-b border-gray-200">${app.change_date}</td>
+                        <td class="text-base text-gray-600 py-4 px-6 border-b border-gray-200">
+                            <!-- Buttons for actions -->
+                            <button class="details-button text-yellow-500 hover:text-yellow-600">
+                                <!-- Icon for version control -->
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+                                </svg>
+                            </button>
+                            <button class="delete-button text-yellow-500 hover:text-yellow-600" data-id="${app.id}">
+                                <!-- Delete icon -->
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            appListHtml += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            $('#appListContainer').html(appListHtml);
+
+            // Attach event handlers for version control buttons
+            $('.details-button').off('click').on('click', function(e) {
+                e.stopPropagation();
+                const clickedButton = $(this);
+                const appId = clickedButton.closest('.app-row').data('id');
+                // Toggle version control details
+                toggleVersionControl(appId, clickedButton);
+            });
+
+            // Attach event handlers for delete buttons
+            $('.delete-button').off('click').on('click', function(e) {
+                e.stopPropagation();
+                const appId = $(this).data('id');
+                if (confirm('Are you sure you want to delete this application?')) {
+                    deleteApplication(appId);
+                }
+            });
+
+            // Attach event handler for application name link
+            $('.app-details-link').off('click').on('click', function(e) {
+                e.preventDefault();
+                const appId = $(this).data('id');
+                window.loadPage('application_details', appId);
+            });
+        }
+
+        // Function to update pagination controls
+        function updatePaginationControls() {
+            let totalPages = Math.ceil(appsData.length / appsPerPage);
+            $('#pageNumbers').html(''); // Clear page numbers
+
+            // Show or hide "Previous" button
+            if (currentPage === 1) {
+                $('#prevPage').addClass('invisible');
+            } else {
+                $('#prevPage').removeClass('invisible');
+            }
+
+            // Show or hide "Next" button
+            if (currentPage === totalPages || totalPages === 0) {
+                $('#nextPage').addClass('invisible');
+            } else {
+                $('#nextPage').removeClass('invisible');
+            }
+
+            // Set up click handlers
+            $('#prevPage').off('click').on('click', function() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    displayApps(currentPage);
+                    updatePaginationControls();
+                }
+            });
+
+            $('#nextPage').off('click').on('click', function() {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    displayApps(currentPage);
+                    updatePaginationControls();
+                }
+            });
+
+            // Display page numbers
+            const maxVisiblePages = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+            if (endPage - startPage < maxVisiblePages - 1) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+
+            for (let page = startPage; page <= endPage; page++) {
+                $('#pageNumbers').append(`
+                    <span class="mx-2 cursor-pointer ${page === currentPage ? 'font-bold text-yellow-500' : 'hover:text-yellow-500'}" onclick="goToPage(${page})">${page}</span>
+                `);
+            }
+        }
+
+        // Function to go to a specific page
+        function goToPage(page) {
+            currentPage = page;
+            displayApps(currentPage);
+            updatePaginationControls();
+        }
+
+        // Function to toggle version control details
+        function toggleVersionControl(appId, clickedButton) {
+            const detailsId = 'details-for-' + appId;
+            const existingDetailsRow = $('#' + detailsId);
+
+            // Close other open details
+            $('.detail-row').not(existingDetailsRow).slideUp(50, function() { $(this).remove(); });
+
+            // Toggle or create new details row
+            if (!existingDetailsRow.length) {
+                const newDetailsRow = $(`
+                    <tr class="detail-row bg-gray-100" id="${detailsId}">
+                        <td colspan="5" class="py-4 px-6 border-b border-grey-light">
+                            <!-- Content for version control -->
+                            <div class="flex items-center">
+                                <!-- VERSION CONTROL -->
+                                <div class="py-4 px-6 border-b border-grey-light">
+                                    <h3 class="font-bold text-gray-600">VERSION CONTROL</h3>
+                                    <div class="space-x-4 mt-2 flex">
+                                        <button onclick="updateVersion(${appId}, 'major')" class="flex items-center text-gray-500 hover:text-gray-600">
+                                            Major
+                                        </button>
+                                        <button onclick="updateVersion(${appId}, 'minor')" class="flex items-center text-gray-500 hover:text-gray-600">
+                                            Minor
+                                        </button>
+                                        <button onclick="updateVersion(${appId}, 'patch')" class="flex items-center text-gray-500 hover:text-gray-600">
+                                            Patch
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                `);
+                clickedButton.closest('tr').after(newDetailsRow);
+                newDetailsRow.hide().slideDown(50);
+            } else {
+                existingDetailsRow.slideToggle(50, function() {
+                    if (!$(this).is(':visible')) {
+                        $(this).remove();
+                    }
+                });
+            }
+        }
+
+        // Function to update version
+        function updateVersion(appId, versionPart) {
+            $.ajax({
+                url: `/app/${appId}/update_version`,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ version_part: versionPart }),
+                success: function(response) {
+                    alert(`Version updated to ${response.new_version}`);
+                    loadAppsData(); // Refresh applications list
+                },
+                error: function(xhr) {
+                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error updating version';
+                    alert(`Error: ${error}`);
+                }
+            });
+        }
+
+        // Function to delete application
+        function deleteApplication(appId) {
+            $.ajax({
+                url: `/delete_application/${appId}`,
+                type: 'DELETE',
+                success: function(response) {
+                    alert(response.message);
+                    loadAppsData(); // Refresh applications list
+                },
+                error: function(xhr) {
+                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error deleting application';
+                    alert(`Error: ${error}`);
+                }
+            });
+        }
+
+        // Expose functions to the global scope if they need to be called from HTML
+        window.loadAppsData = loadAppsData;
+        window.displayApps = displayApps;
+        window.goToPage = goToPage;
+        window.updateVersion = updateVersion;
+        window.deleteApplication = deleteApplication;
+        window.toggleVersionControl = toggleVersionControl;
+
+        // Initialize
+        $(document).ready(function() {
+            // Load initial data
+            loadAppsData();
+
+            // Search form handler
+            $('#searchForm').on('submit', function(e) {
+                e.preventDefault();
+                let searchQuery = $(this).find('input[name="search"]').val();
+                loadAppsData(searchQuery);
+        });
+
+            // Modal functions
+            window.openModal = function() {
+                $('#myModal').removeClass('hidden');
+                loadProjects(); // Load projects into select
+            };
+
+            window.closeModal = function() {
+                $('#myModal').addClass('hidden');
+                $('#createForm')[0].reset();
+                $('#appMessage').text('');
+            };
+
+            // Load projects for select input
+            function loadProjects() {
+                $.ajax({
+                    url: '/get_projects',
+                    type: 'GET',
+                    success: function(response) {
+                        $('#projectSelect').empty();
+                        response.forEach(function(project) {
+                            $('#projectSelect').append(new Option(project.name, project.id));
+                        });
+                    },
+                    error: function(xhr) {
+                        console.error('Error loading projects: ' + xhr.responseText);
+                    }
+                });
+            }
+
+            // Form submissions
+            $('#createForm').submit(function(e) {
+                e.preventDefault();
+                const formData = {
+                    name: $('#name').val().trim(),
+                    project_ids: $('#projectSelect').val() || [],
+                    link: $('#link').val().trim(),
+                    label: $('#label').val().trim()
+                };
+                $.ajax({
+                    url: '/create_application',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formData),
+                    success: function(response) {
+                        if(response.error) {
+                            $('#appMessage').text(response.error).css('color', 'red');
+                        } else {
+                            $('#appMessage').text(response.message).css('color', 'green');
+                            closeModal();
+                            loadAppsData(); // Refresh applications list
+                        }
+                    },
+                    error: function(xhr) {
+                        const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error creating application';
+                        $('#appMessage').text('Error: ' + error).css('color', 'red');
+                    }
+                });
+            });
+        });
+
+    })(); // End of IIFE
+</script>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Vermicelli</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@^2.0/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        a {
+            color: #F59E0B; /* Tailwind's yellow-500 color */
+            text-decoration: none; /* Remove default underline */
+        }
+    </style>
+    
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Header -->
+    <header class="flex items-center justify-between px-12 py-6 bg-white shadow-lg">
+        <div class="flex items-center">
+            <a href="/">
+                <img src="{{ url_for('static', filename='public/logo-vermicelli.png') }}" alt="Vermicelli Logo" class="h-12 w-12 rounded-full mr-4">
+            </a>
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Vermicelli</h1>
+                <p class="text-sm text-gray-500">Application Version Control Automation</p>
+            </div>
+        </div>
+        <nav class="flex space-x-6 text-gray-700">
+            <a href="/" class="text-gray-700 hover:text-gray-900 transition">Home</a>
+            <a href="/guide" class="text-gray-700 hover:text-gray-900 transition">Guide</a>
+            <a href="/about" class="text-gray-700 hover:text-gray-900 transition">About</a>
+            <a href="{{ url_for('logout') }}" class="hover:text-gray-900 transition">Logout</a>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-12 py-10 mt-5 bg-white shadow-lg rounded-lg">
+        <h2 class="text-4xl font-bold text-gray-800 mb-6">About Vermicelli</h2>
+
+        <p class="text-gray-700 text-lg mb-6">
+            Vermicelli is a version control automation system designed to help you track and manage the versions of your applications efficiently. It implements versioning based on the widely recognized 
+            <a href="https://semver.org" target="_blank">Semantic Versioning (SemVer)</a> principles.
+        </p>
+
+        <h3 class="text-2xl font-bold text-gray-800 mb-4">Semantic Versioning Explained</h3>
+        <p class="text-gray-700 text-lg mb-4">
+            Semantic Versioning (SemVer) is a formal convention for specifying the compatibility of new software versions. According to SemVer, version numbers follow a specific pattern:
+        </p>
+        <pre class="bg-gray-100 p-4 rounded">MAJOR.MINOR.PATCH</pre>
+        <p class="text-gray-700 text-lg mb-4">
+            <strong>1. MAJOR version:</strong> Incremented when you make incompatible changes.<br>
+            <strong>2. MINOR version:</strong> Incremented when you add functionality in a backwards-compatible manner.<br>
+            <strong>3. PATCH version:</strong> Incremented when you make backwards-compatible bug fixes.
+        </p>
+
+        <p class="text-gray-700 text-lg mb-4">
+            Semantic Versioning helps ensure that both developers and users have clear expectations about the level of changes introduced with each new release.
+        </p>
+
+        <h3 class="text-2xl font-bold text-gray-800 mb-4">How Vermicelli Uses Semantic Versioning</h3>
+        <p class="text-gray-700 text-lg mb-4">
+            Vermicelli allows you to manage the MAJOR, MINOR, and PATCH versions of your applications through an intuitive web UI or via API requests. It helps you keep track of every change, ensuring smooth and transparent version control.
+        </p>
+
+        <h3 class="text-2xl font-bold text-gray-800 mb-4">Useful Links for Version Control</h3>
+        <ul class="list-disc list-inside text-gray-700 space-y-2">
+            <li>
+                <a href="https://semver.org" target="_blank">Semantic Versioning (SemVer)</a> - The official site for understanding and using SemVer.
+            </li>
+            <li>
+                <a href="https://git-scm.com/book/en/v2/Git-Basics-Tagging" target="_blank">Git Tagging for Releases</a> - Learn about tagging your releases in Git.
+            </li>
+            <li>
+                <a href="https://www.atlassian.com/git/tutorials/comparing-workflows" target="_blank">Git Workflows</a> - Explore different Git workflows for effective version control.
+            </li>
+        </ul>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white footer-shadow w-full px-12 py-5">
+        <p class="text-center text-gray-600">© 2024 Vermicelli.</p>
+    </footer>
+
+</body>
+</html>
