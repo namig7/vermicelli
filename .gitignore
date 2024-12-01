@@ -37,3 +37,4 @@ templates/__pycache__/
 *.swo
 *~
 .DS_Store
+.idea/
