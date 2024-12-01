@@ -37,4 +37,5 @@ templates/__pycache__/
 *.swo
 *~
 .DS_Store
+flask_session/
 .idea/
