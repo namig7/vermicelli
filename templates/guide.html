@@ -6,9 +6,6 @@
     <title>Vermicelli Guide</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@^2.0/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
         .code-block {
             position: relative;
             background: #1e293b;
@@ -66,7 +63,7 @@
             <a href="/" class="text-gray-700 hover:text-gray-900 transition">Home</a>
             <a href="/guide" class="text-gray-700 hover:text-gray-900 transition">Guide</a>
             <a href="/about" class="text-gray-700 hover:text-gray-900 transition">About</a>
-            <a href="{{ url_for('logout') }}" class="hover:text-gray-900 transition">Logout</a>
+            <a href="{{ url_for('logout') }}" class="text-gray-700 hover:text-gray-900 transition">Logout</a>
         </nav>
     </header>
 
