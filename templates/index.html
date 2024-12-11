@@ -39,7 +39,7 @@
         }
     </style>
 </head>
-<body data-initial-page="{{ initial_page | default('applications') }}">
+<body data-initial-page="{{ initial_page | default('applications') }}" data-app-id="{{ app_id or '' }}">
     <!-- Header -->
     <header class="flex items-center justify-between px-12 py-6 bg-white shadow-lg">
         <div class="flex items-center">

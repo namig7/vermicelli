@@ -1,36 +1,52 @@
+import os
+from dotenv import load_dotenv
 from datetime import datetime
+from functools import wraps
+import logging
 from flask import Flask, request, jsonify, render_template, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from sqlalchemy import func, or_, text
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-import logging
 from flask_session import Session
-from functools import wraps
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 
+load_dotenv()
 
 app = Flask(__name__)
 
-app.config["JWT_SECRET_KEY"] = "your_jwt_secret_key"  # Replace with a secure key
-jwt = JWTManager(app)
-
-app.secret_key = 'your_secret_key'  # Replace with a secure key in production
-app.config['SESSION_TYPE'] = 'filesystem'
+app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")  
+app.secret_key = os.environ.get("SECRET_KEY")  
+app.config['SESSION_TYPE'] = os.environ.get("SESSION_TYPE", 'filesystem')
 Session(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/verdb'
+# Сборка URI базы данных из отдельных переменных
+DB = os.environ.get("DB", "verdb")
+DB_USER = os.environ.get("DB_USER", "postgres")
+DB_PASSWORD = os.environ.get("DB_PASSWORD", "postgres")
+DB_HOST = os.environ.get("DB_HOST", "localhost")
+DB_PORT = os.environ.get("DB_PORT", "5432")
+
+app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
+# Парсим список пользователей из переменной окружения USERS
+# Формат: "admin:password;user2:password2"
+users_str = os.environ.get("USERS", "")
+users = {}
+for pair in users_str.split(";"):
+    pair = pair.strip()
+    if pair:
+        username, pwd = pair.split(":", 1)
+        users[username] = pwd
+
+jwt = JWTManager(app)
+
 # Logging configuration
 logging.basicConfig(level=logging.INFO)
-
-users = {
-    "admin": "password"
-}
 
 def login_required(f):
     @wraps(f)
@@ -68,10 +84,11 @@ def logout():
 def test_database_connection():
     with app.app_context():
         try:
-            db.session.execute(text('SELECT 1'))  # Use 'text' here
+            db.session.execute(text('SELECT 1'))
             print("Connection to the database is successfully established")
         except Exception as e:
             print("Error in connection to the database:", str(e))
+
 
 # Association table for many-to-many relationship between Projects and Applications
 project_applications = db.Table('project_applications',
@@ -108,17 +125,11 @@ class Project(db.Model):
     start_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     applications = db.relationship('Application', secondary=project_applications, back_populates='projects')
 
-### Application Routes
-
+### Page Routes (HTML)
 @app.route('/')
 @login_required
 def index():
     return render_template('index.html')
-
-# @app.route('/')
-# @login_required
-# def home():
-#     return render_template('index.html', initial_page='applications')
 
 @app.route('/applications')
 @login_required
@@ -143,9 +154,51 @@ def projects_content():
 @app.route('/content/application_details/<int:app_id>')
 @login_required
 def application_details_content(app_id):
-    app = Application.query.get_or_404(app_id)
+    app_obj = Application.query.get_or_404(app_id)
     latest_version = Version.query.filter_by(application_id=app_id).order_by(Version.change_date.desc()).first()
-    return render_template('application_details.html', app=app, latest_version=latest_version)
+    project_name = app_obj.projects[0].name if app_obj.projects else None
+    project_id = app_obj.projects[0].id if app_obj.projects else None  # Добавляем извлечение project_id
+
+    return render_template('application_details.html',
+                           app=app_obj,
+                           latest_version=latest_version,
+                           project_name=project_name,
+                           project_id=project_id)
+
+
+@app.route('/application/<int:app_id>/details')
+@login_required
+def application_details_page(app_id):
+    app_obj = Application.query.get_or_404(app_id)
+    project_name = app_obj.projects[0].name if app_obj.projects else None
+    latest_version = Version.query.filter_by(application_id=app_obj.id).order_by(Version.change_date.desc()).first()
+    if latest_version:
+        latest_version.change_date = latest_version.change_date.strftime('%m/%d/%Y, %I:%M:%S %p')
+    return render_template('application_details.html',
+                           app=app_obj,
+                           project_name=project_name,
+                           latest_version=latest_version)
+
+@app.route('/application/<int:app_id>', methods=['GET'])
+@login_required
+def show_application_page(app_id):
+    return render_template('index.html', initial_page='application_details', app_id=app_id)
+
+
+
+### API Routes (JSON)
+@app.route('/api/application/<int:app_id>', methods=['GET'])
+@login_required
+def get_application(app_id):
+    app_obj = Application.query.get_or_404(app_id)
+    app_data = {
+        'id': app_obj.id,
+        'name': app_obj.name,
+        'link': app_obj.link,
+        'label': app_obj.label,
+        'project_id': app_obj.projects[0].id if app_obj.projects else None
+    }
+    return jsonify(app_data)
 
 @app.route('/get_applications_data', methods=['GET'])
 @login_required
@@ -165,49 +218,18 @@ def fetch_applications_data():
 
     applications = query.order_by(Application.id).all()
     apps_data = []
-    for app in applications:
-        last_version = Version.query.filter_by(application_id=app.id).order_by(Version.change_date.desc()).first()
+    for app_obj in applications:
+        last_version = Version.query.filter_by(application_id=app_obj.id).order_by(Version.change_date.desc()).first()
         version_info = last_version.number if last_version else 'No versions available'
         change_date = last_version.change_date.strftime('%m/%d/%Y, %I:%M:%S %p') if last_version else 'N/A'
         apps_data.append({
-            'id': app.id,
-            'name': app.name,
+            'id': app_obj.id,
+            'name': app_obj.name,
             'version_info': version_info,
             'change_date': change_date
         })
     return jsonify(apps_data)
 
-@app.route('/application/<int:app_id>/details')
-@login_required
-def application_details_page(app_id):
-    app = Application.query.get_or_404(app_id)
-    project_name = app.projects[0].name if app.projects else None
-
-    latest_version = Version.query.filter_by(application_id=app.id).order_by(Version.change_date.desc()).first()
-
-    if latest_version:
-        latest_version.change_date = latest_version.change_date.strftime('%m/%d/%Y, %I:%M:%S %p')
-
-    return render_template('application_details.html',
-                           app=app,
-                           project_name=project_name,
-                           latest_version=latest_version)
-
-# Add route to get application details via AJAX
-@app.route('/application/<int:app_id>', methods=['GET'])
-@login_required
-def get_application(app_id):
-    app = Application.query.get_or_404(app_id)
-    app_data = {
-        'id': app.id,
-        'name': app.name,
-        'link': app.link,
-        'label': app.label,
-        'project_id': app.projects[0].id if app.projects else None
-    }
-    return jsonify(app_data)
-
-# Add route to get application versions
 @app.route('/app/<int:app_id>/versions', methods=['GET'])
 @login_required
 def get_app_versions(app_id):
@@ -225,23 +247,19 @@ def get_app_versions(app_id):
 @login_required
 def edit_application(app_id):
     data = request.get_json()
+    app_obj = Application.query.get_or_404(app_id)
 
-    app = Application.query.get_or_404(app_id)
-
-    app.name = data.get('name').strip()
-    app.link = data.get('link').strip()
+    app_obj.name = data.get('name').strip()
+    app_obj.link = data.get('link').strip()
     project_id = data.get('project_id')
 
     if project_id:
         project = Project.query.get(project_id)
-        if project:
-            app.projects = [project]
-        else:
-            app.projects = []
+        app_obj.projects = [project] if project else []
     else:
-        app.projects = []
+        app_obj.projects = []
 
-    if not app.name:
+    if not app_obj.name:
         return jsonify({'error': 'Application name cannot be empty'}), 400
 
     try:
@@ -272,7 +290,6 @@ def create_application():
             return jsonify({'error': 'Application name already exists. Please choose another name.'}), 400
 
         projects = Project.query.filter(Project.id.in_(project_ids)).all() if project_ids else []
-
         new_app = Application(name=name, link=link, label=label)
         new_app.projects.extend(projects)
 
@@ -330,7 +347,7 @@ def get_projects():
 @jwt_required()
 def update_version(application_id):
     try:
-        version_part = request.json.get('version_part')  # 'major', 'minor', 'patch'
+        version_part = request.json.get('version_part')
         if version_part not in ['major', 'minor', 'patch']:
             return jsonify({'error': 'Invalid version part'}), 400
 
@@ -359,14 +376,13 @@ def update_version(application_id):
         logging.error(f"Error updating version for application {application_id}: {str(e)}")
         return jsonify({'error': 'Server error while updating version'}), 500
 
-### Project Routes
-
+### Project API Routes
 @app.route('/get_projects_data', methods=['GET'])
 @login_required
 def get_projects_data():
     search_query = request.args.get('search', '').strip()
     page = request.args.get('page', 1, type=int)
-    per_page = 5  # Projects per page
+    per_page = 5
 
     if search_query:
         projects_query = Project.query.filter(Project.name.ilike(f'%{search_query}%')).order_by(Project.created_at.desc())
@@ -462,9 +478,7 @@ def search_applications():
     result = [{'id': app.id, 'name': app.name} for app in applications]
     return jsonify(result)
 
-
 ### Additional Routes
-
 @app.route('/api/login', methods=['POST'])
 def api_login():
     data = request.get_json()
@@ -479,13 +493,26 @@ def api_login():
 
 @app.route('/about')
 @login_required
-def about():
+def about_page():
+    return render_template('index.html', initial_page='about')
+
+@app.route('/content/about')
+@login_required
+def about_content():
     return render_template('about.html')
 
 @app.route('/guide')
 @login_required
-def guide():
+def guide_page():
+    # Возвращаем index.html, задавая начальную страницу 'guide'
+    return render_template('index.html', initial_page='guide')
+
+@app.route('/content/guide')
+@login_required
+def guide_content():
+    # Возвращаем частичный шаблон, который будет подгружен AJAX-ом
     return render_template('guide.html')
+
 
 if __name__ == '__main__':
     test_database_connection()

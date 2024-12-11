@@ -15,15 +15,16 @@
 
 <!-- Отображение проекта приложения -->
 <p class="text-gray-600">
-<strong>Project:</strong> 
-{% if app.project %}
-    <a href="/project/{{ app.project.id }}/details" class="text-yellow-500 hover:text-yellow-600 hover:underline">
-        {{ app.project.name }}
+    <strong>Project:</strong> 
+    {% if project_name and project_id %}
+    <a href="#" onclick="openProjectDetails({{ project_id }}); return false;" class="text-yellow-500 hover:text-yellow-600 hover:underline">
+        {{ project_name }}
     </a>
 {% else %}
     N/A
 {% endif %}
-</p>
+    </p>
+    
 
 <!-- Отображение ссылки на репозиторий -->
 <p class="text-gray-600">
@@ -409,23 +410,23 @@ function copyToClipboard(elementId) {
         function openEditAppModal(appId) {
             // Fetch application data via AJAX
             $.ajax({
-                url: `/application/${appId}`,
+                url: `/api/application/${appId}`,
                 type: 'GET',
                 success: function(data) {
-                    // Populate form fields
-                    $('#appNameInput').val(data.name);
-                    $('#appLinkInput').val(data.link);
-
-                    // Load projects into the dropdown
+                    // Заполняем форму данными
+                    $('#appNameInput').val(data.name || '');
+                    $('#appLinkInput').val(data.link || '');
+            
+                    // Загружаем список проектов
                     loadProjects(data.project_id);
-
-                    // Open the modal
+            
+                    // Открываем модальное окно
                     $('#editAppModal').removeClass('hidden').addClass('flex');
                 },
                 error: function(xhr) {
                     alert('Error loading application details');
                 }
-            });
+            });            
         }
 
         // Function to load projects
@@ -628,5 +629,109 @@ function copyToClipboard(elementId) {
         window.deleteApplication = deleteApplication;
         window.goToPage = goToPage;
     })(); // End of IIFE
+
+
 </script>
 
+<!-- Project Details Modal -->
+<div id="projectModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 items-center justify-center flex">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-hidden">
+        <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
+            <h3 id="modalProjectName" class="text-lg font-bold text-gray-800">Project Name</h3>
+            <button onclick="closeProjectModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div class="p-6 space-y-4">
+            <div>
+                <h4 class="text-sm font-semibold text-gray-600">Project Description:</h4>
+                <p id="modalProjectDescription" class="text-sm text-gray-700">Description of the project will be here...</p>
+            </div>
+            <div>
+                <h4 class="text-sm font-semibold text-gray-600">Created At:</h4>
+                <p id="modalProjectCreatedAt" class="text-sm text-gray-700">Project creation date will appear here...</p>
+            </div>
+            <div>
+                <h4 class="text-sm font-semibold text-gray-600">Source Link:</h4>
+                <a id="modalProjectSourceLink" href="#" target="_blank" class="text-sm text-yellow-500 hover:text-yellow-600 hover:underline">Source link will appear here...</a>
+            </div>
+            <div>
+                <h4 class="text-sm font-semibold text-gray-600">Project Status:</h4>
+                <span id="modalProjectStatus" class="px-2 py-1 rounded-full"></span>
+            </div>
+            <div>
+                <h4 class="text-sm font-semibold text-gray-600">Applications:</h4>
+                <ul id="modalProjectApplications" class="list-disc pl-5 text-sm text-gray-700"></ul>
+            </div>
+        </div>
+        <div class="p-4 border-t border-gray-200 bg-gray-100 text-right">
+            <button onclick="closeProjectModal()" class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 focus:outline-none">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function getStatusLabel(status) {
+        let statusClass = '';
+        switch (status) {
+            case 'Draft': statusClass = 'bg-gray-200 text-gray-800'; break;
+            case 'Planned': statusClass = 'bg-blue-200 text-blue-800'; break;
+            case 'In Progress': statusClass = 'bg-yellow-200 text-yellow-800'; break;
+            case 'On Hold': statusClass = 'bg-orange-200 text-orange-800'; break;
+            case 'Completed': statusClass = 'bg-green-200 text-green-800'; break;
+            case 'Cancelled': statusClass = 'bg-red-200 text-red-800'; break;
+            case 'Under Review': statusClass = 'bg-purple-200 text-purple-800'; break;
+            case 'Delayed': statusClass = 'bg-pink-200 text-pink-800'; break;
+            default: statusClass = 'bg-gray-200 text-gray-800';
+        }
+        return `<span class="px-2 py-1 rounded-full text-xs font-semibold ${statusClass}">${status}</span>`;
+    }
+
+    function openProjectDetails(projectId) {
+        $.ajax({
+            url: `/project/${projectId}`,
+            type: 'GET',
+            success: function(project) {
+                $('#modalProjectName').text(project.name);
+                $('#modalProjectDescription').text(project.description || 'No description provided.');
+                $('#modalProjectCreatedAt').text(project.created_at);
+                if (project.source_link) {
+                    $('#modalProjectSourceLink').attr('href', project.source_link).text(project.source_link);
+                } else {
+                    $('#modalProjectSourceLink').attr('href', '#').text('No source link provided.');
+                }
+                $('#modalProjectStatus').html(getStatusLabel(project.status));
+
+                $('#modalProjectApplications').empty();
+                if (project.applications && project.applications.length > 0) {
+                    project.applications.forEach(function(app) {
+                        $('#modalProjectApplications').append(
+                            `<li>
+                                <a href="#" class="text-yellow-500 hover:text-yellow-600" 
+                                   onclick="window.loadPage('application_details', ${app.id}); return false;">
+                                    ${app.name}
+                                </a>
+                             </li>`
+                        );
+                    });
+                } else {
+                    $('#modalProjectApplications').append('<li>No applications associated.</li>');
+                }                
+
+                $('#projectModal').removeClass('hidden');
+            },
+            error: function(xhr) {
+                alert('Error fetching project details.');
+            }
+        });
+    }
+
+
+    function closeProjectModal() {
+        $('#projectModal').addClass('hidden');
+    }
+</script>

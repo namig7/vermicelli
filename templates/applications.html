@@ -40,17 +40,17 @@
     </div>
 
     <!-- New Application Modal -->
-    <div id="myModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 items-center justify-center flex">
-        <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto">
-            <div class="flex justify-between items-center p-4 border-b  border-gray-200 bg-gray-100">
+    <div id="myModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-hidden">
+            <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
                 <h3 class="text-lg font-bold text-gray-800">Create Application</h3>
                 <button class="close-modal text-gray-400 hover:text-gray-600 focus:outline-none" onclick="closeModal()">
                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
-                </svg>
-            </button>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
-            <div class="p-6">
+            <div class="p-6 space-y-4">
                 <form id="createForm">
                     <div class="mb-4">
                         <label for="name" class="block text-sm font-medium text-gray-700">Application Name</label>
@@ -71,7 +71,7 @@
                         <input type="text" name="label" id="label" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm">
                     </div>
                     <div id="appMessage" class="mt-2 text-sm"></div>
-                    <div class="mt-4">
+                    <div class="mt-4 text-right">
                         <button type="submit" class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Create Application</button>
                     </div>
                 </form>
