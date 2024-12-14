@@ -13,7 +13,7 @@
         <p class="text-gray-600 mt-2"><strong>ID:</strong> {{ app.id }}</p>
         
 
-<!-- Отображение проекта приложения -->
+<!-- The Project of the Application -->
 <p class="text-gray-600">
     <strong>Project:</strong> 
     {% if project_name and project_id %}
@@ -26,7 +26,7 @@
     </p>
     
 
-<!-- Отображение ссылки на репозиторий -->
+<!-- The Link to the Application Repo -->
 <p class="text-gray-600">
 <strong>Link:</strong> 
 {% if app.link %}
@@ -38,7 +38,7 @@
 {% endif %}
 </p>
 
-<!-- Отображение метки -->
+<!-- Labels -->
 <p class="text-gray-600"><strong>Label:</strong> {{ app.label or 'No labels' }}</p>
 
         <p class="text-gray-600"><strong>Created At:</strong> {{ app.created_at }}</p>
@@ -62,7 +62,7 @@
             <p class="text-sm text-gray-600">Released on: {{ latest_version.change_date if latest_version else 'N/A' }}</p>
             <p class="text-sm text-gray-600">No release notes available.</p>
         </div>
-        <!-- История версий -->
+        <!-- Version History -->
         <p class="text-gray-600">
             <a href="#" id="openVersionHistory" class="flex items-center text-gray-500 hover:text-gray-600" data-app-id="{{ app.id }}">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6 mr-1">
@@ -72,7 +72,7 @@
             </a>
         </p>
         
-<!-- Блок управления версиями -->
+<!-- Version Control Block -->
 
 <pre id="curl-major-{{ app.id }}" class="hidden">curl -X POST -H "Content-Type: application/json" -d '{"version_part": "major"}' http://localhost:8000/app/{{ app.id }}/update_version</pre>
 <pre id="curl-minor-{{ app.id }}" class="hidden">curl -X POST -H "Content-Type: application/json" -d '{"version_part": "minor"}' http://localhost:8000/app/{{ app.id }}/update_version</pre>
@@ -145,8 +145,9 @@
         <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
             <h3 class="text-lg font-bold text-gray-800">Version History</h3>
             <button onclick="closeVersionModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
-                <!-- Close icon -->
-                &times;
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
             </button>
         </div>
         <div class="p-6">
@@ -160,26 +161,26 @@
     </div>
 </div>
 
-<!-- Include JavaScript for this page -->
+<!--JavaScript for this page -->
 <script>
     let currentAppId = null;
 
     function openEditAppModal(appId) {
         currentAppId = appId;
 
-        // Загружаем данные о приложении через AJAX
+        // Loading the Data of the Application via AJAX
         $.ajax({
             url: `/application/${appId}`,
             type: 'GET',
             success: function(data) {
-                // Заполняем форму данными
+                // Filling up the form with data
                 $('#appNameInput').val(data.name);
                 $('#appLinkInput').val(data.link);
 
-                // Загружаем список проектов в выпадающий список
+                // Loading list of the projects with the dropdown list
                 loadProjects(data.project_id);
 
-                // Открываем модальное окно
+                // Openning the modal window
                 $('#editAppModal').removeClass('hidden').addClass('flex');
             },
             error: function(xhr) {
@@ -189,7 +190,7 @@
     }
 
     function loadProjects(selectedProjectId) {
-        // Загружаем проекты через AJAX
+        // Loading the projects via AJAX
         $.ajax({
             url: '/get_projects',
             type: 'GET',
@@ -218,13 +219,13 @@
             link: $('#appLinkInput').val().trim(),
         };
 
-        // Выполняем проверку
+        // Processing the check
         if (!appData.name) {
             alert('Application name cannot be empty!');
             return;
         }
 
-        // Отправляем обновленные данные на сервер через AJAX
+        // Sending the new data to the BackEnd via AJAX
         $.ajax({
             url: `/edit_application/${currentAppId}`,
             type: 'POST',
@@ -232,7 +233,7 @@
             data: JSON.stringify(appData),
             success: function() {
                 closeEditAppModal();
-                location.reload();  // Перезагружаем страницу после успешного обновления
+                location.reload();  // Reloading page after the successful edit
             },
             error: function(xhr) {
                 alert('Error saving application');
@@ -247,21 +248,21 @@ let versionsData = [];
 let currentPage = 1;
 const versionsPerPage = 5;
 
-// Открыть модальное окно с историей версий
+// Opening the modal window with the Version History
 $('#openVersionHistory').on('click', function(e) {
     e.preventDefault();
-    const appId = $(this).data('app-id');  // Получаем ID приложения
+    const appId = $(this).data('app-id');  // Getting Application ID
 
-    // Загружаем историю версий через AJAX
+    // Loading the Version History via AJAX
     $.ajax({
         url: `/app/${appId}/versions`,
         type: 'GET',
         success: function(data) {
             if (data.length > 0) {
-                versionsData = data;  // Сохраняем все версии
-                displayVersions(currentPage);  // Показать первую страницу
-                updatePaginationControls();  // Обновить кнопки пагинации и номера страниц
-                openVersionModal();  // Открыть модальное окно после загрузки данных
+                versionsData = data;  // Saving all the Versions
+                displayVersions(currentPage);  // Show the first page
+                updatePaginationControls();  // Reload the pagination buttons and page numbers
+                openVersionModal();  // Open the modal window after loading the data
             } else {
                 $('#versionContent').html('No versions available.');
                 $('#paginationControls').addClass('hidden');
@@ -274,7 +275,7 @@ $('#openVersionHistory').on('click', function(e) {
     });
 });
 
-// Функция для отображения версий на основе текущей страницы
+// Displaying the Versions based on the current page
 function displayVersions(page) {
     let startIndex = (page - 1) * versionsPerPage;
     let endIndex = startIndex + versionsPerPage;
@@ -289,32 +290,32 @@ function displayVersions(page) {
                         </div>`;
     });
 
-    $('#versionContent').html(versionList);  // Обновляем контент модального окна
+    $('#versionContent').html(versionList);  // Renew the content of the modal window
 }
 
-// Функция для обновления кнопок пагинации и номеров страниц
+// Renewing the pagination buttons and page numbers
 function updatePaginationControls() {
     let totalPages = Math.ceil(versionsData.length / versionsPerPage);
     $('#pageNumbers').html(''); // Очистка номеров страниц
 
-    // Максимум номеров страниц для отображения (например, 5)
+    // Maximum number of the page numbers to display (now it is 5)
     const maxVisiblePages = 5;
 
-    // Добавление кнопки "Previous"
+    // "Previous" Button
     if (currentPage === 1) {
         $('#prevPage').addClass('invisible');
     } else {
         $('#prevPage').removeClass('invisible');
     }
 
-    // Добавление кнопки "Next"
+    // "Next" Button
     if (currentPage === totalPages) {
         $('#nextPage').addClass('invisible');
     } else {
         $('#nextPage').removeClass('invisible');
     }
 
-    // Устанавливаем обработчики событий
+    // Installation of the Event handlers
     $('#prevPage').off('click').on('click', function() {
         if (currentPage > 1) {
             currentPage--;
@@ -331,20 +332,20 @@ function updatePaginationControls() {
         }
     });
 
-    // Функция для отображения номера страницы
+    // Display of the page numbers
     const addPageNumber = (page) => {
         $('#pageNumbers').append(`<span class="mx-2 cursor-pointer ${page === currentPage ? 'font-bold text-yellow-500' : 'hover:text-yellow-500'}" onclick="goToPage(${page})">${page}</span>`);
     };
 
-    // Показываем первую страницу
+    // Displaying the first page
     if (currentPage > 1) addPageNumber(1);
 
-    // Добавляем "..." перед текущей страницей, если это необходимо
+    // Adding "..." before the current page, if needed
     if (currentPage > maxVisiblePages) {
         $('#pageNumbers').append('<span class="mx-2">...</span>');
     }
 
-    // Показываем несколько страниц вокруг текущей
+    // Show a few pages around the current
     let startPage = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(totalPages - 1, currentPage + Math.floor(maxVisiblePages / 2));
 
@@ -352,16 +353,16 @@ function updatePaginationControls() {
         addPageNumber(i);
     }
 
-    // Добавляем "..." после текущей страницы, если есть страницы дальше
+    // Adding "..." after the current page, if needed
     if (endPage < totalPages - 1) {
         $('#pageNumbers').append('<span class="mx-2">...</span>');
     }
 
-    // Показываем последнюю страницу
+    // Displaying the last page
     if (totalPages > 1 && currentPage < totalPages) addPageNumber(totalPages);
 }
 
-// Функция для перехода на выбранную страницу
+// Switching to the selected page
 function goToPage(page) {
     currentPage = page;
     displayVersions(currentPage);
@@ -369,12 +370,12 @@ function goToPage(page) {
 }
 
 
-// Функция для открытия модального окна
+// Openning the Modal Window
 function openVersionModal() {
         $('#versionModal').removeClass('hidden').addClass('flex');
     }
 
-// Функция для закрытия модального окна
+// Closing the Modal Window
 function closeVersionModal() {
         $('#versionModal').removeClass('flex').addClass('hidden');
     }
@@ -413,14 +414,14 @@ function copyToClipboard(elementId) {
                 url: `/api/application/${appId}`,
                 type: 'GET',
                 success: function(data) {
-                    // Заполняем форму данными
+                    // Filling up form with data
                     $('#appNameInput').val(data.name || '');
                     $('#appLinkInput').val(data.link || '');
             
-                    // Загружаем список проектов
+                    // Loading list of projects
                     loadProjects(data.project_id);
             
-                    // Открываем модальное окно
+                    // Opening new modal window
                     $('#editAppModal').removeClass('hidden').addClass('flex');
                 },
                 error: function(xhr) {
@@ -543,12 +544,19 @@ function copyToClipboard(elementId) {
 
             let versionList = '';
             versionsToShow.forEach(function(version) {
-                versionList += `<div class="bg-gray-50 border border-gray-200 rounded p-4">
-                                    <h4 class="font-bold text-gray-800">Version ${version.number}</h4>
-                                    <p class="text-sm text-gray-600">Released on: ${new Date(version.change_date).toLocaleString()}</p>
-                                    <p class="text-sm text-gray-600">${version.notes || 'No release notes available.'}</p>
-                                </div>`;
-            });
+                    versionList += `
+                        <div class="bg-gray-50 border border-gray-200 rounded p-4 flex items-start space-x-4">
+                            <div class="flex items-center justify-center">
+                                <img src="{{ url_for('static', filename='public/version.svg') }}" alt="Version Icon" class="w-12 h-12">
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800">Version ${version.number}</h4>
+                                <p class="text-sm text-gray-600">Released on: ${new Date(version.change_date).toLocaleString()}</p>
+                                <p class="text-sm text-gray-600">${version.notes || 'No release notes available.'}</p>
+                            </div>
+                        </div>`;
+                });
+                
 
             $('#versionContent').html(versionList);
         }

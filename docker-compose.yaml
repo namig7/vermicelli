@@ -2,17 +2,30 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres
+    image: postgres:latest
     container_name: postgres
-    environment:
-      - POSTGRES_DB=verdb
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_HOST_AUTH_METHOD=password
+    env_file:
+      - .env
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  vermicelli:
+    image: vermicelli:latest
+    container_name: vermicelli
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    # Optionally, if you need to wait for postgres to be ready before starting Vermicelli:
+    # healthcheck:
+    #   test: ["CMD-SHELL", "pg_isready -h postgres -U postgres"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
 
 volumes:
   postgres_data:

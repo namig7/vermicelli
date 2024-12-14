@@ -65,10 +65,12 @@
     </div>
 
     <!-- Footer -->
-    <footer class="bg-white footer-shadow w-full px-12 py-5">
-        <p class="text-center text-gray-600">© 2024 Vermicelli.</p>
+    <footer class="bg-white footer-shadow w-full px-12 py-5 flex items-center justify-center">
+        <a href="https://github.com/namig7/vermicelli" class="flex items-center space-x-2">
+            <img src="{{ url_for('static', filename='public/logo-vermicelli-footer.png') }}" alt="Vermicelli Logo" class="h-6 w-6 rounded-full">
+            <span class="text-gray-600">© 2024 Vermicelli</span>
+        </a>
     </footer>
-
     <!-- Scripts -->
     <!-- Include jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
