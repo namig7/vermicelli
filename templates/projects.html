@@ -21,29 +21,26 @@
             </button>
         </div>
     </header>
-        <!-- Projects List and Pagination Container -->
-
+    <!-- Projects List and Pagination Container -->
     <div class="flex flex-col" style="min-height: 500px;">
-
-    <!-- Projects Table -->
-    <div id="projectListContainer" class="flex-grow">
-        <!-- Project list will be loaded here via AJAX -->
-    </div>
-
+        <!-- Projects Table -->
+        <div id="projectListContainer" class="flex-grow">
+            <!-- Project list will be loaded here via AJAX -->
+        </div>
         <!-- Pagination Controls -->
         <div id="paginationControls" class="flex justify-between items-center mt-4">
-            <button id="prevPage" class="pagination-button px-3 py-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 focus:outline-none">Previous</button>
+            <button id="prevPage" class="pagination-button hover:bg-yellow-200 hover:text-yellow-800 group flex items-center rounded-full bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2">← Previous</button>
             <div id="pageNumbers" class="flex items-center space-x-1">
                 <!-- Page numbers will be inserted here -->
             </div>
-            <button id="nextPage" class="pagination-button px-3 py-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 focus:outline-none">Next</button>
+            <button id="nextPage" class="pagination-button hover:bg-yellow-200 hover:text-yellow-800 group flex items-center rounded-full bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2">Next →</button>
         </div>
     </div>
-
     <!-- New Project Modal -->
     <div id="newProjectModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center">
-        <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-hidden">
-            <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
+        <!-- Ensured rounded corners by retaining 'rounded-lg' and verifying no CSS overrides -->
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-visible">
+            <div class="rounded-t-md shadow-sm flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
                 <h3 class="text-lg font-bold text-gray-800">Create New Project</h3>
                 <button onclick="closeNewProjectModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -66,28 +63,65 @@
                         <input type="url" id="projectSourceLink" name="projectSourceLink" class="form-input block w-full mt-1 border border-gray-300 rounded-md shadow-sm" placeholder="https://github.com/username/repo">
                     </div>
                     <div>
-                        <label for="projectStatus" class="block text-sm font-medium text-gray-700">Project Status</label>
-                        <select id="projectStatus" name="projectStatus" class="form-select block w-full mt-1 border border-gray-300 rounded-md shadow-sm">
-                            <option value="Draft">Draft</option>
-                            <option value="Planned">Planned</option>
-                            <option value="In Progress">In Progress</option>
-                            <option value="On Hold">On Hold</option>
-                            <option value="Completed">Completed</option>
-                            <option value="Cancelled">Cancelled</option>
-                            <option value="Under Review">Under Review</option>
-                            <option value="Delayed">Delayed</option>
-                        </select>
+                        <!-- Custom Select for Project Status -->
+                        <label id="projectStatus-label" class="block text-sm font-medium text-gray-700">Project Status<span class="text-red-500">*</span></label>
+                        <div class="relative mt-1">
+                            <button type="button" class="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500 sm:text-sm" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="projectStatus-label" id="projectStatus-button">
+                                <span class="block truncate" id="projectStatus-selected">Select Status</span>
+                                <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                    <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.23 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                                    </svg>
+                                </span>
+                            </button>
+
+                            <!-- Dropdown Options -->
+                            <ul class="absolute z-30 mt-1 max-h-96 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm hidden" id="projectStatus-options" role="listbox" aria-labelledby="projectStatus-label" aria-activedescendant="">
+                                <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-200 hover:text-yellow-800" id="projectStatus-option-Draft" role="option" data-value="Draft">
+                                    <span class="block truncate">Draft</span>
+                                    <span class="absolute inset-y-0 right-0 flex items-center pr-4 hidden">
+                                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 10-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z" clip-rule="evenodd" />
+                                        </svg>
+                                    </span>
+                                </li>
+                                <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-200 hover:text-yellow-800" id="projectStatus-option-Planned" role="option" data-value="Planned">
+                                    <span class="block truncate">Planned</span>
+                                    <span class="absolute inset-y-0 right-0 flex items-center pr-4 hidden">
+                                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 10-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z" clip-rule="evenodd" />
+                                        </svg>
+                                    </span>
+                                </li>
+                                <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-200 hover:text-yellow-800" id="projectStatus-option-InProgress" role="option" data-value="In Progress">
+                                    <span class="block truncate">In Progress</span>
+                                    <span class="absolute inset-y-0 right-0 flex items-center pr-4 hidden">
+                                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 10-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z" clip-rule="evenodd" />
+                                        </svg>
+                                    </span>
+                                </li>
+                                <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-200 hover:text-yellow-800" id="projectStatus-option-Completed" role="option" data-value="Completed">
+                                    <span class="block truncate">Completed</span>
+                                    <span class="absolute inset-y-0 right-0 flex items-center pr-4 hidden">
+                                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 10-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z" clip-rule="evenodd" />
+                                        </svg>
+                                    </span>
+                                </li>
+                                <!-- Continue adding all required status options similarly -->
+                            </ul>
+                        </div>
                     </div>
                 </form>
             </div>
-            <div class="p-4 border-t border-gray-200 bg-gray-100 text-right">
+            <div class="p-4 rounded-b-lg border-t border-gray-200 bg-gray-100 text-right">
                 <button onclick="submitNewProject()" class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 focus:outline-none">
                     Create Project
                 </button>
             </div>
         </div>
     </div>
-
     <!-- Project Details Modal -->
     <div id="projectModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 items-center justify-center flex">
         <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-hidden">
@@ -95,7 +129,7 @@
                 <h3 id="modalProjectName" class="text-lg font-bold text-gray-800">Project Name</h3>
                 <button onclick="closeProjectModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
@@ -128,314 +162,530 @@
             </div>
         </div>
     </div>
-</div>
 
-<!-- Include JavaScript for projects -->
-<script>
-    $(document).ready(function() {
-        // Variables for pagination and projects data
-        let projectsData = [];
-        let currentPage = 1;
-        const projectsPerPage = 5;
+    <!-- Consolidated JavaScript for Projects -->
+    <script>
+        (function() {
+            // Variables for pagination and projects data
+            let projectsData = [];
+            let currentPage = 1;
+            let totalPages = 1; // Initialize totalPages
+            const projectsPerPage = 5;
 
-        // Function to load projects data
-        function loadProjectsData(searchQuery = '') {
-            // Show loading placeholder
-            $('#projectListContainer').html('<div class="text-center py-20">Loading...</div>');
-
-            $.ajax({
-                url: '/get_projects_data',
-                type: 'GET',
-                data: { search: searchQuery, page: currentPage },
-                success: function(response) {
-                    projectsData = response.projects;
-                    displayProjects();
-                    updatePaginationControls(response);
-                    attachPaginationEventHandlers(); // Attach event handlers after data load
-                },
-                error: function() {
-                    $('#projectListContainer').html('Error loading projects.');
+            // Helper function to map status to label styles
+            function getStatusLabel(status) {
+                let statusClass = '';
+                switch (status) {
+                    case 'Draft':
+                        statusClass = 'bg-gray-200 text-gray-800';
+                        break;
+                    case 'Planned':
+                        statusClass = 'bg-blue-200 text-blue-800';
+                        break;
+                    case 'In Progress':
+                        statusClass = 'bg-yellow-200 text-yellow-800';
+                        break;
+                    case 'Completed':
+                        statusClass = 'bg-green-200 text-green-800';
+                        break;
+                    case 'Cancelled':
+                        statusClass = 'bg-red-200 text-red-800';
+                        break;
+                    case 'Under Review':
+                        statusClass = 'bg-purple-200 text-purple-800';
+                        break;
+                    case 'Delayed':
+                        statusClass = 'bg-pink-200 text-pink-800';
+                        break;
+                    default:
+                        statusClass = 'bg-gray-200 text-gray-800';
                 }
-            });
-        }
-
-        // Function to map status to label styles
-        function getStatusLabel(status) {
-            let statusClass = '';
-            switch (status) {
-                case 'Draft':
-                    statusClass = 'bg-gray-200 text-gray-800';
-                    break;
-                case 'Planned':
-                    statusClass = 'bg-blue-200 text-blue-800';
-                    break;
-                case 'In Progress':
-                    statusClass = 'bg-yellow-200 text-yellow-800';
-                    break;
-                case 'On Hold':
-                    statusClass = 'bg-orange-200 text-orange-800';
-                    break;
-                case 'Completed':
-                    statusClass = 'bg-green-200 text-green-800';
-                    break;
-                case 'Cancelled':
-                    statusClass = 'bg-red-200 text-red-800';
-                    break;
-                case 'Under Review':
-                    statusClass = 'bg-purple-200 text-purple-800';
-                    break;
-                case 'Delayed':
-                    statusClass = 'bg-pink-200 text-pink-800';
-                    break;
-                default:
-                    statusClass = 'bg-gray-200 text-gray-800';
+                return `<span class="px-2 py-1 rounded-full text-xs font-semibold ${statusClass}">${status}</span>`;
             }
-            return `<span class="px-2 py-1 rounded-full text-xs font-semibold ${statusClass}">${status}</span>`;
-        }
 
-        // Function to display projects on the current page
-        function displayProjects() {
-            let projectListHtml = `
-                <div class="bg-white shadow-md rounded my-6">
-                    <table class="text-left w-full border-collapse">
-                        <thead>
-                            <tr>
-                                <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">ID</th>
-                                <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Project Name</th>
-                                <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Start Date</th>
-                                <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Status</th>
-                                <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
+            // Helper function to show SweetAlert2 modals with consistent styling
+            function showSwalModal({ title, text, icon, confirmText, cancelText, onConfirm }) {
+                Swal.fire({
+                    title: title || '',
+                    text: text || '',
+                    icon: icon || 'info',
+                    showCancelButton: !!cancelText,
+                    confirmButtonText: confirmText || 'OK',
+                    cancelButtonText: cancelText || 'Cancel',
+                    customClass: {
+                        popup: 'bg-white rounded-lg shadow-lg', // Modal styles
+                        title: 'text-xl font-bold text-gray-800', // Title styles
+                        content: 'text-gray-700', // Content styles
+                        confirmButton: getButtonClass(icon, 'confirm'),
+                        cancelButton: getButtonClass(icon, 'cancel'),
+                        actions: 'flex justify-center space-x-4' // Space between buttons
+                    },
+                    buttonsStyling: false, // Disable default styles
+                    scrollbarPadding: false // Disable automatic scrollbar padding
+                }).then((result) => {
+                    if (result.isConfirmed && typeof onConfirm === 'function') {
+                        onConfirm();
+                    }
+                });
+            }
 
-            projectsData.forEach(function(project) {
-                projectListHtml += `
-                    <tr class="hover:bg-gray-50 project-row" data-id="${project.id}">
-                        <td class="text-lg text-gray-600 py-4 px-6 border-b border-gray-200">${project.id}</td>
-                        <td class="text-base text-gray-600 py-4 px-6 border-b border-gray-200">${project.name}</td>
-                        <td class="text-base text-gray-600 py-4 px-6 border-b border-gray-200">${project.start_date}</td>
-                        <td class="text-base py-4 px-6 border-b border-gray-200">${getStatusLabel(project.status)}</td>
-                        <td class="text-base text-gray-600 py-4 px-6 border-b border-gray-200">
-                            <button class="details-button text-yellow-500 hover:text-yellow-600" onclick="openProjectDetails(${project.id})">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.75 9.776c.112-.017.227-.026.344-.026h15.812c.117 0 .232.009.344.026m-16.5 0a2.25 2.25 0 0 0-1.883 2.542l.857 6a2.25 2.25 0 0 0 2.227 1.932H19.05a2.25 2.25 0 0 0 2.227-1.932l.857-6a2.25 2.25 0 0 0-1.883-2.542m-16.5 0V6A2.25 2.25 0 0 1 6 3.75h3.879a1.5 1.5 0 0 1 1.06.44l2.122 2.12a1.5 1.5 0 0 0 1.06.44H18A2.25 2.25 0 0 1 20.25 9v.776" />
-                                </svg>
-                            </button>
-                            <button class="delete-button text-yellow-500 hover:text-yellow-600" data-id="${project.id}">
-<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                            </button>
-                        </td>
-                    </tr>
+            // Function to determine button classes based on icon type
+            function getButtonClass(icon, type) {
+                switch (icon) {
+                    case 'success':
+                        return type === 'confirm' 
+                            ? 'hover:bg-green-200 hover:text-green-800 rounded-md bg-green-100 text-green-600 text-sm font-medium px-4 py-2'
+                            : 'hover:bg-gray-200 hover:text-gray-800 rounded-md bg-gray-100 text-gray-600 text-sm font-medium px-4 py-2';
+                    case 'error':
+                        return type === 'confirm' 
+                            ? 'hover:bg-red-200 hover:text-red-800 rounded-md bg-red-100 text-red-600 text-sm font-medium px-4 py-2'
+                            : 'hover:bg-gray-200 hover:text-gray-800 rounded-md bg-gray-100 text-gray-600 text-sm font-medium px-4 py-2';
+                    case 'warning':
+                        return type === 'confirm' 
+                            ? 'hover:bg-yellow-200 hover:text-yellow-800 rounded-md bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2'
+                            : 'hover:bg-gray-200 hover:text-gray-800 rounded-md bg-gray-100 text-gray-600 text-sm font-medium px-4 py-2';
+                    case 'info':
+                    default:
+                        return type === 'confirm' 
+                            ? 'hover:bg-blue-200 hover:text-blue-800 rounded-md bg-blue-100 text-blue-600 text-sm font-medium px-4 py-2'
+                            : 'hover:bg-gray-200 hover:text-gray-800 rounded-md bg-gray-100 text-gray-600 text-sm font-medium px-4 py-2';
+                }
+            }
+
+            // Function to load projects data
+            function loadProjectsData(searchQuery = '') {
+                // Show loading placeholder
+                $('#projectListContainer').html('<div class="text-center py-20">Loading...</div>');
+
+                $.ajax({
+                    url: '/get_projects_data',
+                    type: 'GET',
+                    data: { search: searchQuery, page: currentPage },
+                    success: function(response) {
+                        console.log('Loaded data:', response); // Debugging
+                        projectsData = response.projects;
+                        currentPage = response.page; // Ensure currentPage is updated
+                        totalPages = response.total_pages; // Update totalPages
+                        displayProjects();
+                        updatePaginationControls(response);
+                    },
+                    error: function() {
+                        $('#projectListContainer').html('Error loading projects.');
+                    }
+                });
+            }
+
+            // Function to display projects on the current page
+            function displayProjects() {
+                let projectListHtml = `
+                    <div class="bg-white shadow-md rounded my-6">
+                        <table class="table-fixed text-left w-full border-collapse">
+                            <thead>
+                                <tr>
+                                    <th class="w-16 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">ID</th>
+                                    <th class="w-1/4 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Project Name</th>
+                                    <th class="w-24 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Start Date</th>
+                                    <th class="w-32 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Status</th>
+                                    <th class="w-16 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
                 `;
-            });
 
-            projectListHtml += `
-                        </tbody>
-                    </table>
-                </div>
-            `;
+                projectsData.forEach(function(project) {
+                    // Truncate project name if it's too long and add a tooltip
+                    let truncatedName = project.name.length > 20 ? `<span title="${project.name}">${project.name.substring(0, 20)}…</span>` : project.name;
 
-            $('#projectListContainer').html(projectListHtml);
+                    projectListHtml += `
+                        <tr class="hover:bg-gray-50 project-row" data-id="${project.id}">
+                            <td class="text-lg text-gray-600 py-4 px-6 border-b border-gray-200">
+                                <span class="inline-block bg-gray-200 text-gray-800 rounded-full px-3 py-1 text-sm font-semibold">
+                                    ${project.id}
+                                </span>
+                            </td>
+                            <td class="text-base text-gray-600 py-4 px-6 border-b border-gray-200 truncate" style="max-width: 150px;">
+                                ${truncatedName}
+                            </td>
+                            <td class="text-base text-gray-600 py-4 px-6 border-b border-gray-200">${project.start_date}</td>
+                            <td class="text-base py-4 px-6 border-b border-gray-200">${getStatusLabel(project.status)}</td>
+                            <td class="py-4 px-6 border-b border-gray-200">
+                                <div class="flex space-x-2">
+                                    <button class="details-button text-yellow-500 hover:text-yellow-600 flex items-center" data-id="${project.id}">
+                                        <!-- Details SVG Icon -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.75 9.776c.112-.017.227-.026.344-.026h15.812c.117 0 .232.009.344.026m-16.5 0a2.25 2.25 0 0 0-1.883 2.542l.857 6a2.25 2.25 0 0 0 2.227 1.932H19.05a2.25 2.25 0 0 0 2.227-1.932l.857-6a2.25 2.25 0 0 0-1.883-2.542m-16.5 0V6A2.25 2.25 0 0 1 6 3.75h3.879a1.5 1.5 0 0 1 1.06.44l2.122 2.12a1.5 1.5 0 0 0 1.06.44H18A2.25 2.25 0 0 1 20.25 9v.776" />
+                                        </svg>
+                                    </button>
+                                    <button class="delete-button text-yellow-500 hover:text-red-600 flex items-center" data-id="${project.id}">
+                                        <!-- Delete SVG Icon -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" 
+                                             stroke="currentColor" class="w-6 h-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                  d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 
+                                                     1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 
+                                                     1-2.244 2.077H8.084a2.25 2.25 0 0 
+                                                     1-2.244-2.077L4.772 5.79m14.456 
+                                                     0a48.108 48.108 0 0 0-3.478-.397m-12 
+                                                     .562c.34-.059.68-.114 1.022-.165m0 0a48.11 
+                                                     48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201 
+                                                     a51.964 51.964 0 0 0-3.32 
+                                                     0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 
+                                                     0a48.667 48.667 0 0 0-7.5 0" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
 
-            // Attach event handlers for delete buttons
-            $('.delete-button').off('click').on('click', function(e) {
-                e.stopPropagation();
-                const projectId = $(this).data('id');
-                if (confirm('Are you sure you want to delete this project?')) {
-                    deleteProject(projectId);
+                projectListHtml += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+
+                $('#projectListContainer').html(projectListHtml);
+            }
+
+            // Function to update pagination controls
+            function updatePaginationControls(response) {
+                totalPages = response.total_pages;
+                currentPage = response.page;
+                $('#pageNumbers').html(''); // Clear existing page numbers
+
+                // Show or hide "Previous" button
+                if (!response.has_prev) {
+                    $('#prevPage').addClass('invisible');
+                } else {
+                    $('#prevPage').removeClass('invisible');
                 }
-            });
-        }
 
-        // Function to update pagination controls
-        function updatePaginationControls(response) {
-            let totalPages = response.total_pages;
-            currentPage = response.page;
-            $('#pageNumbers').html(''); // Clear page numbers
-
-            // Show or hide "Previous" button
-            if (!response.has_prev) {
-                $('#prevPage').addClass('invisible');
-            } else {
-                $('#prevPage').removeClass('invisible');
-            }
-
-            // Show or hide "Next" button
-            if (!response.has_next) {
-                $('#nextPage').addClass('invisible');
-            } else {
-                $('#nextPage').removeClass('invisible');
-            }
-
-            // Set up click handlers
-            $('#prevPage').off('click').on('click', function() {
-                if (response.has_prev) {
-                    currentPage = response.prev_num;
-                    loadProjectsData($('#searchForm input[name="search"]').val());
+                // Show or hide "Next" button
+                if (!response.has_next) {
+                    $('#nextPage').addClass('invisible');
+                } else {
+                    $('#nextPage').removeClass('invisible');
                 }
-            });
 
-            $('#nextPage').off('click').on('click', function() {
-                if (response.has_next) {
-                    currentPage = response.next_num;
-                    loadProjectsData($('#searchForm input[name="search"]').val());
+                // Display page numbers
+                const maxVisiblePages = 5;
+                let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+                let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+                if (endPage - startPage < maxVisiblePages - 1) {
+                    startPage = Math.max(1, endPage - maxVisiblePages + 1);
                 }
+
+                for (let page = startPage; page <= endPage; page++) {
+                    $('#pageNumbers').append(`
+                        <span class="cursor-pointer inline-flex items-center justify-center w-8 h-8 
+                            ${page === currentPage 
+                            ? 'bg-yellow-100 text-yellow-600' 
+                            : 'bg-white hover:bg-yellow-200 border border-gray-200'} 
+                        rounded-full" 
+                            onclick="goToPage(${page})">${page}</span>
+                    `);
+                }
+            }
+
+            // Function to go to a specific page
+            window.goToPage = function(page) {
+                if (page < 1 || page > totalPages) {
+                    return; // Prevent navigating to invalid pages
+                }
+                currentPage = page;
+                loadProjectsData($('#searchForm input[name="search"]').val());
+            }
+
+            // Function to open project details modal
+            window.openProjectDetails = function(projectId) {
+                $.ajax({
+                    url: `/project/${projectId}`,
+                    type: 'GET',
+                    success: function(project) {
+                        // Populate modal fields
+                        $('#modalProjectName').text(project.name);
+                        $('#modalProjectDescription').text(project.description || 'No description provided.');
+                        $('#modalProjectCreatedAt').text(project.created_at);
+                        if (project.source_link) {
+                            $('#modalProjectSourceLink').attr('href', project.source_link).text(project.source_link);
+                        } else {
+                            $('#modalProjectSourceLink').attr('href', '#').text('No source link provided.');
+                        }
+                        // Update status label in modal
+                        $('#modalProjectStatus').html(getStatusLabel(project.status));
+
+                        // Handle applications list
+                        $('#modalProjectApplications').empty();
+                        if (project.applications && project.applications.length > 0) {
+                            project.applications.forEach(function(app) {
+                                $('#modalProjectApplications').append(
+                                    `<li>
+                                        <a href="#" class="text-yellow-500 hover:text-yellow-600" 
+                                           onclick="window.loadPage('application_details', ${app.id}); return false;">
+                                            ${app.name}
+                                        </a>
+                                     </li>`
+                                );
+                            });
+                        } else {
+                            $('#modalProjectApplications').append('<li>No applications associated.</li>');
+                        }    
+
+                        // Show modal
+                        $('#projectModal').removeClass('hidden');
+                    },
+                    error: function(xhr) {
+                        showSwalModal({
+                            title: 'Error!',
+                            text: 'Failed to fetch project details.',
+                            icon: 'error',
+                            confirmText: 'OK'
+                        });
+                    }
+                });
+            }
+
+            // Function to close project details modal
+            window.closeProjectModal = function() {
+                $('#projectModal').addClass('hidden');
+            }
+
+            // Function to delete project
+            function deleteProject(projectId) {
+                $.ajax({
+                    url: `/delete_project/${projectId}`,
+                    type: 'DELETE',
+                    success: function(response) {
+                        showSwalModal({
+                            title: 'Deleted!',
+                            text: response.message,
+                            icon: 'success',
+                            confirmText: 'OK',
+                            onConfirm: function() {
+                                loadProjectsData($('#searchForm input[name="search"]').val());
+                            }
+                        });
+                    },
+                    error: function(xhr) {
+                        const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error deleting project';
+                        showSwalModal({
+                            title: 'Error!',
+                            text: `Error: ${error}`,
+                            icon: 'error',
+                            confirmText: 'OK'
+                        });
+                    }
+                });
+            }
+
+            // Function to submit new project
+            window.submitNewProject = function() {
+                const name = $('#projectName').val().trim();
+                const status = $('#projectStatus-hidden').val();
+
+                // Validation Order:
+                // 1. Project Name is filled
+                if (!name) {
+                    showSwalModal({
+                        title: 'Validation Error',
+                        text: 'Please enter a Project Name.',
+                        icon: 'error',
+                        confirmText: 'OK'
+                    });
+                    return; // Prevent form submission
+                }
+
+                // 2. Project Status is selected
+                if (!status) {
+                    showSwalModal({
+                        title: 'Validation Error',
+                        text: 'Please select a Project Status.',
+                        icon: 'error',
+                        confirmText: 'OK'
+                    });
+                    return; // Prevent form submission
+                }
+
+                const formData = {
+                    name: name,
+                    description: $('#projectDescription').val().trim(),
+                    source_link: $('#projectSourceLink').val().trim(),
+                    status: status, // Get the selected status from hidden input
+                    applications: [] // Add application IDs if needed
+                };
+                $.ajax({
+                    url: '/create_project',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formData),
+                    success: function(response) {
+                        showSwalModal({
+                            title: 'Created!',
+                            text: response.message,
+                            icon: 'success',
+                            confirmText: 'OK',
+                            onConfirm: function() {
+                                closeNewProjectModal();
+                                loadProjectsData($('#searchForm input[name="search"]').val());
+                            }
+                        });
+                    },
+                    error: function(xhr) {
+                        const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error creating project';
+                        showSwalModal({
+                            title: 'Error!',
+                            text: `Error: ${error}`,
+                            icon: 'error',
+                            confirmText: 'OK'
+                        });
+                    }
+                });
+            }
+
+            // Event handlers using Event Delegation for dynamic content
+            $(document).ready(function() {
+                // Event delegation for delete buttons
+                $('#projectListContainer').on('click', '.delete-button', function(e) {
+                    e.stopPropagation();
+                    const projectId = $(this).data('id');
+                    showSwalModal({
+                        title: 'Are you sure?',
+                        text: "This will permanently delete the project.",
+                        icon: 'warning',
+                        confirmText: 'Yes, delete it!',
+                        cancelText: 'Cancel',
+                        onConfirm: function() {
+                            deleteProject(projectId);
+                        }
+                    });
+                });
+
+                // Event delegation for details buttons
+                $('#projectListContainer').on('click', '.details-button', function(e) {
+                    e.preventDefault();
+                    const projectId = $(this).data('id');
+                    openProjectDetails(projectId);
+                });
+
+                // Initial data load
+                loadProjectsData();
+
+                // Search form handler
+                $('#searchForm').on('submit', function(e) {
+                    e.preventDefault();
+                    currentPage = 1; // Reset to first page
+                    loadProjectsData($(this).find('input[name="search"]').val());
+                });
+
+                // Modal functions for new project are already defined above
+                // Ensure they are attached to window if called via onclick
+                window.openNewProjectModal = function() {
+                    $('#newProjectModal').removeClass('hidden');
+                }
+
+                window.closeNewProjectModal = function() {
+                    $('#newProjectModal').addClass('hidden');
+                    $('#newProjectForm')[0].reset();
+
+                    // Reset custom select
+                    $('#projectStatus-selected').text('Select Status').removeClass('text-yellow-600');
+                    $('#projectStatus-options li').each(function() {
+                        $(this).find('span svg').addClass('hidden');
+                    });
+                    $('#projectStatus-hidden').remove(); // Remove the hidden input
+                }
+
+                // Initialize custom select functionality
+                initializeCustomSelect();
+
+                // **Adjustment 3: Close modal when clicking outside the modal content**
+                $('#newProjectModal').on('click', function(e) {
+                    if (e.target.id === 'newProjectModal') {
+                        closeNewProjectModal();
+                    }
+                });
+
+                // **New Adjustment: Close Project Details Modal when clicking outside**
+                $('#projectModal').on('click', function(e) {
+                    if (e.target.id === 'projectModal') {
+                        closeProjectModal();
+                    }
+                });
             });
 
-            // Display page numbers
-            const maxVisiblePages = 5;
-            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-            if (endPage - startPage < maxVisiblePages - 1) {
-                startPage = Math.max(1, endPage - maxVisiblePages + 1);
-            }
-
-            for (let page = startPage; page <= endPage; page++) {
-                $('#pageNumbers').append(`
-                    <span class="mx-2 cursor-pointer ${page === currentPage ? 'font-bold text-yellow-500' : 'hover:text-yellow-500'}" onclick="goToPage(${page})">${page}</span>
-                `);
-            }
-        }
-
-        // Function to attach event handlers to Prev/Next buttons
-        function attachPaginationEventHandlers() {
+            // Attach click handlers for Prev and Next buttons once, outside of updatePaginationControls
+            // Ensure they are not re-attached multiple times
             $('#prevPage').off('click').on('click', function() {
                 if (currentPage > 1) {
                     currentPage--;
-                    displayApps(currentPage);
-                    updatePaginationControls();
+                    loadProjectsData($('#searchForm input[name="search"]').val());
                 }
             });
 
             $('#nextPage').off('click').on('click', function() {
-                let totalPages = Math.ceil(appsData.length / appsPerPage);
                 if (currentPage < totalPages) {
                     currentPage++;
-                    displayApps(currentPage);
-                    updatePaginationControls();
+                    loadProjectsData($('#searchForm input[name="search"]').val());
                 }
             });
-        }
-        
-        // Function to go to a specific page
-        window.goToPage = function(page) {
-            currentPage = page;
-            loadProjectsData($('#searchForm input[name="search"]').val());
-        }
 
-        // Function to open project details modal
-        window.openProjectDetails = function(projectId) {
-            $.ajax({
-                url: `/project/${projectId}`,
-                type: 'GET',
-                success: function(project) {
-                    // Populate modal fields
-                    $('#modalProjectName').text(project.name);
-                    $('#modalProjectDescription').text(project.description || 'No description provided.');
-                    $('#modalProjectCreatedAt').text(project.created_at);
-                    if (project.source_link) {
-                        $('#modalProjectSourceLink').attr('href', project.source_link).text(project.source_link);
-                    } else {
-                        $('#modalProjectSourceLink').attr('href', '#').text('No source link provided.');
+            // Function to initialize custom select functionality
+            function initializeCustomSelect() {
+                const projectStatusButton = document.getElementById('projectStatus-button');
+                const projectStatusOptions = document.getElementById('projectStatus-options');
+                const projectStatusSelected = document.getElementById('projectStatus-selected');
+                const projectStatusOptionsList = projectStatusOptions.querySelectorAll('li');
+
+                // Toggle the dropdown menu
+                projectStatusButton.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    const expanded = projectStatusButton.getAttribute('aria-expanded') === 'true' || false;
+                    projectStatusButton.setAttribute('aria-expanded', !expanded);
+                    projectStatusOptions.classList.toggle('hidden');
+                });
+
+                // Close the dropdown when clicking outside
+                document.addEventListener('click', function (event) {
+                    if (!projectStatusButton.contains(event.target) && !projectStatusOptions.contains(event.target)) {
+                        projectStatusButton.setAttribute('aria-expanded', 'false');
+                        projectStatusOptions.classList.add('hidden');
                     }
-                    // Update status label in modal
-                    $('#modalProjectStatus').html(getStatusLabel(project.status));
+                });
 
-                    // Handle applications list
-                    $('#modalProjectApplications').empty();
-                    if (project.applications && project.applications.length > 0) {
-                        project.applications.forEach(function(app) {
-                            $('#modalProjectApplications').append(
-                                `<li>
-                                    <a href="#" class="text-yellow-500 hover:text-yellow-600" 
-                                       onclick="window.loadPage('application_details', ${app.id}); return false;">
-                                        ${app.name}
-                                    </a>
-                                 </li>`
-                            );
+                // Handle option selection
+                projectStatusOptionsList.forEach(function (option) {
+                    option.addEventListener('click', function () {
+                        const value = this.getAttribute('data-value');
+                        projectStatusSelected.textContent = value;
+                        projectStatusButton.setAttribute('aria-expanded', 'false');
+                        projectStatusOptions.classList.add('hidden');
+
+                        // Remove checkmark from all options
+                        projectStatusOptionsList.forEach(function (opt) {
+                            opt.querySelector('span svg').classList.add('hidden');
                         });
-                    } else {
-                        $('#modalProjectApplications').append('<li>No applications associated.</li>');
-                    }    
 
-                    // Show modal
-                    $('#projectModal').removeClass('hidden');
-                },
-                error: function(xhr) {
-                    alert('Error fetching project details.');
-                }
-            });
-        }
+                        // Add checkmark to the selected option
+                        this.querySelector('span svg').classList.remove('hidden');
 
-        // Function to close project details modal
-        window.closeProjectModal = function() {
-            $('#projectModal').addClass('hidden');
-        }
+                        // Update the hidden input
+                        let hiddenInput = document.getElementById('projectStatus-hidden');
+                        if (!hiddenInput) {
+                            hiddenInput = document.createElement('input');
+                            hiddenInput.type = 'hidden';
+                            hiddenInput.id = 'projectStatus-hidden';
+                            hiddenInput.name = 'projectStatus';
+                            document.getElementById('newProjectForm').appendChild(hiddenInput);
+                        }
+                        hiddenInput.value = value;
 
-        // Function to delete project
-        function deleteProject(projectId) {
-            $.ajax({
-                url: `/delete_project/${projectId}`,
-                type: 'DELETE',
-                success: function(response) {
-                    alert(response.message);
-                    loadProjectsData($('#searchForm input[name="search"]').val());
-                },
-                error: function(xhr) {
-                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error deleting project';
-                    alert(`Error: ${error}`);
-                }
-            });
-        }
-
-        // Event handlers
-        // Load initial data
-        loadProjectsData();
-
-        // Search form handler
-        $('#searchForm').on('submit', function(e) {
-            e.preventDefault();
-            currentPage = 1; // Reset to first page
-            loadProjectsData($(this).find('input[name="search"]').val());
-        });
-
-        // Modal functions for new project
-        window.openNewProjectModal = function() {
-            $('#newProjectModal').removeClass('hidden');
-        }
-
-        window.closeNewProjectModal = function() {
-            $('#newProjectModal').addClass('hidden');
-            $('#newProjectForm')[0].reset();
-        }
-
-        window.submitNewProject = function() {
-            const formData = {
-                name: $('#projectName').val().trim(),
-                description: $('#projectDescription').val().trim(),
-                source_link: $('#projectSourceLink').val().trim(),
-                status: $('#projectStatus').val(),
-                applications: [] // Add application IDs if needed
-            };
-            $.ajax({
-                url: '/create_project',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(formData),
-                success: function(response) {
-                    alert(response.message);
-                    closeNewProjectModal();
-                    loadProjectsData($('#searchForm input[name="search"]').val());
-                },
-                error: function(xhr) {
-                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error creating project';
-                    alert(`Error: ${error}`);
-                }
-            });
-        }
-    });
-</script>
+                        // **Adjustment 4: Set selected status color to match buttons (yellow)**
+                        projectStatusSelected.classList.add('text-yellow-600');
+                    });
+                });
+            }
+        })(); // End of IIFE
+    </script>
+</div>

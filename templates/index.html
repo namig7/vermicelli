@@ -5,9 +5,31 @@
     <title>Vermicelli Dashboard</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='public/favicon.ico') }}">
     <!-- Include Tailwind CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@^2.0/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
+        /* Apply box-sizing globally */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        /* Ensure the html always shows the vertical scrollbar */
+        html {
+            overflow-y: scroll;
+        }
+
+        /* Ensure the body takes full height and uses Flexbox */
+        body, html {
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
         .tab-link {
             display: inline-block;
             padding: 0.5rem 1rem;
@@ -23,19 +45,23 @@
             color: #b45309;
         }
 
-        /* Added CSS for sticky footer */
-        html, body {
-            height: 100%;
-        }
-        body {
-            display: flex;
-            flex-direction: column;
-        }
-        #content-area {
-            flex: 1;
-        }
+        /* Footer Styling */
         .footer-shadow {
             box-shadow: 0 -5px 10px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Prevent footer from shrinking or growing */
+        footer {
+            max-width: 100%;
+            width: 100%;
+            box-sizing: border-box;
+            flex-shrink: 0; /* Prevents footer from shrinking */
+        }
+
+        /* Override SweetAlert2's overflow hidden and padding-right on body */
+        body.swal2-shown {
+            overflow: scroll !important; /* Maintain scrollbar */
+            padding-right: 0 !important; /* Remove any added padding */
         }
     </style>
 </head>
