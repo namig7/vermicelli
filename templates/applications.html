@@ -4,19 +4,56 @@
     <header class="flex justify-between items-center mb-4">
         <!-- Navigation Tabs -->
         <nav class="flex space-x-6 text-gray-700">
-             <a href="/applications" data-page="applications" class="tab-link active">Applications</a>
-            <a href="/projects" data-page="projects" class="tab-link">Projects</a> 
+            <a href="/applications" data-page="applications" class="tab-link active">Applications</a>
+            <a href="/projects" data-page="projects" class="tab-link">Projects</a>
         </nav>
         <div class="flex items-center space-x-4">
             <form id="searchForm" class="relative">
-                <input class="focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 focus:outline-none w-full text-sm text-black placeholder-gray-500 border border-gray-200 rounded-md py-2 pl-10" type="text" name="search" placeholder="Search applications..." value="" />
-                <svg width="20" height="20" fill="currentColor" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" />
+                <input
+                    class="focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 focus:outline-none
+                           w-full text-sm text-black placeholder-gray-500 border border-gray-200
+                           rounded-md py-2 pl-10"
+                    type="text"
+                    name="search"
+                    placeholder="Search applications..."
+                    value=""
+                />
+                <svg
+                    width="20"
+                    height="20"
+                    fill="currentColor"
+                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                >
+                    <path
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        d="M8 4a4 4 0 100 8 4 4 0 000-8zM2
+                           8a6 6 0 1110.89 3.476l4.817
+                           4.817a1 1 0 01-1.414
+                           1.414l-4.816-4.816A6
+                           6 0 012 8z"
+                    />
                 </svg>
             </form>
-            <button onclick="openModal()" class="hover:bg-yellow-200 hover:text-yellow-800 group flex items-center rounded-md bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2">
-                <svg class="group-hover:text-yellow-600 text-yellow-500 mr-2" width="12" height="20" fill="currentColor">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M6 5a1 1 0 011 1v3h3a1 1 0 110 2H7v3a1 1 0 11-2 0v-3H2a1 1 0 110-2h3V6a1 1 0 011-1z"/>
+            <button
+                onclick="openModal()"
+                class="hover:bg-yellow-200 hover:text-yellow-800 group flex items-center
+                       rounded-md bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2"
+            >
+                <svg
+                    class="group-hover:text-yellow-600 text-yellow-500 mr-2"
+                    width="12"
+                    height="20"
+                    fill="currentColor"
+                >
+                    <path
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        d="M6 5a1 1 0 011 1v3h3a1 1 0 110
+                           2H7v3a1 1 0 11-2
+                           0v-3H2a1 1 0 110-2h3V6a1 1
+                           0 011-1z"
+                    />
                 </svg>
                 New Application
             </button>
@@ -31,479 +68,780 @@
 
         <!-- Pagination Controls -->
         <div id="paginationControls" class="flex justify-between items-center mt-4">
-            <button id="prevPage" class="pagination-button hover:bg-yellow-200 hover:text-yellow-800 group flex items-center rounded-full bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2">← Previous</button>
+            <button
+                id="prevPage"
+                class="pagination-button hover:bg-yellow-200 hover:text-yellow-800 group flex items-center
+                       rounded-full bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2"
+            >
+                ← Previous
+            </button>
             <div id="pageNumbers" class="flex items-center space-x-1">
                 <!-- Page numbers will be inserted here -->
             </div>
-            <button id="nextPage" class="pagination-button hover:bg-yellow-200 hover:text-yellow-800 group flex items-center rounded-full bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2">Next →</button>
+            <button
+                id="nextPage"
+                class="pagination-button hover:bg-yellow-200 hover:text-yellow-800 group flex items-center
+                       rounded-full bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2"
+            >
+                Next →
+            </button>
         </div>
     </div>
 
     <!-- New Application Modal -->
-    <div id="myModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center">
+    <div
+        id="myModal"
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center"
+    >
         <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-hidden">
+            <!-- Modal Header -->
             <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
                 <h3 class="text-lg font-bold text-gray-800">Create Application</h3>
-                <button class="close-modal text-gray-400 hover:text-gray-600 focus:outline-none" onclick="closeModal()">
-                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                <button
+                    class="close-modal text-gray-400 hover:text-gray-600 focus:outline-none"
+                    onclick="closeModal()"
+                >
+                    <svg
+                        class="w-6 h-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M6 18L18 6M6 6l12
+                               12"
+                        />
                     </svg>
                 </button>
             </div>
+
+            <!-- Modal Body -->
             <div class="p-6 space-y-4">
                 <form id="createForm">
                     <div class="mb-4">
-                        <label for="name" class="block text-sm font-medium text-gray-700">Application Name</label>
-                        <input type="text" name="name" id="name" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm" required>
+                        <label
+                            for="name"
+                            class="block text-sm font-medium text-gray-700"
+                        >
+                            Application Name
+                        </label>
+                        <input
+                            type="text"
+                            name="name"
+                            id="name"
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm"
+                            required
+                        />
+                    </div>
+
+                    <!-- Dropdown for Project, with filter -->
+                    <div class="mb-4">
+                        <label
+                            id="projectDropdownLabel"
+                            class="block text-sm font-medium text-gray-700"
+                        >
+                            Project
+                        </label>
+                        <div class="relative mt-1">
+                            <button
+                                type="button"
+                                id="projectDropdownButton"
+                                class="relative w-full cursor-default rounded-md border
+                                       border-gray-300 bg-white py-2 pl-3 pr-10 text-left
+                                       shadow-sm focus:border-yellow-500 focus:outline-none
+                                       focus:ring-1 focus:ring-yellow-500 sm:text-sm"
+                                aria-haspopup="listbox"
+                                aria-expanded="false"
+                            >
+                                <span
+                                    class="block truncate"
+                                    id="projectDropdownSelected"
+                                >
+                                    Select Project
+                                </span>
+                                <span
+                                    class="pointer-events-none absolute inset-y-0 right-0 flex
+                                           items-center pr-2"
+                                >
+                                    <svg
+                                        class="h-5 w-5 text-gray-400"
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            fill-rule="evenodd"
+                                            d="M5.23 7.21a.75.75
+                                               0 011.06.02L10 10.94l3.71-3.71a.75.75
+                                               0 111.06
+                                               1.06l-4.24
+                                               4.24a.75.75
+                                               0
+                                               01-1.06
+                                               0L5.23
+                                               8.27a.75.75
+                                               0
+                                               01.02-1.06z"
+                                            clip-rule="evenodd"
+                                        />
+                                    </svg>
+                                </span>
+                            </button>
+
+                            <!-- Dropdown Panel -->
+                            <div
+                                id="projectDropdownPanel"
+                                class="absolute z-50 mt-1 w-full hidden rounded-md bg-white
+                                       shadow-lg ring-1 ring-black ring-opacity-5
+                                       focus:outline-none"
+                                role="listbox"
+                                aria-labelledby="projectDropdownLabel"
+                            >
+                                <!-- Filter box -->
+                                <div class="p-2 border-b border-gray-200">
+                                    <input
+                                        type="text"
+                                        id="projectSearchInput"
+                                        class="w-full rounded-md border border-gray-300 px-2 py-1
+                                               text-sm focus:border-yellow-500 focus:ring-1
+                                               focus:ring-yellow-500"
+                                        placeholder="Type to filter..."
+                                    />
+                                </div>
+                                <ul
+                                    id="projectList"
+                                    class="max-h-48 overflow-auto py-1 text-base sm:text-sm"
+                                >
+                                </ul>
+                            </div>
+                        </div>
+                        <input
+                            type="hidden"
+                            id="selectedProjectId"
+                            name="project_ids"
+                            value=""
+                        />
+                    </div>
+
+                    <div class="mb-4">
+                        <label
+                            for="link"
+                            class="block text-sm font-medium text-gray-700"
+                        >
+                            Git Repository Link
+                        </label>
+                        <input
+                            type="url"
+                            name="link"
+                            id="link"
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm"
+                        />
                     </div>
                     <div class="mb-4">
-                        <label for="projectSelect" class="block text-sm font-medium text-gray-700">Projects</label>
-                        <select id="projectSelect" name="project_ids" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm" multiple>
-                            <!-- Options will be loaded via AJAX -->
-                        </select>
-                    </div>
-                    <div class="mb-4">
-                        <label for="link" class="block text-sm font-medium text-gray-700">Git Repository Link</label>
-                        <input type="url" name="link" id="link" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm">
-                    </div>
-                    <div class="mb-4">
-                        <label for="label" class="block text-sm font-medium text-gray-700">Label</label>
-                        <input type="text" name="label" id="label" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm">
-                    </div>
-                    <div id="appMessage" class="mt-2 text-sm"></div>
-                    <div class="mt-4 text-right">
-                        <button type="submit" class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">Create Application</button>
+                        <label
+                            for="label"
+                            class="block text-sm font-medium text-gray-700"
+                        >
+                            Label
+                        </label>
+                        <input
+                            type="text"
+                            name="label"
+                            id="label"
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm"
+                        />
                     </div>
                 </form>
+            </div>
+
+            <!-- Modal Footer (gray bottom, akin to newProjectModal style) -->
+            <div class="p-4 border-t border-gray-200 bg-gray-100 text-right rounded-b-lg">
+                <button
+                    type="submit"
+                    form="createForm"
+                    class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 focus:outline-none"
+                >
+                    Create Application
+                </button>
             </div>
         </div>
     </div>
 </div>
 
 
-<!-- Include JavaScript for applications -->
+<!-- Main JavaScript for this page -->
 <script>
-    (function() {
-        // Variables for pagination and applications data
-        let appsData = [];
-        let currentPage = 1;
-        const appsPerPage = 5;
+(function() {
+    let appsData = [];
+    let currentPage = 1;
+    const appsPerPage = 5;
 
-        // Helper function to determine button classes based on icon type
-        function getButtonClass(icon, type) {
-            switch (icon) {
-                case 'success':
-                    return type === 'confirm' 
-                        ? 'hover:bg-green-200 hover:text-green-800 rounded-md bg-green-100 text-green-600 text-sm font-medium px-4 py-2'
-                        : 'hover:bg-gray-200 hover:text-gray-800 rounded-md bg-gray-100 text-gray-600 text-sm font-medium px-4 py-2';
-                case 'error':
-                    return type === 'confirm' 
-                        ? 'hover:bg-red-200 hover:text-red-800 rounded-md bg-red-100 text-red-600 text-sm font-medium px-4 py-2'
-                        : 'hover:bg-gray-200 hover:text-gray-800 rounded-md bg-gray-100 text-gray-600 text-sm font-medium px-4 py-2';
-                case 'warning':
-                    return type === 'confirm' 
-                        ? 'hover:bg-yellow-200 hover:text-yellow-800 rounded-md bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2'
-                        : 'hover:bg-gray-200 hover:text-gray-800 rounded-md bg-gray-100 text-gray-600 text-sm font-medium px-4 py-2';
-                case 'info':
-                default:
-                    return type === 'confirm' 
-                        ? 'hover:bg-blue-200 hover:text-blue-800 rounded-md bg-blue-100 text-blue-600 text-sm font-medium px-4 py-2'
-                        : 'hover:bg-gray-200 hover:text-gray-800 rounded-md bg-gray-100 text-gray-600 text-sm font-medium px-4 py-2';
+    // ================== SweetAlert Helpers ==================
+    function getButtonClass(icon, type) {
+        // same logic as your snippet
+        switch (icon) {
+            case 'success':
+                return (type === 'confirm'
+                    ? 'hover:bg-green-200 hover:text-green-800 rounded-md bg-green-100 text-green-600 text-sm font-medium px-4 py-2'
+                    : 'hover:bg-gray-200 hover:text-gray-800 rounded-md bg-gray-100 text-gray-600 text-sm font-medium px-4 py-2');
+            case 'error':
+                return (type === 'confirm'
+                    ? 'hover:bg-red-200 hover:text-red-800 rounded-md bg-red-100 text-red-600 text-sm font-medium px-4 py-2'
+                    : 'hover:bg-gray-200 hover:text-gray-800 rounded-md bg-gray-100 text-gray-600 text-sm font-medium px-4 py-2');
+            case 'warning':
+                return (type === 'confirm'
+                    ? 'hover:bg-yellow-200 hover:text-yellow-800 rounded-md bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2'
+                    : 'hover:bg-gray-200 hover:text-gray-800 rounded-md bg-gray-100 text-gray-600 text-sm font-medium px-4 py-2');
+            case 'info':
+            default:
+                return (type === 'confirm'
+                    ? 'hover:bg-blue-200 hover:text-blue-800 rounded-md bg-blue-100 text-blue-600 text-sm font-medium px-4 py-2'
+                    : 'hover:bg-gray-200 hover:text-gray-800 rounded-md bg-gray-100 text-gray-600 text-sm font-medium px-4 py-2');
+        }
+    }
+
+    function showSwalModal({ title, text, icon, confirmText, cancelText, onConfirm }) {
+        Swal.fire({
+            title: title || '',
+            text: text || '',
+            icon: icon || 'info',
+            showCancelButton: !!cancelText,
+            confirmButtonText: confirmText || 'OK',
+            cancelButtonText: cancelText || 'Cancel',
+            customClass: {
+                popup: 'bg-white rounded-lg shadow-lg',
+                title: 'text-xl font-bold text-gray-800',
+                content: 'text-gray-700',
+                confirmButton: getButtonClass(icon, 'confirm'),
+                cancelButton: getButtonClass(icon, 'cancel'),
+                actions: 'flex justify-center space-x-4'
+            },
+            buttonsStyling: false,
+            scrollbarPadding: false
+        }).then((result) => {
+            if (result.isConfirmed && typeof onConfirm === 'function') {
+                onConfirm();
             }
-        }
+        });
+    }
 
-        // Helper function to show Swal modals with consistent styling
-        function showSwalModal({ title, text, icon, confirmText, cancelText, onConfirm }) {
-            Swal.fire({
-                title: title || '',
-                text: text || '',
-                icon: icon || 'info',
-                showCancelButton: !!cancelText,
-                confirmButtonText: confirmText || 'OK',
-                cancelButtonText: cancelText || 'Cancel',
-                customClass: {
-                    popup: 'bg-white rounded-lg shadow-lg', // Modal styles
-                    title: 'text-xl font-bold text-gray-800', // Title styles
-                    content: 'text-gray-700', // Content styles
-                    confirmButton: getButtonClass(icon, 'confirm'),
-                    cancelButton: getButtonClass(icon, 'cancel'),
-                    actions: 'flex justify-center space-x-4' // Space between buttons
-                },
-                buttonsStyling: false, // Disable default styles
-                scrollbarPadding: false // Disable automatic scrollbar padding
-            }).then((result) => {
-                if (result.isConfirmed && typeof onConfirm === 'function') {
-                    onConfirm();
+    // ============== Load & Display Applications ==============
+    function loadAppsData(searchQuery = '') {
+        $('#appListContainer').html('<div class="text-center py-20">Loading...</div>');
+        $.ajax({
+            url: '/get_applications_data',
+            type: 'GET',
+            data: { search: searchQuery },
+            success: function(data) {
+                appsData = data;
+                currentPage = 1;
+                displayApps(currentPage);
+                updatePaginationControls();
+            },
+            error: function() {
+                $('#appListContainer').html('Error loading applications.');
+            }
+        });
+    }
+
+    function displayApps(page) {
+        let startIndex = (page - 1) * appsPerPage;
+        let endIndex = startIndex + appsPerPage;
+        let appsToShow = appsData.slice(startIndex, endIndex);
+
+        let appListHtml = `
+            <div class="bg-white shadow-md rounded my-6">
+                <table class="table-fixed text-left w-full border-collapse">
+                    <thead>
+                        <tr>
+                            <th class="w-16 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">
+                                ID
+                            </th>
+                            <th class="w-1/4 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">
+                                Name
+                            </th>
+                            <th class="w-24 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">
+                                Latest Version
+                            </th>
+                            <th class="w-32 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">
+                                Release Date
+                            </th>
+                            <th class="w-16 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        appsToShow.forEach(function(app) {
+            let appName = app.name || '';
+            let truncatedName = (appName.length > 20)
+                ? appName.substring(0, 20) + '…'
+                : appName;
+
+            let dateStr = 'N/A';
+            if (app.change_date) {
+                let dateObj = new Date(app.change_date);
+                if (!isNaN(dateObj)) {
+                    let year = dateObj.getFullYear();
+                    let month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                    let day = String(dateObj.getDate()).padStart(2, '0');
+                    dateStr = `${year}-${month}-${day}`;
                 }
-            });
-        }
-
-        // Function to load applications data
-        function loadAppsData(searchQuery = '') {
-            // Show loading placeholder
-            $('#appListContainer').html('<div class="text-center py-20">Loading...</div>');
-
-            $.ajax({
-                url: '/get_applications_data',
-                type: 'GET',
-                data: { search: searchQuery },
-                success: function(data) {
-                    console.log('Loaded data:', data); // Debugging
-                    appsData = data;
-                    currentPage = 1; // Reset to first page on new search
-                    displayApps(currentPage);
-                    updatePaginationControls();
-                },
-                error: function() {
-                    $('#appListContainer').html('Error loading applications.');
-                }
-            });
-        }
-
-        // Function to display applications on the current page
-        function displayApps(page) {
-            let startIndex = (page - 1) * appsPerPage;
-            let endIndex = startIndex + appsPerPage;
-            let appsToShow = appsData.slice(startIndex, endIndex);
-
-            let appListHtml = `
-                <div class="bg-white shadow-md rounded my-6">
-                    <table class="table-fixed text-left w-full border-collapse">
-                        <thead>
-                            <tr>
-                                <th class="w-16 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">ID</th>
-                                <th class="w-1/4 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Name</th>
-                                <th class="w-24 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Latest Version</th>
-                                <th class="w-32 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Release Date</th>
-                                <th class="w-16 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-
-            appsToShow.forEach(function(app) {
-                // Defensive checks
-                let appName = app.name || '';
-                let truncatedName = appName.length > 20 ? appName.substring(0, 20) + '…' : appName;
-
-                let dateStr = 'N/A';
-                if (app.change_date) {
-                    let dateObj = new Date(app.change_date);
-                    if (!isNaN(dateObj)) {
-                        // Format date as YYYY-MM-DD
-                        let year = dateObj.getFullYear();
-                        let month = String(dateObj.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-                        let day = String(dateObj.getDate()).padStart(2, '0');
-                        dateStr = `${year}-${month}-${day}`;
-                    }
-                }
-
-                appListHtml += `
-                    <tr class="hover:bg-gray-50 app-row" data-id="${app.id}">
-                        <td class="text-lg text-gray-600 py-4 px-6 border-b border-gray-200">
-                            <span class="inline-block bg-gray-200 text-gray-800 rounded-full px-3 py-1 text-sm font-semibold">
-                                ${app.id}
-                            </span>
-                        </td>
-                        <td class="text-base text-gray-600 py-4 px-6 border-b border-gray-200">
-                            <a href="#" class="app-details-link text-yellow-500 hover:text-yellow-600 truncate" data-id="${app.id}" style="max-width: 150px;">
-                                ${truncatedName}
-                            </a>
-                        </td>
-                        <td class="text-base text-gray-600 py-4 px-6 border-b border-gray-200">${app.version_info || 'N/A'}</td>
-                        <td class="text-base text-gray-600 py-4 px-6 border-b border-gray-200">${dateStr}</td>
-                        <td class="text-base text-gray-600 py-4 px-6 border-b border-gray-200">
-        <div class="flex space-x-2">
-            
-            <!-- Details Button -->
-            <button class="app-details-link text-yellow-500 hover:text-yellow-600 flex items-center" data-id="${app.id}" aria-label="View Application Details">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m5.231 13.481L15 17.25m-4.5-15H5.625c-.621 0-1.125.504-1.125 1.125v16.5c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Zm3.75 11.625a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
-                </svg>
-            </button>
-            
-            <!-- Delete Button -->
-            <button class="delete-button text-yellow-500 hover:text-red-600 flex items-center" data-id="${app.id}" aria-label="Delete Application">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" 
-                     stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                          d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 
-                             1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 
-                             1-2.244 2.077H8.084a2.25 2.25 0 0 
-                             1-2.244-2.077L4.772 5.79m14.456 
-                             0a48.108 48.108 0 0 0-3.478-.397m-12 
-                             .562c.34-.059.68-.114 1.022-.165m0 0a48.11 
-                             48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201 
-                             a51.964 51.964 0 0 0-3.32 
-                             0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 
-                             0a48.667 48.667 0 0 0-7.5 0" />
-                </svg>
-            </button></div>
-                        </td>
-                    </tr>
-                `;
-            });
+            }
 
             appListHtml += `
-                        </tbody>
-                    </table>
-                </div>
+                <tr class="hover:bg-gray-50 app-row" data-id="${app.id}">
+                    <td class="text-lg text-gray-600 py-4 px-6 border-b border-gray-200">
+                        <span class="inline-block bg-gray-200 text-gray-800 rounded-full px-3 py-1 text-sm font-semibold">
+                            ${app.id}
+                        </span>
+                    </td>
+                    <td class="text-base text-gray-600 py-4 px-6 border-b border-gray-200">
+                        <a
+                            href="#"
+                            class="app-details-link text-black-500 hover:text-black-600 truncate hover:underline"
+                            data-id="${app.id}"
+                            style="max-width: 150px;"
+                        >
+                            ${truncatedName}
+                        </a>
+                    </td>
+                    <td class="text-base py-4 px-6 border-b border-gray-200">
+                        <span>${app.version_info || 'N/A'}</span>
+                    </td>
+                    <td class="text-base text-gray-600 py-4 px-6 border-b border-gray-200">
+                        ${dateStr}
+                    </td>
+                    <td class="text-base text-gray-600 py-4 px-6 border-b border-gray-200">
+                        <div class="flex space-x-2">
+                            <!-- Details Button -->
+                            <button
+                                class="app-details-link text-yellow-500 hover:text-yellow-600 flex items-center"
+                                data-id="${app.id}"
+                                aria-label="View Application Details"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    class="w-6 h-6"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M19.5
+                                           14.25v-2.625a3.375
+                                           3.375
+                                           0 0
+                                           0-3.375-3.375h-1.5A1.125
+                                           1.125
+                                           0 0
+                                           1
+                                           13.5
+                                           7.125v-1.5a3.375
+                                           3.375
+                                           0 0
+                                           0-3.375-3.375H8.25m5.231
+                                           13.481L15
+                                           17.25m-4.5-15H5.625c-.621
+                                           0-1.125.504-1.125
+                                           1.125v16.5c0
+                                           .621.504
+                                           1.125
+                                           1.125
+                                           1.125h12.75c.621
+                                           0
+                                           1.125-.504
+                                           1.125-1.125V11.25a9
+                                           9
+                                           0 0
+                                           0-9-9Zm3.75
+                                           11.625a2.625
+                                           2.625
+                                           0
+                                           1
+                                           1-5.25
+                                           0
+                                           2.625
+                                           2.625
+                                           0
+                                           0
+                                           1
+                                           5.25
+                                           0Z"
+                                    />
+                                </svg>
+                            </button>
+
+                            <!-- Delete Button -->
+                            <button
+                                class="delete-button text-yellow-500 hover:text-red-600 flex items-center"
+                                data-id="${app.id}"
+                                aria-label="Delete Application"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    class="w-6 h-6"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="m14.74
+                                           9-.346
+                                           9m-4.788
+                                           0L9.26
+                                           9m9.968-3.21c.342.052.682.107
+                                           1.022.166m-1.022-.165L18.16
+                                           19.673a2.25
+                                           2.25
+                                           0
+                                           0
+                                           1-2.244
+                                           2.077H8.084a2.25
+                                           2.25
+                                           0
+                                           0
+                                           1-2.244-2.077L4.772
+                                           5.79m14.456
+                                           0a48.108
+                                           48.108
+                                           0
+                                           0
+                                           0-3.478-.397m-12
+                                           .562c.34-.059.68-.114
+                                           1.022-.165m0
+                                           0a48.11
+                                           48.11
+                                           0
+                                           0
+                                           1
+                                           3.478-.397m7.5
+                                           0v-.916c0-1.18-.91-2.164-2.09-2.201
+                                           a51.964
+                                           51.964
+                                           0
+                                           0
+                                           0-3.32
+                                           0c-1.18.037-2.09
+                                           1.022-2.09
+                                           2.201v.916m7.5
+                                           0a48.667
+                                           48.667
+                                           0
+                                           0
+                                           0-7.5
+                                           0"
+                                    />
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
             `;
+        });
 
-            $('#appListContainer').html(appListHtml);
+        appListHtml += `
+                    </tbody>
+                </table>
+            </div>
+        `;
 
-            // Attach event handlers for delete buttons with SweetAlert2
-            $('.delete-button').off('click').on('click', function(e) {
-                e.stopPropagation();
-                const appId = $(this).data('id');
+        $('#appListContainer').html(appListHtml);
 
-                showSwalModal({
-                    title: 'Are you sure?',
-                    text: "This will permanently delete the application.",
-                    icon: 'warning',
-                    confirmText: 'Yes, delete it!',
-                    cancelText: 'Cancel',
-                    onConfirm: function() {
-                        deleteApplication(appId);
-                    }
-                });
-            });
-
-            // Attach event handler for application name link
-            $('.app-details-link').off('click').on('click', function(e) {
-                e.preventDefault();
-                const appId = $(this).data('id');
-                window.loadPage('application_details', appId);
-            });
-        }
-
-        // Function to update pagination controls
-        function updatePaginationControls() {
-            let totalPages = Math.ceil(appsData.length / appsPerPage);
-            $('#pageNumbers').html(''); // Clear page numbers
-
-            // Show or hide "Previous" button
-            if (currentPage === 1) {
-                $('#prevPage').addClass('invisible');
-            } else {
-                $('#prevPage').removeClass('invisible');
-            }
-
-            // Show or hide "Next" button
-            if (currentPage === totalPages || totalPages === 0) {
-                $('#nextPage').addClass('invisible');
-            } else {
-                $('#nextPage').removeClass('invisible');
-            }
-
-            // Set up click handlers
-            $('#prevPage').off('click').on('click', function() {
-                if (currentPage > 1) {
-                    currentPage--;
-                    displayApps(currentPage);
-                    updatePaginationControls();
+        // Re-attach event handlers
+        $('.delete-button').off('click').on('click', function(e) {
+            e.stopPropagation();
+            const appId = $(this).data('id');
+            showSwalModal({
+                title: 'Are you sure?',
+                text: "This will permanently delete the application.",
+                icon: 'warning',
+                confirmText: 'Yes, delete it!',
+                cancelText: 'Cancel',
+                onConfirm: function() {
+                    deleteApplication(appId);
                 }
-            });
-
-            $('#nextPage').off('click').on('click', function() {
-                if (currentPage < totalPages) {
-                    currentPage++;
-                    displayApps(currentPage);
-                    updatePaginationControls();
-                }
-            });
-
-            // Display page numbers
-            const maxVisiblePages = 5;
-            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-            if (endPage - startPage < maxVisiblePages - 1) {
-                startPage = Math.max(1, endPage - maxVisiblePages + 1);
-            }
-
-            for (let page = startPage; page <= endPage; page++) {
-                $('#pageNumbers').append(`
-                    <span class="cursor-pointer inline-flex items-center justify-center w-8 h-8 
-                        ${page === currentPage 
-                            ? 'bg-yellow-100 text-yellow-600' 
-                            : 'bg-white hover:bg-yellow-200 border border-gray-200'} 
-                        rounded-full" 
-                        onclick="goToPage(${page})">${page}</span>
-                `);            
-            }
-        }
-
-        // Function to go to a specific page
-        function goToPage(page) {
-            currentPage = page;
-            displayApps(currentPage);
-            updatePaginationControls();
-        }
-
-        // Function to toggle version control details
-        function toggleVersionControl(appId, clickedButton) {
-            const detailsId = 'details-for-' + appId;
-            const existingDetailsRow = $('#' + detailsId);
-
-            // Close other open details
-            $('.detail-row').not(existingDetailsRow).slideUp(50, function() { $(this).remove(); });
-        }
-
-        // Function to update version
-        function updateVersion(appId, versionPart) {
-            $.ajax({
-                url: `/app/${appId}/update_version`,
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({ version_part: versionPart }),
-                success: function(response) {
-                    showSwalModal({
-                        title: 'Updated!',
-                        text: `Version updated to ${response.new_version}`,
-                        icon: 'success',
-                        confirmText: 'OK',
-                        onConfirm: function() {
-                            loadAppsData(); // Refresh applications list
-                        }
-                    });
-                },
-                error: function(xhr) {
-                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error updating version';
-                    showSwalModal({
-                        title: 'Error!',
-                        text: `Error: ${error}`,
-                        icon: 'error',
-                        confirmText: 'OK'
-                    });
-                }
-            });
-        }
-
-        // Function to delete application
-        function deleteApplication(appId) {
-            $.ajax({
-                url: `/delete_application/${appId}`,
-                type: 'DELETE',
-                success: function(response) {
-                    showSwalModal({
-                        title: 'Deleted!',
-                        text: response.message,
-                        icon: 'success',
-                        confirmText: 'OK',
-                        onConfirm: function() {
-                            loadAppsData(); // Refresh applications list
-                        }
-                    });
-                },
-                error: function(xhr) {
-                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error deleting application';
-                    showSwalModal({
-                        title: 'Error!',
-                        text: `Error: ${error}`,
-                        icon: 'error',
-                        confirmText: 'OK'
-                    });
-                }
-            });
-        }
-
-        // Expose functions to the global scope if they need to be called from HTML
-        window.loadAppsData = loadAppsData;
-        window.displayApps = displayApps;
-        window.goToPage = goToPage;
-        window.updateVersion = updateVersion;
-        window.deleteApplication = deleteApplication;
-        window.toggleVersionControl = toggleVersionControl;
-
-        // Initialize
-        $(document).ready(function() {
-            // Load initial data
-            loadAppsData();
-
-            // Search form handler
-            $('#searchForm').on('submit', function(e) {
-                e.preventDefault();
-                let searchQuery = $(this).find('input[name="search"]').val();
-                loadAppsData(searchQuery);
-            });
-
-            // Modal functions
-            window.openModal = function() {
-                $('#myModal').removeClass('hidden');
-                loadProjects(); // Load projects into select
-            };
-
-            window.closeModal = function() {
-                $('#myModal').addClass('hidden');
-                $('#createForm')[0].reset();
-                $('#appMessage').text('');
-            };
-
-            // Load projects for select input
-            function loadProjects() {
-                $.ajax({
-                    url: '/get_projects',
-                    type: 'GET',
-                    success: function(response) {
-                        $('#projectSelect').empty();
-                        response.forEach(function(project) {
-                            $('#projectSelect').append(new Option(project.name, project.id));
-                        });
-                    },
-                    error: function(xhr) {
-                        console.error('Error loading projects: ' + xhr.responseText);
-                    }
-                });
-            }
-
-            // Form submissions
-            $('#createForm').submit(function(e) {
-                e.preventDefault();
-                const formData = {
-                    name: $('#name').val().trim(),
-                    project_ids: $('#projectSelect').val() || [],
-                    link: $('#link').val().trim(),
-                    label: $('#label').val().trim()
-                };
-                $.ajax({
-                    url: '/create_application',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(formData),
-                    success: function(response) {
-                        if(response.error) {
-                            showSwalModal({
-                                title: 'Error!',
-                                text: response.error,
-                                icon: 'error',
-                                confirmText: 'OK'
-                            });
-                        } else {
-                            showSwalModal({
-                                title: 'Created!',
-                                text: response.message,
-                                icon: 'success',
-                                confirmText: 'OK',
-                                onConfirm: function() {
-                                    closeModal();
-                                    loadAppsData(); // Refresh applications list
-                                }
-                            });
-                        }
-                    },
-                    error: function(xhr) {
-                        const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error creating application';
-                        showSwalModal({
-                            title: 'Error!',
-                            text: `Error: ${error}`,
-                            icon: 'error',
-                            confirmText: 'OK'
-                        });
-                    }
-                });
             });
         });
 
-    })(); // End of IIFE
+        $('.app-details-link').off('click').on('click', function(e) {
+            e.preventDefault();
+            const appId = $(this).data('id');
+            window.loadPage('application_details', appId);
+        });
+    }
+
+    function updatePaginationControls() {
+        let totalPages = Math.ceil(appsData.length / appsPerPage);
+        $('#pageNumbers').html('');
+
+        // Show/hide prev
+        if (currentPage === 1) {
+            $('#prevPage').addClass('invisible');
+        } else {
+            $('#prevPage').removeClass('invisible');
+        }
+        // Show/hide next
+        if (currentPage === totalPages || totalPages === 0) {
+            $('#nextPage').addClass('invisible');
+        } else {
+            $('#nextPage').removeClass('invisible');
+        }
+
+        // Prev click
+        $('#prevPage').off('click').on('click', function() {
+            if (currentPage > 1) {
+                currentPage--;
+                displayApps(currentPage);
+                updatePaginationControls();
+            }
+        });
+        // Next click
+        $('#nextPage').off('click').on('click', function() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                displayApps(currentPage);
+                updatePaginationControls();
+            }
+        });
+
+        // Page number logic
+        const maxVisiblePages = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+        if (endPage - startPage < maxVisiblePages - 1) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+
+        for (let page = startPage; page <= endPage; page++) {
+            $('#pageNumbers').append(`
+                <span
+                    class="cursor-pointer inline-flex items-center justify-center w-8 h-8
+                    ${page === currentPage
+                        ? 'bg-yellow-100 text-yellow-600'
+                        : 'bg-white hover:bg-yellow-200 border border-gray-200'}
+                    rounded-full"
+                    onclick="goToPage(${page})"
+                >
+                    ${page}
+                </span>
+            `);
+        }
+    }
+
+    function goToPage(page) {
+        currentPage = page;
+        displayApps(page);
+        updatePaginationControls();
+    }
+    window.goToPage = goToPage;
+
+    // DELETE APPLICATION
+    function deleteApplication(appId) {
+        $.ajax({
+            url: `/delete_application/${appId}`,
+            type: 'DELETE',
+            success: function(response) {
+                showSwalModal({
+                    title: 'Deleted!',
+                    text: response.message,
+                    icon: 'success',
+                    confirmText: 'OK',
+                    onConfirm: function() {
+                        loadAppsData();
+                    }
+                });
+            },
+            error: function(xhr) {
+                const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error deleting application';
+                showSwalModal({
+                    title: 'Error!',
+                    text: `Error: ${error}`,
+                    icon: 'error',
+                    confirmText: 'OK'
+                });
+            }
+        });
+    }
+
+    // =============== Open/Close Modal =================
+    window.openModal = function() {
+        $('#myModal').removeClass('hidden');
+        loadProjectsSingleSelect();
+    };
+    window.closeModal = function() {
+        $('#myModal').addClass('hidden');
+        $('#createForm')[0].reset();
+        // reset the single select
+        $('#projectDropdownSelected').text('Select Project');
+        $('#selectedProjectId').val('');
+        $('#projectList').empty();
+        $('#projectSearchInput').val('');
+    };
+
+    // Close modal if user clicks outside the content
+    $(document).ready(function() {
+        $('#myModal').on('click', function(e) {
+            if (e.target.id === 'myModal') {
+                closeModal();
+            }
+        });
+    });
+
+    // ================== FORM SUBMISSION ==================
+    $(document).ready(function() {
+        // 1) Load data
+        loadAppsData();
+
+        // 2) Search form
+        $('#searchForm').on('submit', function(e) {
+            e.preventDefault();
+            let searchQuery = $(this).find('input[name="search"]').val();
+            loadAppsData(searchQuery);
+        });
+
+        // 3) Submit create form
+        $('#createForm').submit(function(e) {
+            e.preventDefault();
+
+            // Extra front-end check if user picked a project
+            const projectChoice = $('#selectedProjectId').val().trim();
+            if (!projectChoice) {
+                // If empty, show error message, do not call the API
+                showSwalModal({
+                    title: 'Validation Error',
+                    text: 'Please select a Project before creating the application.',
+                    icon: 'error',
+                    confirmText: 'OK'
+                });
+                return;
+            }
+
+            const formData = {
+                name: $('#name').val().trim(),
+                project_ids: [ projectChoice ], // single pick => array if needed
+                link: $('#link').val().trim(),
+                label: $('#label').val().trim()
+            };
+
+            $.ajax({
+                url: '/create_application',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function(response) {
+                    if (response.error) {
+                        showSwalModal({
+                            title: 'Error!',
+                            text: response.error,
+                            icon: 'error',
+                            confirmText: 'OK'
+                        });
+                    } else {
+                        showSwalModal({
+                            title: 'Created!',
+                            text: response.message,
+                            icon: 'success',
+                            confirmText: 'OK',
+                            onConfirm: function() {
+                                closeModal();
+                                loadAppsData();
+                            }
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error creating application';
+                    showSwalModal({
+                        title: 'Error!',
+                        text: `Error: ${error}`,
+                        icon: 'error',
+                        confirmText: 'OK'
+                    });
+                }
+            });
+        });
+    });
+
+    // ========== LOAD & FILTER PROJECTS (SINGLE SELECT) ==========
+    function loadProjectsSingleSelect() {
+        $.ajax({
+            url: '/get_projects',
+            type: 'GET',
+            success: function(allProjects) {
+                const projectList = $('#projectList');
+                projectList.empty();
+
+                // Populate single-select items
+                allProjects.forEach(proj => {
+                    projectList.append(`
+                        <li
+                            class="cursor-pointer hover:bg-yellow-100 px-3 py-2 text-sm text-gray-700"
+                            data-id="${proj.id}"
+                            data-name="${proj.name}"
+                        >
+                            <span class="truncate">${proj.name}</span>
+                        </li>
+                    `);
+                });
+
+                // Toggle the dropdown on button click
+                $('#projectDropdownButton')
+                  .off('click')
+                  .on('click', function(e) {
+                      e.stopPropagation();
+                      $('#projectDropdownPanel').toggleClass('hidden');
+                  });
+
+                // Close if user clicks away
+                $(document).off('click.projectSelect').on('click.projectSelect', function(event) {
+                    const panel = $('#projectDropdownPanel');
+                    if (!panel.is(event.target)
+                        && panel.has(event.target).length === 0
+                        && !$('#projectDropdownButton').is(event.target)
+                        && $('#projectDropdownButton').has(event.target).length === 0
+                    ) {
+                        panel.addClass('hidden');
+                    }
+                });
+
+                // On <li> click => set selection
+                $('#projectList li')
+                  .off('click')
+                  .on('click', function() {
+                      const pid = $(this).data('id');
+                      const pname = $(this).data('name');
+                      $('#projectDropdownPanel').addClass('hidden');
+                      $('#projectDropdownSelected').text(pname);
+                      $('#selectedProjectId').val(pid);
+                  });
+
+                // Filter logic
+                $('#projectSearchInput')
+                  .off('input')
+                  .on('input', function() {
+                      const term = $(this).val().toLowerCase();
+                      $('#projectList li').each(function() {
+                          const name = $(this).data('name').toLowerCase();
+                          $(this).toggle(name.includes(term));
+                      });
+                  });
+            },
+            error: function(xhr) {
+                console.error('Error loading projects: ' + xhr.responseText);
+            }
+        });
+    }
+})();
 </script>

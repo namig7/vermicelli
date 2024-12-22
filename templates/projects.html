@@ -304,7 +304,9 @@
                                 </span>
                             </td>
                             <td class="text-base text-gray-600 py-4 px-6 border-b border-gray-200 truncate" style="max-width: 150px;">
-                                ${truncatedName}
+                                <a href="#" class="text-black-500 hover:text-black-600 truncate hover:underline" onclick="openProjectDetails(${project.id}); return false;" style="max-width: 150px;">
+                                    ${truncatedName}
+                                </a>
                             </td>
                             <td class="text-base text-gray-600 py-4 px-6 border-b border-gray-200">${project.start_date}</td>
                             <td class="text-base py-4 px-6 border-b border-gray-200">${getStatusLabel(project.status)}</td>

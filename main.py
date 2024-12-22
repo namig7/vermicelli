@@ -15,8 +15,8 @@ load_dotenv()
 
 app = Flask(__name__)
 
-app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")  
-app.secret_key = os.environ.get("SECRET_KEY")  
+app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")
+app.secret_key = os.environ.get("SECRET_KEY")
 app.config['SESSION_TYPE'] = os.environ.get("SESSION_TYPE", 'filesystem')
 Session(app)
 

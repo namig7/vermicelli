@@ -20,12 +20,11 @@ services:
       - "8000:8000"
     depends_on:
       - postgres
-    # Optionally, if you need to wait for postgres to be ready before starting Vermicelli:
-    # healthcheck:
-    #   test: ["CMD-SHELL", "pg_isready -h postgres -U postgres"]
-    #   interval: 10s
-    #   timeout: 5s
-    #   retries: 5
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h postgres -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:
