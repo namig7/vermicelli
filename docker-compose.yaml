@@ -1,18 +1,20 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:latest
     container_name: postgres
     env_file:
       - .env
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
-      - "5432:5432"
+      - "5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
   vermicelli:
-    image: vermicelli:latest
+    image: ghcr.io/namig7/vermicelli:latest
     container_name: vermicelli
     env_file:
       - .env
