@@ -1,6 +1,10 @@
+<div align="center" width="100%">
+    <img src="./static/public/logo-vermicelli-w.svg" width="128" alt="" />
+</div>
+
 # vermicelli (U/C)
 
-### Simple self-hosted version control automation application track and manage the versions of your applications.
+### Simple self-hosted version control automation to track and manage the versions of your applications.
 
 ***TBD***
 
@@ -9,9 +13,9 @@
 ### **1. Description**
 The **update.sh** script is designed to automate version updates for an application managed by a remote API. It follows these steps:
 
-1. Authenticates with the specified service by sending a username and password to the **login** endpoint.  
-2. Retrieves a JWT token from the response.  
-3. Uses that token to call the **update_version** endpoint, incrementing the specified version part (**MAJOR**, **MINOR**, or **PATCH**).  
+1. Authenticates with the specified service by sending a username and password to the **login** endpoint.
+2. Retrieves a JWT token from the response.
+3. Uses that token to call the **update_version** endpoint, incrementing the specified version part (**MAJOR**, **MINOR**, or **PATCH**).
 4. Outputs the new version if the update is successful.
 
 This script makes it easy to manage and bump version numbers in your CI/CD pipelines or as part of a local development process.
