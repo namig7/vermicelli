@@ -20,21 +20,24 @@ app.secret_key = os.environ.get("SECRET_KEY")
 app.config['SESSION_TYPE'] = os.environ.get("SESSION_TYPE", 'filesystem')
 Session(app)
 
-# Сборка URI базы данных из отдельных переменных
-DB = os.environ.get("DB", "verdb")
+DB_ENGINE = os.environ.get("DB_ENGINE", "sqlite").lower()  # By default: SQLite
+DB_NAME = os.environ.get("DB", "verdb")
 DB_USER = os.environ.get("DB_USER", "postgres")
 DB_PASSWORD = os.environ.get("DB_PASSWORD", "postgres")
 DB_HOST = os.environ.get("DB_HOST", "localhost")
 DB_PORT = os.environ.get("DB_PORT", "5432")
 
-app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB}"
+
+if DB_ENGINE == "sqlite":
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{DB_NAME}.db"
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-# Парсим список пользователей из переменной окружения USERS
-# Формат: "admin:password;user2:password2"
 users_str = os.environ.get("USERS", "")
 users = {}
 for pair in users_str.split(";"):
@@ -44,9 +47,6 @@ for pair in users_str.split(";"):
         users[username] = pwd
 
 jwt = JWTManager(app)
-
-# Logging configuration
-logging.basicConfig(level=logging.INFO)
 
 def login_required(f):
     @wraps(f)
@@ -157,7 +157,7 @@ def application_details_content(app_id):
     app_obj = Application.query.get_or_404(app_id)
     latest_version = Version.query.filter_by(application_id=app_id).order_by(Version.change_date.desc()).first()
     project_name = app_obj.projects[0].name if app_obj.projects else None
-    project_id = app_obj.projects[0].id if app_obj.projects else None  # Добавляем извлечение project_id
+    project_id = app_obj.projects[0].id if app_obj.projects else None  # project_id
 
     return render_template('application_details.html',
                            app=app_obj,
@@ -504,13 +504,11 @@ def about_content():
 @app.route('/guide')
 @login_required
 def guide_page():
-    # Возвращаем index.html, задавая начальную страницу 'guide'
     return render_template('index.html', initial_page='guide')
 
 @app.route('/content/guide')
 @login_required
 def guide_content():
-    # Возвращаем частичный шаблон, который будет подгружен AJAX-ом
     return render_template('guide.html')
 
 

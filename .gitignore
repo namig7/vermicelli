@@ -9,6 +9,9 @@ venv/
 # Flask session files
 flask_session/
 
+# Sqlite files
+instance/
+
 # Logs
 *.log
 

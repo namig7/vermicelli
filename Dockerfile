@@ -1,7 +1,5 @@
-# Use a lightweight base image with Python 3
 FROM python:3.10-slim
 
-# Set the working directory inside the container
 WORKDIR /app
 
 # Copy the requirements file and install dependencies
