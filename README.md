@@ -4,13 +4,31 @@
 
 # vermicelli (U/C)
 
-### Simple self-hosted version control automation to track and manage the versions of your applications.
+### Simple self-hosted version control automation to track and manage the versions of your applications
 
 ***TBD***
+
+## Getting Started
+
+This script runs the container in detached mode, mapping port 8000 and using the .env file. Please note that .env file should be created prior. Ensure that DB_ENGINE=sqlite is set in your .env if you want to use SQLite. Also, if you want to persist the database file outside the container, use a volume or bind mount.
+
+```bash
+docker run -d \
+  --name vermicelli \
+  -p 8000:8000 \
+  --env-file .env \
+  -v "$(pwd)/data:/app/data" \
+  namigg/vermicelli:latest
+Key points:
+```
+
+*1. Create the .env file prior the `docker run`
+*2. **`-v "$(pwd)/data:/app/data"`**   is an example of mounting a local folder to store the SQLite database file persistently. When using SQLite make sure that the path points to `/app/data/verdb.db` (or a similar path), so the data is not lost when the container is removed.
 
 ## **update.sh - Documentation and Guide**
 
 ### **1. Description**
+
 The **update.sh** script is designed to automate version updates for an application managed by a remote API. It follows these steps:
 
 1. Authenticates with the specified service by sending a username and password to the **login** endpoint.
@@ -24,16 +42,16 @@ This script makes it easy to manage and bump version numbers in your CI/CD pipel
 
 ### **2. Default Values**
 
-- **DEFAULT_BASE_URL**: `http://localhost:8000`  
+* **DEFAULT_BASE_URL**: `http://localhost:8000`  
   The default URL of the API service. If you don’t provide a `--url` flag, the script will attempt to connect to this local address.
 
-- **DEFAULT_USERNAME**: `admin`  
+* **DEFAULT_USERNAME**: `admin`  
   The default username used for login. Adjust it if your service has different login credentials.
 
-- **DEFAULT_PASSWORD**: `password`  
+* **DEFAULT_PASSWORD**: `password`  
   The default password used for login. Change this to maintain security in a real environment.
 
-- **DEFAULT_APP_ID**: `1`  
+* **DEFAULT_APP_ID**: `1`  
   The default application ID for which the version will be updated.
 
 If you don’t supply overrides via flags, the script will use these default values.
@@ -43,25 +61,25 @@ If you don’t supply overrides via flags, the script will use these default val
 ### **3. Script Flags Explained**
 
 1. **`--appid`**  
-   - **Purpose**: Sets the application ID you want to update.  
-   - **Default**: `1` (as per `DEFAULT_APP_ID`).
+   * **Purpose**: Sets the application ID you want to update.  
+   * **Default**: `1` (as per `DEFAULT_APP_ID`).
 
 2. **`--version`**  
-   - **Purpose**: **Required flag**. Defines which part of the version to update—`major`, `minor`, or `patch`.  
-   - **Example**: `--version patch`  
-   - **Note**: If `--version` is not provided, the script will exit with an error message.
+   * **Purpose**: **Required flag**. Defines which part of the version to update—`major`, `minor`, or `patch`.  
+   * **Example**: `--version patch`  
+   * **Note**: If `--version` is not provided, the script will exit with an error message.
 
 3. **`--username`**  
-   - **Purpose**: Specifies the username for login.  
-   - **Default**: `admin` (as per `DEFAULT_USERNAME`).
+   * **Purpose**: Specifies the username for login.  
+   * **Default**: `admin` (as per `DEFAULT_USERNAME`).
 
 4. **`--password`**  
-   - **Purpose**: Specifies the password for login.  
-   - **Default**: `password` (as per `DEFAULT_PASSWORD`).
+   * **Purpose**: Specifies the password for login.  
+   * **Default**: `password` (as per `DEFAULT_PASSWORD`).
 
 5. **`--url`**  
-   - **Purpose**: The base URL of your server or API endpoint.  
-   - **Default**: `http://localhost:8000` (as per `DEFAULT_BASE_URL`).
+   * **Purpose**: The base URL of your server or API endpoint.  
+   * **Default**: `http://localhost:8000` (as per `DEFAULT_BASE_URL`).
 
 ---
 
