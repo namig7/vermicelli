@@ -2,15 +2,49 @@
     <img src="./static/public/logo-vermicelli-w.svg" width="128" alt="" />
 </div>
 
-# vermicelli (U/C)
+# Vermicelli
 
-### Simple self-hosted version control automation to track and manage the versions of your applications
+Simple self-hosted version control automation to track and manage the versions of your applications.
 
-***TBD***
+## Features
+
+- **Create Multiple Applications**  
+  Manage multiple applications and group them into one or more projects.
+
+- **Version Tracking**  
+  Track each application’s Major.Minor.Patch version and increment specific segments (major, minor, patch) as needed.
+
+- **Historical Log**  
+  Maintain a version history for each application, including release notes or additional details.
+
+- **CI/CD Integration**  
+  Easily integrate with your CI/CD pipelines to automate version updates and streamline releases.
+
+- **Web UI & API**  
+  Perform all operations through an intuitive web interface or via a REST API (e.g., using `curl`).
 
 ## Getting Started
 
-This script runs the container in detached mode, mapping port 8000 and using the .env file. Please note that .env file should be created prior. Ensure that DB_ENGINE=sqlite is set in your .env if you want to use SQLite. Also, if you want to persist the database file outside the container, use a volume or bind mount.
+> [!WARNING]
+> `.env` file should be created prior.
+
+The minimum content of the `.env`:
+
+```yaml
+# JWT & Flask secret keys
+JWT_SECRET_KEY=your_jwt_secret_key
+SECRET_KEY=your_secret_key
+SESSION_TYPE=filesystem
+
+# DB Configuration
+DB_ENGINE=sqlite
+DB=verdb
+
+# List of users. Please specify using this format: "USERS=username:password;username2:password2"
+USERS=admin:password;testuser:testpass
+```
+
+This script runs the container in detached mode, mapping port 8000 and using the `.env` file.
 
 ```bash
 docker run -d \
@@ -22,68 +56,15 @@ docker run -d \
 Key points:
 ```
 
-*1. Create the .env file prior the `docker run`
-*2. **`-v "$(pwd)/data:/app/data"`**   is an example of mounting a local folder to store the SQLite database file persistently. When using SQLite make sure that the path points to `/app/data/verdb.db` (or a similar path), so the data is not lost when the container is removed.
+> [!NOTE]
+> Ensure that DB_ENGINE=sqlite is set in your .env if you want to use SQLite.
+> Also, if you want to persist the database file outside the container, use a volume or bind mount. **`-v "$(pwd)/data:/app/data"`**   is an example of mounting a local folder to store the SQLite database file persistently. When using SQLite make sure that the path points to `/app/data/verdb.db` (or a similar path), so the data is not lost when the container is removed.
 
-## **update.sh - Documentation and Guide**
+## Advanced Installation
 
-### **1. Description**
+For the advanced installation steps and features(Docker & Non-docker with Postgresql etc.) please proceed to the [wiki](https://github.com/namig7/vermicelli/wiki).
 
-The **update.sh** script is designed to automate version updates for an application managed by a remote API. It follows these steps:
-
-1. Authenticates with the specified service by sending a username and password to the **login** endpoint.
-2. Retrieves a JWT token from the response.
-3. Uses that token to call the **update_version** endpoint, incrementing the specified version part (**MAJOR**, **MINOR**, or **PATCH**).
-4. Outputs the new version if the update is successful.
-
-This script makes it easy to manage and bump version numbers in your CI/CD pipelines or as part of a local development process.
-
----
-
-### **2. Default Values**
-
-* **DEFAULT_BASE_URL**: `http://localhost:8000`  
-  The default URL of the API service. If you don’t provide a `--url` flag, the script will attempt to connect to this local address.
-
-* **DEFAULT_USERNAME**: `admin`  
-  The default username used for login. Adjust it if your service has different login credentials.
-
-* **DEFAULT_PASSWORD**: `password`  
-  The default password used for login. Change this to maintain security in a real environment.
-
-* **DEFAULT_APP_ID**: `1`  
-  The default application ID for which the version will be updated.
-
-If you don’t supply overrides via flags, the script will use these default values.
-
----
-
-### **3. Script Flags Explained**
-
-1. **`--appid`**  
-   * **Purpose**: Sets the application ID you want to update.  
-   * **Default**: `1` (as per `DEFAULT_APP_ID`).
-
-2. **`--version`**  
-   * **Purpose**: **Required flag**. Defines which part of the version to update—`major`, `minor`, or `patch`.  
-   * **Example**: `--version patch`  
-   * **Note**: If `--version` is not provided, the script will exit with an error message.
-
-3. **`--username`**  
-   * **Purpose**: Specifies the username for login.  
-   * **Default**: `admin` (as per `DEFAULT_USERNAME`).
-
-4. **`--password`**  
-   * **Purpose**: Specifies the password for login.  
-   * **Default**: `password` (as per `DEFAULT_PASSWORD`).
-
-5. **`--url`**  
-   * **Purpose**: The base URL of your server or API endpoint.  
-   * **Default**: `http://localhost:8000` (as per `DEFAULT_BASE_URL`).
-
----
-
-### **4. Usage Example**
+## update.sh - Usage Example
 
 ```bash
 ./update.sh --version patch --appid 10 --username myuser --password mypass --url http://myapi.example.com
