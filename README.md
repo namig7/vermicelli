@@ -53,7 +53,6 @@ docker run -d \
   --env-file .env \
   -v "$(pwd)/data:/app/data" \
   namigg/vermicelli:latest
-Key points:
 ```
 
 > [!NOTE]
