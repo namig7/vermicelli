@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from datetime import datetime
 from functools import wraps
 import logging
+import re  # for URL validation
 from flask import Flask, request, jsonify, render_template, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -15,19 +16,21 @@ load_dotenv()
 
 app = Flask(__name__)
 
+# JWT and session configuration
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")
 app.secret_key = os.environ.get("SECRET_KEY")
 app.config['SESSION_TYPE'] = os.environ.get("SESSION_TYPE", 'filesystem')
 Session(app)
 
-DB_ENGINE = os.environ.get("DB_ENGINE", "sqlite").lower()  # By default: SQLite
+# Database configuration
+DB_ENGINE = os.environ.get("DB_ENGINE", "sqlite").lower()  # By default, uses SQLite
 DB_NAME = os.environ.get("DB", "verdb")
 DB_USER = os.environ.get("DB_USER", "postgres")
 DB_PASSWORD = os.environ.get("DB_PASSWORD", "postgres")
 DB_HOST = os.environ.get("DB_HOST", "localhost")
 DB_PORT = os.environ.get("DB_PORT", "5432")
 
-
+# Construct SQLAlchemy URI
 if DB_ENGINE == "sqlite":
     app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{DB_NAME}.db"
 else:
@@ -49,6 +52,7 @@ for pair in users_str.split(";"):
 jwt = JWTManager(app)
 
 def login_required(f):
+    """Checks if a user is logged in (via session) to access specific routes."""
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'username' not in session:
@@ -59,6 +63,7 @@ def login_required(f):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """Handles user login with session-based authentication."""
     if 'username' in session:
         return redirect(url_for('index'))
 
@@ -77,11 +82,13 @@ def login():
 
 @app.route('/logout')
 def logout():
+    """Logs out the user by clearing the session."""
     session.pop('username', None)
     flash('You have been logged out.')
     return redirect(url_for('login'))
 
 def test_database_connection():
+    """Verifies if the database connection can be successfully established."""
     with app.app_context():
         try:
             db.session.execute(text('SELECT 1'))
@@ -89,14 +96,15 @@ def test_database_connection():
         except Exception as e:
             print("Error in connection to the database:", str(e))
 
-
-# Association table for many-to-many relationship between Projects and Applications
-project_applications = db.Table('project_applications',
+# Many-to-many association table for Projects and Applications
+project_applications = db.Table(
+    'project_applications',
     db.Column('project_id', db.Integer, db.ForeignKey('project.id'), primary_key=True),
     db.Column('application_id', db.Integer, db.ForeignKey('application.id'), primary_key=True)
 )
 
 class Application(db.Model):
+    """Represents an application entity."""
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), unique=True, nullable=False)
     versions = db.relationship('Version', backref='application', lazy=True, cascade="all, delete-orphan")
@@ -108,14 +116,16 @@ class Application(db.Model):
     projects = db.relationship('Project', secondary=project_applications, back_populates='applications')
 
 class Version(db.Model):
+    """Represents a version of an application."""
     id = db.Column(db.Integer, primary_key=True)
     application_id = db.Column(db.Integer, db.ForeignKey('application.id', ondelete='CASCADE'), nullable=False)
-    number = db.Column(db.String(20), nullable=False)
+    number = db.Column(db.String(20), nullable=False)  # e.g. "1.2.3"
     version_type = db.Column(db.String(20))
     change_date = db.Column(db.DateTime, default=datetime.utcnow)
     notes = db.Column(db.Text)
 
 class Project(db.Model):
+    """Represents a project entity."""
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), unique=True, nullable=False)
     description = db.Column(db.Text)
@@ -125,7 +135,18 @@ class Project(db.Model):
     start_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     applications = db.relationship('Application', secondary=project_applications, back_populates='projects')
 
-### Page Routes (HTML)
+### Helper: basic URL validation
+def is_valid_url(url: str) -> bool:
+    """
+    Allows empty or None as 'valid' if optional,
+    otherwise checks if it starts with http:// or https://
+    """
+    if not url:
+        return True  # if we want to allow empty
+    pattern = r'^https?://'
+    return bool(re.match(pattern, url.strip()))
+
+### HTML page routes (render templates)
 @app.route('/')
 @login_required
 def index():
@@ -157,14 +178,15 @@ def application_details_content(app_id):
     app_obj = Application.query.get_or_404(app_id)
     latest_version = Version.query.filter_by(application_id=app_id).order_by(Version.change_date.desc()).first()
     project_name = app_obj.projects[0].name if app_obj.projects else None
-    project_id = app_obj.projects[0].id if app_obj.projects else None  # project_id
+    project_id = app_obj.projects[0].id if app_obj.projects else None
 
-    return render_template('application_details.html',
-                           app=app_obj,
-                           latest_version=latest_version,
-                           project_name=project_name,
-                           project_id=project_id)
-
+    return render_template(
+        'application_details.html',
+        app=app_obj,
+        latest_version=latest_version,
+        project_name=project_name,
+        project_id=project_id
+    )
 
 @app.route('/application/<int:app_id>/details')
 @login_required
@@ -174,19 +196,19 @@ def application_details_page(app_id):
     latest_version = Version.query.filter_by(application_id=app_obj.id).order_by(Version.change_date.desc()).first()
     if latest_version:
         latest_version.change_date = latest_version.change_date.strftime('%m/%d/%Y, %I:%M:%S %p')
-    return render_template('application_details.html',
-                           app=app_obj,
-                           project_name=project_name,
-                           latest_version=latest_version)
+    return render_template(
+        'application_details.html',
+        app=app_obj,
+        project_name=project_name,
+        latest_version=latest_version
+    )
 
 @app.route('/application/<int:app_id>', methods=['GET'])
 @login_required
 def show_application_page(app_id):
     return render_template('index.html', initial_page='application_details', app_id=app_id)
 
-
-
-### API Routes (JSON)
+### JSON API routes
 @app.route('/api/application/<int:app_id>', methods=['GET'])
 @login_required
 def get_application(app_id):
@@ -275,6 +297,8 @@ def edit_application(app_id):
 @app.route('/create_application', methods=['POST'])
 @login_required
 def create_application():
+    # Not specifically asked for link validation here,
+    # but you can add if needed similarly to the project approach.
     try:
         data = request.get_json()
         name = data.get('name', '').strip()
@@ -376,7 +400,7 @@ def update_version(application_id):
         logging.error(f"Error updating version for application {application_id}: {str(e)}")
         return jsonify({'error': 'Server error while updating version'}), 500
 
-### Project API Routes
+### Project JSON API routes
 @app.route('/get_projects_data', methods=['GET'])
 @login_required
 def get_projects_data():
@@ -414,6 +438,7 @@ def get_projects_data():
 @app.route('/create_project', methods=['POST'])
 @login_required
 def create_project():
+    """Creates a new project with optional associated applications, now with link validation."""
     try:
         data = request.get_json()
         name = data.get('name', '').strip()
@@ -422,12 +447,18 @@ def create_project():
         status = data.get('status', 'Draft').strip()
         applications_ids = data.get('applications', [])
 
+        # Validate required name
         if not name:
             return jsonify({'error': 'Project name is required'}), 400
 
+        # Validate uniqueness of project name
         existing_project = Project.query.filter(func.lower(Project.name) == name.lower()).first()
         if existing_project:
             return jsonify({'error': 'Project name already exists. Please choose another name.'}), 400
+
+        # Validate link (if not empty, must start with http:// or https://)
+        if not is_valid_url(source_link):
+            return jsonify({'error': 'Invalid link. Must start with http:// or https://'}), 400
 
         new_project = Project(name=name, description=description, source_link=source_link, status=status)
         applications = Application.query.filter(Application.id.in_(applications_ids)).all()
@@ -478,7 +509,47 @@ def search_applications():
     result = [{'id': app.id, 'name': app.name} for app in applications]
     return jsonify(result)
 
-### Additional Routes
+@app.route('/edit_project/<int:project_id>', methods=['POST'])
+@login_required
+def edit_project(project_id):
+    """Edits a project's basic fields (including link validation) WITHOUT closing modal automatically."""
+    project = Project.query.get_or_404(project_id)
+    data = request.get_json()
+
+    name = data.get('name', '').strip()
+    description = data.get('description', '').strip()
+    source_link = data.get('source_link', '').strip()
+    status = data.get('status', '').strip()
+
+    if not name:
+        return jsonify({'error': 'Project name cannot be empty'}), 400
+
+    # uniqueness check
+    existing_project = Project.query.filter(
+        func.lower(Project.name) == name.lower(),
+        Project.id != project_id
+    ).first()
+    if existing_project:
+        return jsonify({'error': 'Project name must be unique'}), 400
+
+    # Validate link
+    if not is_valid_url(source_link):
+        return jsonify({'error': 'Invalid link. Must start with http:// or https://'}), 400
+
+    project.name = name
+    project.description = description
+    project.source_link = source_link
+    project.status = status or project.status
+
+    try:
+        db.session.commit()
+        return jsonify({'message': 'Project updated successfully'})
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"Error updating project {project_id}: {str(e)}")
+        return jsonify({'error': 'Database error'}), 500
+
+### Additional routes
 @app.route('/api/login', methods=['POST'])
 def api_login():
     data = request.get_json()
@@ -510,7 +581,6 @@ def guide_page():
 @login_required
 def guide_content():
     return render_template('guide.html')
-
 
 if __name__ == '__main__':
     test_database_connection()

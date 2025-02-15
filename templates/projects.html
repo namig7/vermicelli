@@ -1,6 +1,5 @@
 <!-- projects.html -->
 <div>
-    <!-- Header for Projects -->
     <header class="flex justify-between items-center mb-4">
         <nav class="flex space-x-6 text-gray-700">
             <a href="/applications" data-page="applications" class="tab-link">Applications</a>
@@ -8,7 +7,10 @@
         </nav>
         <div class="flex items-center space-x-4">
             <form id="searchForm" class="relative">
-                <input class="focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 focus:outline-none w-full text-sm text-black placeholder-gray-500 border border-gray-200 rounded-md py-2 pl-10" type="text" name="search" placeholder="Search projects..." value="" />
+                <input class="focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 focus:outline-none w-full text-sm text-black placeholder-gray-500 border border-gray-200 rounded-md py-2 pl-10"
+                       type="text"
+                       name="search"
+                       placeholder="Search projects..." />
                 <svg width="20" height="20" fill="currentColor" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" />
                 </svg>
@@ -21,158 +23,428 @@
             </button>
         </div>
     </header>
-    <!-- Projects List and Pagination Container -->
+
     <div class="flex flex-col" style="min-height: 500px;">
-        <!-- Projects Table -->
-        <div id="projectListContainer" class="flex-grow">
-            <!-- Project list will be loaded here via AJAX -->
-        </div>
-        <!-- Pagination Controls -->
+        <div id="projectListContainer" class="flex-grow"></div>
         <div id="paginationControls" class="flex justify-between items-center mt-4">
-            <button id="prevPage" class="pagination-button hover:bg-yellow-200 hover:text-yellow-800 group flex items-center rounded-full bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2">← Previous</button>
-            <div id="pageNumbers" class="flex items-center space-x-1">
-                <!-- Page numbers will be inserted here -->
-            </div>
-            <button id="nextPage" class="pagination-button hover:bg-yellow-200 hover:text-yellow-800 group flex items-center rounded-full bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2">Next →</button>
+            <button id="prevPage" class="pagination-button hover:bg-yellow-200 hover:text-yellow-800 group flex items-center rounded-full bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2">
+                ← Previous
+            </button>
+            <div id="pageNumbers" class="flex items-center space-x-1"></div>
+            <button id="nextPage" class="pagination-button hover:bg-yellow-200 hover:text-yellow-800 group flex items-center rounded-full bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2">
+                Next →
+            </button>
         </div>
     </div>
-    <!-- New Project Modal -->
+
     <div id="newProjectModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center">
-        <!-- Ensured rounded corners by retaining 'rounded-lg' and verifying no CSS overrides -->
-        <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-visible">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-visible relative">
             <div class="rounded-t-md shadow-sm flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
                 <h3 class="text-lg font-bold text-gray-800">Create New Project</h3>
                 <button onclick="closeNewProjectModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    <svg class="w-6 h-6 my-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
             <div class="p-6 space-y-4">
                 <form id="newProjectForm">
                     <div>
-                        <label for="projectName" class="block text-sm font-medium text-gray-700">Project Name<span class="text-red-500">*</span></label>
-                        <input type="text" id="projectName" name="projectName" class="form-input block w-full mt-1 border border-gray-300 rounded-md shadow-sm" required>
+                        <h4 class="text-sm font-semibold text-gray-600 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6 mr-2 my-1">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 10.5v6m3-3H9m4.06-7.19-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
+                            </svg>
+                            <label for="projectName" class="text-sm font-semibold text-gray-600 flex items-center">
+                                Name<span class="text-red-500">*</span>
+                            </label>
+                        </h4>
+                        <input type="text" id="projectName" name="projectName"
+                               class="form-input block w-full mt-1 border border-gray-300 rounded-md shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500" required>
                     </div>
                     <div>
-                        <label for="projectDescription" class="block text-sm font-medium text-gray-700">Project Description</label>
-                        <textarea id="projectDescription" name="projectDescription" class="form-textarea block w-full mt-1 border border-gray-300 rounded-md shadow-sm" rows="3"></textarea>
+                        <h4 class="text-sm font-semibold text-gray-600 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6 mr-2 my-1">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+                            </svg>
+                            <label for="projectDescription" class="flex items-center text-sm font-medium text-gray-700">
+                                Description:
+                            </label>
+                        </h4>
+                        <textarea id="projectDescription" name="projectDescription" rows="3"
+                                  class="form-textarea block w-full mt-1 border border-gray-300 rounded-md shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500"></textarea>
                     </div>
                     <div>
-                        <label for="projectSourceLink" class="block text-sm font-medium text-gray-700">Source Link</label>
-                        <input type="url" id="projectSourceLink" name="projectSourceLink" class="form-input block w-full mt-1 border border-gray-300 rounded-md shadow-sm" placeholder="https://github.com/username/repo">
+                        <h4 class="text-sm font-semibold text-gray-600 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6 mr-2 my-1">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
+                            </svg>
+                            <label for="projectSourceLink" class="flex items-center text-sm font-medium text-gray-700">
+                                URL:
+                            </label>
+                        </h4>
+                        <input type="url" id="projectSourceLink" name="projectSourceLink"
+                               class="form-input block w-full mt-1 border border-gray-300 rounded-md shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500"
+                               placeholder="https://">
                     </div>
                     <div>
-                        <!-- Custom Select for Project Status -->
-                        <label id="projectStatus-label" class="block text-sm font-medium text-gray-700">Project Status<span class="text-red-500">*</span></label>
+                        <h4 class="text-sm font-semibold text-gray-600 flex items-center mb-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6 mr-2 my-1">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605" />
+                            </svg>
+                            <label id="projectStatus-label" class="block text-sm font-medium text-gray-700">
+                            </label>
+                            Status:<span class="text-red-500">*</span>
+                        </h4>
                         <div class="relative mt-1">
-                            <button type="button" class="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500 sm:text-sm" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="projectStatus-label" id="projectStatus-button">
+                            <button type="button"
+                                    id="projectStatus-button"
+                                    class="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500 sm:text-sm"
+                                    aria-haspopup="listbox" aria-expanded="false" aria-labelledby="projectStatus-label">
                                 <span class="block truncate" id="projectStatus-selected">Select Status</span>
                                 <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                                    <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <svg class="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                                         <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.23 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
                                     </svg>
                                 </span>
                             </button>
-
-                            <!-- Dropdown Options -->
-                            <ul class="absolute z-30 mt-1 max-h-96 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm hidden" id="projectStatus-options" role="listbox" aria-labelledby="projectStatus-label" aria-activedescendant="">
-                                <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-200 hover:text-yellow-800" id="projectStatus-option-Draft" role="option" data-value="Draft">
+                            <ul class="absolute z-30 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm hidden"
+                                id="projectStatus-options"
+                                role="listbox"
+                                aria-labelledby="projectStatus-label"
+                                aria-activedescendant="">
+                                <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-200 hover:text-yellow-800"
+                                    data-value="Draft">
                                     <span class="block truncate">Draft</span>
                                     <span class="absolute inset-y-0 right-0 flex items-center pr-4 hidden">
-                                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 10-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z" clip-rule="evenodd" />
+                                        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd"
+                                                  d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 10-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z"
+                                                  clip-rule="evenodd" />
                                         </svg>
                                     </span>
                                 </li>
-                                <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-200 hover:text-yellow-800" id="projectStatus-option-Planned" role="option" data-value="Planned">
+                                <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-200 hover:text-yellow-800"
+                                    data-value="Planned">
                                     <span class="block truncate">Planned</span>
                                     <span class="absolute inset-y-0 right-0 flex items-center pr-4 hidden">
-                                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 10-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z" clip-rule="evenodd" />
+                                        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd"
+                                                  d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 10-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z"
+                                                  clip-rule="evenodd" />
                                         </svg>
                                     </span>
                                 </li>
-                                <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-200 hover:text-yellow-800" id="projectStatus-option-InProgress" role="option" data-value="In Progress">
+                                <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-200 hover:text-yellow-800"
+                                    data-value="In Progress">
                                     <span class="block truncate">In Progress</span>
                                     <span class="absolute inset-y-0 right-0 flex items-center pr-4 hidden">
-                                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 10-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z" clip-rule="evenodd" />
+                                        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd"
+                                                  d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 10-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z"
+                                                  clip-rule="evenodd" />
                                         </svg>
                                     </span>
                                 </li>
-                                <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-200 hover:text-yellow-800" id="projectStatus-option-Completed" role="option" data-value="Completed">
+                                <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-200 hover:text-yellow-800"
+                                    data-value="Completed">
                                     <span class="block truncate">Completed</span>
                                     <span class="absolute inset-y-0 right-0 flex items-center pr-4 hidden">
-                                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 10-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z" clip-rule="evenodd" />
+                                        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd"
+                                                  d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 10-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z"
+                                                  clip-rule="evenodd" />
                                         </svg>
                                     </span>
                                 </li>
-                                <!-- Continue adding all required status options similarly -->
                             </ul>
                         </div>
                     </div>
                 </form>
             </div>
             <div class="p-4 rounded-b-lg border-t border-gray-200 bg-gray-100 text-right">
-                <button onclick="submitNewProject()" class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 focus:outline-none">
+                <button onclick="submitNewProject()" class="px-4 py-2 bg-yellow-500 text-white rounded-lg focus:outline-none mr-2 transition-colors duration-300 hover:bg-yellow-100 hover:text-yellow-800 active:bg-yellow-500 active:text-white">
                     Create Project
                 </button>
             </div>
         </div>
     </div>
-    <!-- Project Details Modal -->
-    <div id="projectModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 items-center justify-center flex">
-        <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-hidden">
-            <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
-                <h3 id="modalProjectName" class="text-lg font-bold text-gray-800">Project Name</h3>
-                <button onclick="closeProjectModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+    
+    
+
+    <div id="projectModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-visible relative">
+            <div class="p-4 rounded-t-lg border-b border-gray-200 bg-gray-100 relative">
+                <div class="flex items-center space-x-2">
+                    <span id="modalProjectNameDisplay" class="text-lg font-bold text-gray-800 block"></span>
+                        <button id="editNameBtn" class="text-yellow-500 hover:text-blue-500 focus:outline-none">
+                        <input type="text" id="modalProjectNameInput" class="hidden w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-1 focus:outline-none focus:ring-yellow-500" /> 
+                        </button>
+                </div>
+                <button onclick="closeProjectModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 focus:outline-none">
                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
-            <div class="p-6 space-y-4">
-                <div>
-                    <h4 class="text-sm font-semibold text-gray-600">Project Description:</h4>
-                    <p id="modalProjectDescription" class="text-sm text-gray-700">Description of the project will be here...</p>
+            <div class="p-4 space-y-4">
+                <div class="flex items-center space-x-2">
+                    <h4 class="text-sm font-semibold text-gray-600 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6 mr-2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
+                        </svg>
+                        Launched on:
+                    </h4>
+                    <p id="modalProjectCreatedAt" class="text-sm text-gray-500">Date*</p>
                 </div>
                 <div>
-                    <h4 class="text-sm font-semibold text-gray-600">Created At:</h4>
-                    <p id="modalProjectCreatedAt" class="text-sm text-gray-700">Project creation date will appear here...</p>
+                    <h4 class="text-sm font-semibold text-gray-600 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6 mr-2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+                        </svg>
+                        Description:
+                    </h4>
+                    <textarea id="modalProjectDescription" rows="3"
+                              class="w-full mt-1 p-2 border border-gray-300 rounded-md focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500"></textarea>
                 </div>
                 <div>
-                    <h4 class="text-sm font-semibold text-gray-600">Source Link:</h4>
-                    <a id="modalProjectSourceLink" href="#" target="_blank" class="text-sm text-yellow-500 hover:underline">Source link will appear here...</a>
+                    <div class="flex items-center space-x-2">                        
+                        <h4 class="text-sm font-semibold text-gray-600 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6 mr-2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
+                            </svg>
+                            URL:
+                        </h4>
+                    </div>
+                    <div class="relative">
+                        <span id="modalProjectSourceLinkDisplay" class="text-sm mt-1 break-all"></span>
+                        <input type="url" id="modalProjectSourceLinkInput"
+                               class="hidden w-full mt-1 p-2 pr-10 border border-gray-300 rounded-md focus:ring-1 focus:outline-none focus:ring-yellow-500"
+                               placeholder="https://github.com/username/repo" />
+                        <button id="editLinkBtn" class="absolute inset-y-0 right-0 flex items-center pr-2 text-yellow-500 hover:text-blue-500 focus:outline-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                 viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                 class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="m16.862 4.487 1.687-1.688a1.875 1.875 0 012.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                            </svg>
+                        </button>
+                        <button id="cancelLinkEditBtn" class="hidden absolute inset-y-0 right-0 flex items-center pr-2 text-red-500 hover:text-red-700 focus:outline-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                 viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                 class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
                 <div>
-                    <h4 class="text-sm font-semibold text-gray-600">Project Status:</h4>
-                    <span id="modalProjectStatus" class="px-2 py-1 rounded-full"></span>
+                    <h4 class="text-sm font-semibold text-gray-600 flex items-center mb-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6 mr-2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605" />
+                        </svg>
+                        Status:
+                    </h4>
+                    <div class="relative">
+                        <button type="button"
+                                id="editProjectStatus-button"
+                                class="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500 sm:text-sm"
+                                aria-haspopup="listbox" aria-expanded="false">
+                            <span class="block truncate" id="editProjectStatus-selected">Select Status</span>
+                            <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                <svg class="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                          d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.23 8.27a.75.75 0 01.02-1.06z"
+                                          clip-rule="evenodd" />
+                                </svg>
+                            </span>
+                        </button>
+                        <ul class="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm hidden"
+                            id="editProjectStatus-options"
+                            role="listbox">
+                            <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-200 hover:text-yellow-800"
+                                data-value="Draft">
+                                <span class="block truncate">Draft</span>
+                                <span class="absolute inset-y-0 right-0 flex items-center pr-4 hidden">
+                                    <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                              d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586l-3.293-3.293a1 1 0 10-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z"
+                                              clip-rule="evenodd" />
+                                    </svg>
+                                </span>
+                            </li>
+                            <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-200 hover:text-yellow-800"
+                                data-value="Planned">
+                                <span class="block truncate">Planned</span>
+                                <span class="absolute inset-y-0 right-0 flex items-center pr-4 hidden">
+                                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                              d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586l-3.293-3.293a1 1 0 10-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z"
+                                              clip-rule="evenodd" />
+                                    </svg>
+                                </span>
+                            </li>
+                            <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-200 hover:text-yellow-800"
+                                data-value="In Progress">
+                                <span class="block truncate">In Progress</span>
+                                <span class="absolute inset-y-0 right-0 flex items-center pr-4 hidden">
+                                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                              d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586l-3.293-3.293a1 1 0 10-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z"
+                                              clip-rule="evenodd" />
+                                    </svg>
+                                </span>
+                            </li>
+                            <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-200 hover:text-yellow-800"
+                                data-value="Completed">
+                                <span class="block truncate">Completed</span>
+                                <span class="absolute inset-y-0 right-0 flex items-center pr-4 hidden">
+                                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                              d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586l-3.293-3.293a1 1 0 10-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z"
+                                              clip-rule="evenodd" />
+                                    </svg>
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
                 <div>
-                    <h4 class="text-sm font-semibold text-gray-600">Applications:</h4>
+                    <h4 class="text-sm font-semibold text-gray-600 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6 mr-2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 6.878V6a2.25 2.25 0 0 1 2.25-2.25h7.5A2.25 2.25 0 0 1 18 6v.878m-12 0c.235-.083.487-.128.75-.128h10.5c.263 0 .515.045.75.128m-12 0A2.25 2.25 0 0 0 4.5 9v.878m13.5-3A2.25 2.25 0 0 1 19.5 9v.878m0 0a2.246 2.246 0 0 0-.75-.128H5.25c-.263 0-.515.045-.75.128m15 0A2.25 2.25 0 0 1 21 12v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6c0-.98.626-1.813 1.5-2.122" />
+                        </svg>
+                        Applications:
+                    </h4>
                     <ul id="modalProjectApplications" class="list-disc pl-5 text-sm text-gray-700"></ul>
                 </div>
             </div>
-            <div class="p-4 border-t border-gray-200 bg-gray-100 text-right">
-                <button onclick="closeProjectModal()" class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 focus:outline-none">
+            <div class="rounded-b-lg p-4 border-t border-gray-200 bg-gray-100 text-right">
+                <button id="saveChangesBtn"
+                        onclick="updateProject()"
+                        class="hidden px-4 py-2 bg-yellow-500 text-white rounded-lg focus:outline-none mr-2 transition-colors duration-300 hover:bg-yellow-100 hover:text-yellow-800 active:bg-yellow-500 active:text-white">
+                    Save Changes
+                </button>
+                <button onclick="closeProjectModal()"
+                        class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 focus:outline-none">
                     Close
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Consolidated JavaScript for Projects -->
     <script>
         (function() {
-            // Variables for pagination and projects data
+            const editIcon = `
+<svg xmlns="http://www.w3.org/2000/svg" fill="none"
+     viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+  <path stroke-linecap="round" stroke-linejoin="round"
+        d="m16.862 4.487 1.687-1.688a1.875 1.875 0 012.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+</svg>`;
+            const cancelIcon = `
+<svg xmlns="http://www.w3.org/2000/svg" fill="none"
+     viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+  <path stroke-linecap="round" stroke-linejoin="round"
+        d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+</svg>`;
+
             let projectsData = [];
             let currentPage = 1;
-            let totalPages = 1; // Initialize totalPages
-            const projectsPerPage = 5;
+            let totalPages = 1;
 
-            // Helper function to map status to label styles
+            let originalProjectData = {
+                name: '',
+                description: '',
+                source_link: '',
+                status: ''
+            };
+            let currentEditingProjectId = null;
+            let inEditModeName = false;
+            let inEditModeLink = false;
+
+            function setSourceLinkDisplay(link) {
+                if (!link) {
+                    $('#modalProjectSourceLinkDisplay').text('');
+                    return;
+                }
+                const anchor = `
+                  <a href="${link}" target="_blank"
+                     class="text-yellow-600 hover:underline hover:text-yellow-700">
+                    ${link}
+                  </a>`;
+                $('#modalProjectSourceLinkDisplay').html(anchor);
+            }
+
+            function refreshProjectDetails(projectId) {
+                $.ajax({
+                    url: `/project/${projectId}`,
+                    type: 'GET',
+                    success: function(project) {
+                        originalProjectData.name = project.name;
+                        originalProjectData.description = project.description || '';
+                        originalProjectData.source_link = project.source_link || '';
+                        originalProjectData.status = project.status || 'Draft';
+
+                        $('#modalProjectNameDisplay').text(originalProjectData.name);
+                        $('#modalProjectNameInput').val(originalProjectData.name);
+                        $('#modalProjectDescription').val(originalProjectData.description);
+
+                        setSourceLinkDisplay(originalProjectData.source_link);
+                        $('#modalProjectSourceLinkInput').val(originalProjectData.source_link);
+                        $('#modalProjectCreatedAt').text(project.created_at);
+
+                        $('#editProjectStatus-selected').text(originalProjectData.status);
+                        $('#editProjectStatus-options li').each(function() {
+                            $(this).find('span svg').addClass('hidden');
+                        });
+                        $('#editProjectStatus-options li').each(function() {
+                            if ($(this).data('value') === originalProjectData.status) {
+                                $(this).find('span svg').removeClass('hidden');
+                            }
+                        });
+
+                        $('#modalProjectApplications').empty();
+                        if (project.applications && project.applications.length > 0) {
+                            project.applications.forEach(function(app) {
+                                $('#modalProjectApplications').append(`
+                                    <li>
+                                        <a href="#" class="text-yellow-500 hover:text-yellow-600"
+                                           onclick="window.loadPage('application_details', ${app.id});return false;">
+                                           ${app.name}
+                                        </a>
+                                    </li>
+                                `);
+                            });
+                        } else {
+                            $('#modalProjectApplications').append('<li>No applications associated.</li>');
+                        }
+
+                        inEditModeName = false;
+                        inEditModeLink = false;
+                        $('#editNameBtn')
+                            .html(editIcon)
+                            .removeClass('hover:text-red-500')
+                            .addClass('hover:text-blue-500');
+                        $('#modalProjectNameDisplay').removeClass('hidden');
+                        $('#modalProjectNameInput').addClass('hidden');
+
+                        $('#editLinkBtn')
+                            .html(editIcon)
+                            .removeClass('hover:text-red-500')
+                            .addClass('hover:text-blue-500');
+                        $('#modalProjectSourceLinkDisplay').removeClass('hidden');
+                        $('#modalProjectSourceLinkInput').addClass('hidden');
+
+                        $('#saveChangesBtn').addClass('hidden');
+                    },
+                    error: function() {
+                        console.error('Error reloading project data after save');
+                    }
+                });
+            }
+
             function getStatusLabel(status) {
                 let statusClass = '';
                 switch (status) {
@@ -203,7 +475,6 @@
                 return `<span class="px-2 py-1 rounded-full text-xs font-semibold ${statusClass}">${status}</span>`;
             }
 
-            // Helper function to show SweetAlert2 modals with consistent styling
             function showSwalModal({ title, text, icon, confirmText, cancelText, onConfirm }) {
                 Swal.fire({
                     title: title || '',
@@ -213,15 +484,15 @@
                     confirmButtonText: confirmText || 'OK',
                     cancelButtonText: cancelText || 'Cancel',
                     customClass: {
-                        popup: 'bg-white rounded-lg shadow-lg', // Modal styles
-                        title: 'text-xl font-bold text-gray-800', // Title styles
-                        content: 'text-gray-700', // Content styles
+                        popup: 'bg-white rounded-lg shadow-lg',
+                        title: 'text-xl font-bold text-gray-800',
+                        content: 'text-gray-700',
                         confirmButton: getButtonClass(icon, 'confirm'),
                         cancelButton: getButtonClass(icon, 'cancel'),
-                        actions: 'flex justify-center space-x-4' // Space between buttons
+                        actions: 'flex justify-center space-x-4'
                     },
-                    buttonsStyling: false, // Disable default styles
-                    scrollbarPadding: false // Disable automatic scrollbar padding
+                    buttonsStyling: false,
+                    scrollbarPadding: false
                 }).then((result) => {
                     if (result.isConfirmed && typeof onConfirm === 'function') {
                         onConfirm();
@@ -229,44 +500,39 @@
                 });
             }
 
-            // Function to determine button classes based on icon type
             function getButtonClass(icon, type) {
                 switch (icon) {
                     case 'success':
-                        return type === 'confirm' 
+                        return type === 'confirm'
                             ? 'hover:bg-green-200 hover:text-green-800 rounded-md bg-green-100 text-green-600 text-sm font-medium px-4 py-2'
                             : 'hover:bg-gray-200 hover:text-gray-800 rounded-md bg-gray-100 text-gray-600 text-sm font-medium px-4 py-2';
                     case 'error':
-                        return type === 'confirm' 
+                        return type === 'confirm'
                             ? 'hover:bg-red-200 hover:text-red-800 rounded-md bg-red-100 text-red-600 text-sm font-medium px-4 py-2'
                             : 'hover:bg-gray-200 hover:text-gray-800 rounded-md bg-gray-100 text-gray-600 text-sm font-medium px-4 py-2';
                     case 'warning':
-                        return type === 'confirm' 
+                        return type === 'confirm'
                             ? 'hover:bg-yellow-200 hover:text-yellow-800 rounded-md bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2'
                             : 'hover:bg-gray-200 hover:text-gray-800 rounded-md bg-gray-100 text-gray-600 text-sm font-medium px-4 py-2';
                     case 'info':
                     default:
-                        return type === 'confirm' 
+                        return type === 'confirm'
                             ? 'hover:bg-blue-200 hover:text-blue-800 rounded-md bg-blue-100 text-blue-600 text-sm font-medium px-4 py-2'
                             : 'hover:bg-gray-200 hover:text-gray-800 rounded-md bg-gray-100 text-gray-600 text-sm font-medium px-4 py-2';
                 }
             }
 
-            // Function to load projects data
             function loadProjectsData(searchQuery = '') {
-                // Show loading placeholder
                 $('#projectListContainer').html('<div class="text-center py-20">Loading...</div>');
-
                 $.ajax({
                     url: '/get_projects_data',
                     type: 'GET',
                     data: { search: searchQuery, page: currentPage },
                     success: function(response) {
-                        console.log('Loaded data:', response); // Debugging
                         projectsData = response.projects;
-                        currentPage = response.page; // Ensure currentPage is updated
-                        totalPages = response.total_pages; // Update totalPages
-                        displayProjects();
+                        currentPage = response.page;
+                        totalPages = response.total_pages;
+                        renderProjectsTable();
                         updatePaginationControls(response);
                     },
                     error: function() {
@@ -275,9 +541,8 @@
                 });
             }
 
-            // Function to display projects on the current page
-            function displayProjects() {
-                let projectListHtml = `
+            function renderProjectsTable() {
+                let html = `
                     <div class="bg-white shadow-md rounded my-6">
                         <table class="table-fixed text-left w-full border-collapse">
                             <thead>
@@ -292,47 +557,59 @@
                             <tbody>
                 `;
 
-                projectsData.forEach(function(project) {
-                    // Truncate project name if it's too long and add a tooltip
-                    let truncatedName = project.name.length > 20 ? `<span title="${project.name}">${project.name.substring(0, 20)}…</span>` : project.name;
-
-                    projectListHtml += `
-                        <tr class="hover:bg-gray-50 project-row" data-id="${project.id}">
+                projectsData.forEach(function(proj) {
+                    let truncatedName = proj.name.length > 20 ? `<span title="${proj.name}">${proj.name.substring(0, 20)}…</span>` : proj.name;
+                    html += `
+                        <tr class="hover:bg-gray-50" data-id="${proj.id}">
                             <td class="text-lg text-gray-600 py-4 px-6 border-b border-gray-200">
                                 <span class="inline-block bg-gray-200 text-gray-800 rounded-full px-3 py-1 text-sm font-semibold">
-                                    ${project.id}
+                                    ${proj.id}
                                 </span>
                             </td>
-                            <td class="text-base text-gray-600 py-4 px-6 border-b border-gray-200 truncate" style="max-width: 150px;">
-                                <a href="#" class="text-black-500 hover:text-black-600 truncate hover:underline" onclick="openProjectDetails(${project.id}); return false;" style="max-width: 150px;">
+                            <td class="text-base text-gray-600 py-4 px-6 border-b border-gray-200 truncate" style="max-width:150px;">
+                                <a href="#" class="hover:underline" onclick="openProjectDetails(${proj.id});return false;">
                                     ${truncatedName}
                                 </a>
                             </td>
-                            <td class="text-base text-gray-600 py-4 px-6 border-b border-gray-200">${project.start_date}</td>
-                            <td class="text-base py-4 px-6 border-b border-gray-200">${getStatusLabel(project.status)}</td>
+                            <td class="text-base text-gray-600 py-4 px-6 border-b border-gray-200">${proj.start_date}</td>
+                            <td class="text-base py-4 px-6 border-b border-gray-200">${getStatusLabel(proj.status)}</td>
                             <td class="py-4 px-6 border-b border-gray-200">
                                 <div class="flex space-x-2">
-                                    <button class="details-button text-yellow-500 hover:text-yellow-600 flex items-center" data-id="${project.id}">
-                                        <!-- Details SVG Icon -->
+                                    <button class="details-button text-yellow-500 hover:text-yellow-600 flex items-center" data-id="${proj.id}">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.75 9.776c.112-.017.227-.026.344-.026h15.812c.117 0 .232.009.344.026m-16.5 0a2.25 2.25 0 0 0-1.883 2.542l.857 6a2.25 2.25 0 0 0 2.227 1.932H19.05a2.25 2.25 0 0 0 2.227-1.932l.857-6a2.25 2.25 0 0 0-1.883-2.542m-16.5 0V6A2.25 2.25 0 0 1 6 3.75h3.879a1.5 1.5 0 0 1 1.06.44l2.122 2.12a1.5 1.5 0 0 0 1.06.44H18A2.25 2.25 0 0 1 20.25 9v.776" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M3.75 9.776c.112-.017.227-.026.344-.026h15.812c.117 0
+                                                     .232.009.344.026m-16.5 0a2.25 2.25 0 0 0-1.883
+                                                     2.542l.857 6a2.25 2.25 0 0 0 2.227
+                                                     1.932H19.05a2.25 2.25 0 0 0 2.227-1.932l.857-6a2.25
+                                                     2.25 0 0 0-1.883-2.542m-16.5 0V6A2.25 2.25 0 0
+                                                     1 6 3.75h3.879a1.5 1.5 0
+                                                     0 1 1.06.44l2.122 2.12a1.5 1.5
+                                                     0 0 0 1.06.44H18A2.25 2.25 0 0 1
+                                                     20.25 9v.776"/>
                                         </svg>
                                     </button>
-                                    <button class="delete-button text-yellow-500 hover:text-red-600 flex items-center" data-id="${project.id}">
-                                        <!-- Delete SVG Icon -->
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" 
+                                    <button class="delete-button text-yellow-500 hover:text-red-600 flex items-center" data-id="${proj.id}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                              stroke="currentColor" class="w-6 h-6">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                  d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 
-                                                     1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 
-                                                     1-2.244 2.077H8.084a2.25 2.25 0 0 
-                                                     1-2.244-2.077L4.772 5.79m14.456 
-                                                     0a48.108 48.108 0 0 0-3.478-.397m-12 
-                                                     .562c.34-.059.68-.114 1.022-.165m0 0a48.11 
-                                                     48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201 
-                                                     a51.964 51.964 0 0 0-3.32 
-                                                     0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 
-                                                     0a48.667 48.667 0 0 0-7.5 0" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="m14.74 9-.346 9m-4.788 0
+                                                     L9.26 9m9.968-3.21c.342.052.682.107
+                                                     1.022.166m-1.022-.165L18.16
+                                                     19.673a2.25 2.25 0 0
+                                                     1-2.244 2.077H8.084a2.25
+                                                     2.25 0 0 1-2.244-2.077L4.772
+                                                     5.79m14.456
+                                                     0a48.108 48.108 0 0 0-3.478-.397m-12
+                                                     .562c.34-.059.68-.114
+                                                     1.022-.165m0 0a48.11 48.11
+                                                     0 0 1 3.478-.397m7.5
+                                                     0v-.916c0-1.18-.91-2.164-2.09-2.201
+                                                     a51.964 51.964
+                                                     0 0 0-3.32 0c-1.18.037-2.09
+                                                     1.022-2.09 2.201v.916m7.5
+                                                     0a48.667 48.667 0 0 0-7.5
+                                                     0"/>
                                         </svg>
                                     </button>
                                 </div>
@@ -341,36 +618,26 @@
                     `;
                 });
 
-                projectListHtml += `
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-
-                $('#projectListContainer').html(projectListHtml);
+                html += `</tbody></table></div>`;
+                $('#projectListContainer').html(html);
             }
 
-            // Function to update pagination controls
             function updatePaginationControls(response) {
                 totalPages = response.total_pages;
                 currentPage = response.page;
-                $('#pageNumbers').html(''); // Clear existing page numbers
+                $('#pageNumbers').html('');
 
-                // Show or hide "Previous" button
                 if (!response.has_prev) {
                     $('#prevPage').addClass('invisible');
                 } else {
                     $('#prevPage').removeClass('invisible');
                 }
-
-                // Show or hide "Next" button
                 if (!response.has_next) {
                     $('#nextPage').addClass('invisible');
                 } else {
                     $('#nextPage').removeClass('invisible');
                 }
 
-                // Display page numbers
                 const maxVisiblePages = 5;
                 let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
                 let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
@@ -381,61 +648,85 @@
 
                 for (let page = startPage; page <= endPage; page++) {
                     $('#pageNumbers').append(`
-                        <span class="cursor-pointer inline-flex items-center justify-center w-8 h-8 
-                            ${page === currentPage 
-                            ? 'bg-yellow-100 text-yellow-600' 
-                            : 'bg-white hover:bg-yellow-200 border border-gray-200'} 
-                        rounded-full" 
+                        <span class="cursor-pointer inline-flex items-center justify-center w-8 h-8
+                            ${page === currentPage
+                            ? 'bg-yellow-100 text-yellow-600'
+                            : 'bg-white hover:bg-yellow-200 border border-gray-200'}
+                            rounded-full"
                             onclick="goToPage(${page})">${page}</span>
                     `);
                 }
             }
 
-            // Function to go to a specific page
             window.goToPage = function(page) {
-                if (page < 1 || page > totalPages) {
-                    return; // Prevent navigating to invalid pages
-                }
+                if (page < 1 || page > totalPages) return;
                 currentPage = page;
                 loadProjectsData($('#searchForm input[name="search"]').val());
             }
 
-            // Function to open project details modal
             window.openProjectDetails = function(projectId) {
+                inEditModeName = false;
+                inEditModeLink = false;
+                $('#editNameBtn')
+                    .html(editIcon)
+                    .removeClass('hover:text-red-500')
+                    .addClass('hover:text-blue-500');
+                $('#editLinkBtn')
+                    .html(editIcon)
+                    .removeClass('hover:text-red-500')
+                    .addClass('hover:text-blue-500');
+
+                $('#modalProjectNameDisplay').removeClass('hidden');
+                $('#modalProjectNameInput').addClass('hidden');
+                $('#modalProjectSourceLinkDisplay').removeClass('hidden');
+                $('#modalProjectSourceLinkInput').addClass('hidden');
+
                 $.ajax({
                     url: `/project/${projectId}`,
                     type: 'GET',
                     success: function(project) {
-                        // Populate modal fields
-                        $('#modalProjectName').text(project.name);
-                        $('#modalProjectDescription').text(project.description || 'No description provided.');
-                        $('#modalProjectCreatedAt').text(project.created_at);
-                        if (project.source_link) {
-                            $('#modalProjectSourceLink').attr('href', project.source_link).text(project.source_link);
-                        } else {
-                            $('#modalProjectSourceLink').attr('href', '#').text('No source link provided.');
-                        }
-                        // Update status label in modal
-                        $('#modalProjectStatus').html(getStatusLabel(project.status));
+                        currentEditingProjectId = projectId;
 
-                        // Handle applications list
+                        originalProjectData.name = project.name;
+                        originalProjectData.description = project.description || '';
+                        originalProjectData.source_link = project.source_link || '';
+                        originalProjectData.status = project.status || 'Draft';
+
+                        $('#modalProjectNameDisplay').text(originalProjectData.name);
+                        $('#modalProjectNameInput').val(originalProjectData.name);
+                        $('#modalProjectDescription').val(originalProjectData.description);
+
+                        setSourceLinkDisplay(originalProjectData.source_link);
+                        $('#modalProjectSourceLinkInput').val(originalProjectData.source_link);
+                        $('#modalProjectCreatedAt').text(project.created_at);
+
+                        $('#editProjectStatus-selected').text(originalProjectData.status);
+                        $('#editProjectStatus-options li').each(function() {
+                            $(this).find('span svg').addClass('hidden');
+                        });
+                        $('#editProjectStatus-options li').each(function() {
+                            if ($(this).data('value') === originalProjectData.status) {
+                                $(this).find('span svg').removeClass('hidden');
+                            }
+                        });
+
                         $('#modalProjectApplications').empty();
                         if (project.applications && project.applications.length > 0) {
                             project.applications.forEach(function(app) {
-                                $('#modalProjectApplications').append(
-                                    `<li>
-                                        <a href="#" class="text-yellow-500 hover:text-yellow-600" 
-                                           onclick="window.loadPage('application_details', ${app.id}); return false;">
-                                            ${app.name}
+                                $('#modalProjectApplications').append(`
+                                    <li>
+                                        <a href="#" class="text-yellow-500 hover:text-yellow-600"
+                                           onclick="window.loadPage('application_details', ${app.id});return false;">
+                                           ${app.name}
                                         </a>
-                                     </li>`
-                                );
+                                    </li>
+                                `);
                             });
                         } else {
                             $('#modalProjectApplications').append('<li>No applications associated.</li>');
-                        }    
+                        }
 
-                        // Show modal
+                        $('#saveChangesBtn').addClass('hidden');
                         $('#projectModal').removeClass('hidden');
                     },
                     error: function(xhr) {
@@ -449,12 +740,10 @@
                 });
             }
 
-            // Function to close project details modal
             window.closeProjectModal = function() {
                 $('#projectModal').addClass('hidden');
             }
 
-            // Function to delete project
             function deleteProject(projectId) {
                 $.ajax({
                     url: `/delete_project/${projectId}`,
@@ -471,7 +760,65 @@
                         });
                     },
                     error: function(xhr) {
-                        const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error deleting project';
+                        const err = xhr.responseJSON ? xhr.responseJSON.error : 'Error deleting project';
+                        showSwalModal({
+                            title: 'Error!',
+                            text: `Error: ${err}`,
+                            icon: 'error',
+                            confirmText: 'OK'
+                        });
+                    }
+                });
+            }
+
+            window.updateProject = function() {
+                if (!currentEditingProjectId) return;
+
+                const updatedData = {
+                    name: $('#modalProjectNameDisplay').text().trim(),
+                    description: $('#modalProjectDescription').val().trim(),
+                    source_link: $('#modalProjectSourceLinkInput').val().trim(),
+                    status: $('#editProjectStatus-selected').text().trim()
+                };                
+
+                if (!updatedData.name) {
+                    showSwalModal({
+                        title: 'Validation Error',
+                        text: 'Project name cannot be empty.',
+                        icon: 'error',
+                        confirmText: 'OK'
+                    });
+                    return;
+                }
+
+                $.ajax({
+                    url: `/edit_project/${currentEditingProjectId}`,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(updatedData),
+                    success: function(resp) {
+                        if (resp.message) {
+                            showSwalModal({
+                                title: 'Success!',
+                                text: resp.message,
+                                icon: 'success',
+                                confirmText: 'OK',
+                                onConfirm: function() {
+                                    refreshProjectDetails(currentEditingProjectId);
+                                    loadProjectsData($('#searchForm input[name="search"]').val());
+                                }
+                            });
+                        } else {
+                            showSwalModal({
+                                title: 'Error!',
+                                text: resp.error || 'Unknown error',
+                                icon: 'error',
+                                confirmText: 'OK'
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error updating project';
                         showSwalModal({
                             title: 'Error!',
                             text: `Error: ${error}`,
@@ -482,13 +829,10 @@
                 });
             }
 
-            // Function to submit new project
             window.submitNewProject = function() {
                 const name = $('#projectName').val().trim();
                 const status = $('#projectStatus-hidden').val();
 
-                // Validation Order:
-                // 1. Project Name is filled
                 if (!name) {
                     showSwalModal({
                         title: 'Validation Error',
@@ -496,10 +840,8 @@
                         icon: 'error',
                         confirmText: 'OK'
                     });
-                    return; // Prevent form submission
+                    return;
                 }
-
-                // 2. Project Status is selected
                 if (!status) {
                     showSwalModal({
                         title: 'Validation Error',
@@ -507,16 +849,17 @@
                         icon: 'error',
                         confirmText: 'OK'
                     });
-                    return; // Prevent form submission
+                    return;
                 }
 
                 const formData = {
-                    name: name,
+                    name,
                     description: $('#projectDescription').val().trim(),
                     source_link: $('#projectSourceLink').val().trim(),
-                    status: status, // Get the selected status from hidden input
-                    applications: [] // Add application IDs if needed
+                    status,
+                    applications: []
                 };
+
                 $.ajax({
                     url: '/create_project',
                     type: 'POST',
@@ -546,12 +889,30 @@
                 });
             }
 
-            // Event handlers using Event Delegation for dynamic content
             $(document).ready(function() {
-                // Event delegation for delete buttons
+                $('#prevPage').on('click', function(e) {
+                    e.preventDefault();
+                    if (currentPage > 1) {
+                        goToPage(currentPage - 1);
+                    }
+                });
+
+                $('#nextPage').on('click', function(e) {
+                    e.preventDefault();
+                    if (currentPage < totalPages) {
+                        goToPage(currentPage + 1);
+                    }
+                });
+
+                $('#projectListContainer').on('click', '.details-button', function(e) {
+                    e.preventDefault();
+                    const pid = $(this).data('id');
+                    openProjectDetails(pid);
+                });
+
                 $('#projectListContainer').on('click', '.delete-button', function(e) {
-                    e.stopPropagation();
-                    const projectId = $(this).data('id');
+                    e.preventDefault();
+                    const pid = $(this).data('id');
                     showSwalModal({
                         title: 'Are you sure?',
                         text: "This will permanently delete the project.",
@@ -559,135 +920,233 @@
                         confirmText: 'Yes, delete it!',
                         cancelText: 'Cancel',
                         onConfirm: function() {
-                            deleteProject(projectId);
+                            deleteProject(pid);
                         }
                     });
                 });
 
-                // Event delegation for details buttons
-                $('#projectListContainer').on('click', '.details-button', function(e) {
-                    e.preventDefault();
-                    const projectId = $(this).data('id');
-                    openProjectDetails(projectId);
-                });
-
-                // Initial data load
                 loadProjectsData();
 
-                // Search form handler
                 $('#searchForm').on('submit', function(e) {
                     e.preventDefault();
-                    currentPage = 1; // Reset to first page
-                    loadProjectsData($(this).find('input[name="search"]').val());
+                    currentPage = 1;
+                    loadProjectsData($('#searchForm input[name="search"]').val());
                 });
 
-                // Modal functions for new project are already defined above
-                // Ensure they are attached to window if called via onclick
                 window.openNewProjectModal = function() {
                     $('#newProjectModal').removeClass('hidden');
                 }
-
                 window.closeNewProjectModal = function() {
                     $('#newProjectModal').addClass('hidden');
                     $('#newProjectForm')[0].reset();
-
-                    // Reset custom select
                     $('#projectStatus-selected').text('Select Status').removeClass('text-yellow-600');
                     $('#projectStatus-options li').each(function() {
                         $(this).find('span svg').addClass('hidden');
                     });
-                    $('#projectStatus-hidden').remove(); // Remove the hidden input
+                    $('#projectStatus-hidden').remove();
                 }
-
-                // Initialize custom select functionality
-                initializeCustomSelect();
-
-                // **Adjustment 3: Close modal when clicking outside the modal content**
                 $('#newProjectModal').on('click', function(e) {
                     if (e.target.id === 'newProjectModal') {
                         closeNewProjectModal();
                     }
                 });
 
-                // **New Adjustment: Close Project Details Modal when clicking outside**
                 $('#projectModal').on('click', function(e) {
                     if (e.target.id === 'projectModal') {
                         closeProjectModal();
                     }
                 });
-            });
 
-            // Attach click handlers for Prev and Next buttons once, outside of updatePaginationControls
-            // Ensure they are not re-attached multiple times
-            $('#prevPage').off('click').on('click', function() {
-                if (currentPage > 1) {
-                    currentPage--;
-                    loadProjectsData($('#searchForm input[name="search"]').val());
-                }
-            });
+                initializeCustomSelect('projectStatus-button','projectStatus-options','projectStatus-selected','newProjectForm');
+                initializeCustomSelect('editProjectStatus-button','editProjectStatus-options','editProjectStatus-selected');
 
-            $('#nextPage').off('click').on('click', function() {
-                if (currentPage < totalPages) {
-                    currentPage++;
-                    loadProjectsData($('#searchForm input[name="search"]').val());
-                }
-            });
+                $('#editNameBtn').off('click').on('click', function() {
+                    Swal.fire({
+                        title: 'Edit Project Name',
+                        input: 'text',
+                        inputLabel: 'Project Name',
+                        inputValue: originalProjectData.name,
+                        showCancelButton: true,
+                        confirmButtonText: 'Save',
+                        cancelButtonText: 'Cancel',
+                        customClass: {
+                            popup: 'bg-white rounded-lg shadow-lg',
+                            title: 'text-xl font-bold text-gray-800',
+                            content: 'text-gray-700',
+                            input: 'border border-gray-300 rounded-md px-3 py-2 focus:shadow-none focus:border-yellow-500 focus:outline-none',
+                            confirmButton: 'hover:bg-yellow-200 hover:text-yellow-800 rounded-md bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2',
+                            cancelButton: 'hover:bg-gray-200 hover:text-gray-800 rounded-md bg-gray-100 text-gray-600 text-sm font-medium px-4 py-2',
+                            actions: 'flex justify-center space-x-4'
+                        },
+                        buttonsStyling: false,
+                        scrollbarPadding: false,
+                        preConfirm: (newName) => {
+                            if (!newName) {
+                                Swal.showValidationMessage('Project name cannot be empty');
+                            }
+                            return newName;
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            let updatedName = result.value;
+                            $.ajax({
+                                url: `/edit_project/${currentEditingProjectId}`,
+                                type: 'POST',
+                                contentType: 'application/json',
+                                data: JSON.stringify({
+                                    name: updatedName,
+                                    description: $('#modalProjectDescription').val().trim(),
+                                    source_link: $('#modalProjectSourceLinkInput').val().trim() || originalProjectData.source_link,
+                                    status: $('#editProjectStatus-selected').text().trim()
+                                }),
+                                success: function(resp) {
+                                    if (resp.message) {
+                                        Swal.fire({
+                                            title: 'Success!',
+                                            text: resp.message,
+                                            icon: 'success',
+                                            customClass: {
+                                                popup: 'bg-white rounded-lg shadow-lg',
+                                                title: 'text-xl font-bold text-gray-800',
+                                                content: 'text-gray-700',
+                                                confirmButton: 'hover:bg-green-200 hover:text-green-800 rounded-md bg-green-100 text-green-600 text-sm font-medium px-4 py-2',
+                                                actions: 'flex justify-center'
+                                            },
+                                            buttonsStyling: false,
+                                            scrollbarPadding: false
+                                        });
+                                        refreshProjectDetails(currentEditingProjectId);
+                                        loadProjectsData($('#searchForm input[name="search"]').val());
+                                    } else {
+                                        Swal.fire({
+                                            title: 'Error!',
+                                            text: resp.error || 'Unknown error',
+                                            icon: 'error',
+                                            customClass: {
+                                                popup: 'bg-white rounded-lg shadow-lg',
+                                                title: 'text-xl font-bold text-gray-800',
+                                                content: 'text-gray-700',
+                                                confirmButton: 'hover:bg-red-200 hover:text-red-800 rounded-md bg-red-100 text-red-600 text-sm font-medium px-4 py-2',
+                                                actions: 'flex justify-center'
+                                            },
+                                            buttonsStyling: false,
+                                            scrollbarPadding: false
+                                        });
+                                    }
+                                },
+                                error: function(xhr) {
+                                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error updating project';
+                                    Swal.fire({
+                                        title: 'Error!',
+                                        text: error,
+                                        icon: 'error',
+                                        customClass: {
+                                            popup: 'bg-white rounded-lg shadow-lg',
+                                            title: 'text-xl font-bold text-gray-800',
+                                            content: 'text-gray-700',
+                                            confirmButton: 'hover:bg-red-200 hover:text-red-800 rounded-md bg-red-100 text-red-600 text-sm font-medium px-4 py-2',
+                                            actions: 'flex justify-center'
+                                        },
+                                        buttonsStyling: false,
+                                        scrollbarPadding: false
+                                    });
+                                }
+                            });
+                        }
+                    });
+                });                
 
-            // Function to initialize custom select functionality
-            function initializeCustomSelect() {
-                const projectStatusButton = document.getElementById('projectStatus-button');
-                const projectStatusOptions = document.getElementById('projectStatus-options');
-                const projectStatusSelected = document.getElementById('projectStatus-selected');
-                const projectStatusOptionsList = projectStatusOptions.querySelectorAll('li');
-
-                // Toggle the dropdown menu
-                projectStatusButton.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                    const expanded = projectStatusButton.getAttribute('aria-expanded') === 'true' || false;
-                    projectStatusButton.setAttribute('aria-expanded', !expanded);
-                    projectStatusOptions.classList.toggle('hidden');
-                });
-
-                // Close the dropdown when clicking outside
-                document.addEventListener('click', function (event) {
-                    if (!projectStatusButton.contains(event.target) && !projectStatusOptions.contains(event.target)) {
-                        projectStatusButton.setAttribute('aria-expanded', 'false');
-                        projectStatusOptions.classList.add('hidden');
+                $('#editLinkBtn').on('click', function() {
+                    if (!inEditModeLink) {
+                        inEditModeLink = true;
+                        $(this).html(cancelIcon);
+                        $(this).removeClass('hover:text-blue-500').addClass('hover:text-red-500');
+                        $('#modalProjectSourceLinkDisplay').addClass('hidden');
+                        $('#modalProjectSourceLinkInput').removeClass('hidden').focus();
+                    } else {
+                        inEditModeLink = false;
+                        $(this).html(editIcon);
+                        $(this).removeClass('hover:text-red-500').addClass('hover:text-blue-500');
+                        setSourceLinkDisplay(originalProjectData.source_link);
+                        $('#modalProjectSourceLinkInput').val(originalProjectData.source_link)
+                            .addClass('hidden');
+                        $('#modalProjectSourceLinkDisplay').removeClass('hidden');
+                        checkIfModified();
                     }
                 });
 
-                // Handle option selection
-                projectStatusOptionsList.forEach(function (option) {
-                    option.addEventListener('click', function () {
-                        const value = this.getAttribute('data-value');
-                        projectStatusSelected.textContent = value;
-                        projectStatusButton.setAttribute('aria-expanded', 'false');
-                        projectStatusOptions.classList.add('hidden');
+                $('#modalProjectDescription, #modalProjectSourceLinkInput').on('input', function() {
+                    checkIfModified();
+                });                
+            });
 
-                        // Remove checkmark from all options
-                        projectStatusOptionsList.forEach(function (opt) {
-                            opt.querySelector('span svg').classList.add('hidden');
-                        });
+            function checkIfModified() {
+                const currentDesc = $('#modalProjectDescription').val().trim();
+                const currentLink = $('#modalProjectSourceLinkInput').val().trim();
+                const currentStatus = $('#editProjectStatus-selected').text().trim();
+            
+                const changed = (
+                    currentDesc !== originalProjectData.description ||
+                    currentLink !== originalProjectData.source_link ||
+                    currentStatus !== originalProjectData.status
+                );
+            
+                if (changed) {
+                    $('#saveChangesBtn').removeClass('hidden');
+                } else {
+                    $('#saveChangesBtn').addClass('hidden');
+                }
+            }            
 
-                        // Add checkmark to the selected option
-                        this.querySelector('span svg').classList.remove('hidden');
+            function initializeCustomSelect(buttonId, optionsId, selectedId, formId='') {
+                const triggerBtn = document.getElementById(buttonId);
+                const optionsList = document.getElementById(optionsId);
+                const selectedSpan = document.getElementById(selectedId);
+                if (!triggerBtn) return;
 
-                        // Update the hidden input
-                        let hiddenInput = document.getElementById('projectStatus-hidden');
-                        if (!hiddenInput) {
-                            hiddenInput = document.createElement('input');
-                            hiddenInput.type = 'hidden';
-                            hiddenInput.id = 'projectStatus-hidden';
-                            hiddenInput.name = 'projectStatus';
-                            document.getElementById('newProjectForm').appendChild(hiddenInput);
+                const listItems = optionsList.querySelectorAll('li');
+
+                triggerBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const expanded = triggerBtn.getAttribute('aria-expanded') === 'true' || false;
+                    triggerBtn.setAttribute('aria-expanded', !expanded);
+                    optionsList.classList.toggle('hidden');
+                });
+
+                document.addEventListener('click', (event) => {
+                    if (!triggerBtn.contains(event.target) && !optionsList.contains(event.target)) {
+                        triggerBtn.setAttribute('aria-expanded', 'false');
+                        optionsList.classList.add('hidden');
+                    }
+                });
+
+                listItems.forEach(li => {
+                    li.addEventListener('click', () => {
+                        const val = li.getAttribute('data-value');
+                        selectedSpan.textContent = val;
+                        listItems.forEach(i => i.querySelector('span svg').classList.add('hidden'));
+                        li.querySelector('span svg').classList.remove('hidden');
+
+                        triggerBtn.setAttribute('aria-expanded', 'false');
+                        optionsList.classList.add('hidden');
+
+                        if (formId) {
+                            let hiddenInput = document.getElementById('projectStatus-hidden');
+                            if (!hiddenInput) {
+                                hiddenInput = document.createElement('input');
+                                hiddenInput.type = 'hidden';
+                                hiddenInput.id = 'projectStatus-hidden';
+                                hiddenInput.name = 'projectStatus';
+                                document.getElementById(formId).appendChild(hiddenInput);
+                            }
+                            hiddenInput.value = val;
+                            selectedSpan.classList.add('text-yellow-600');
                         }
-                        hiddenInput.value = value;
 
-                        // **Adjustment 4: Set selected status color to match buttons (yellow)**
-                        projectStatusSelected.classList.add('text-yellow-600');
+                        checkIfModified();
                     });
                 });
             }
-        })(); // End of IIFE
+        })();
     </script>
 </div>
