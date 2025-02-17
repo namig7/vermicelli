@@ -9,6 +9,7 @@ Simple self-hosted version control automation to track and manage the versions o
 [![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)](https://github.com/namig7/vermicelli)
 ![GitHub Created At](https://img.shields.io/github/created-at/namig7/vermicelli)
 ![GitHub License](https://img.shields.io/github/license/namig7/vermicelli) ![GitHub last commit](https://img.shields.io/github/last-commit/namig7/vermicelli%2Fdevelop) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/namig7/vermicelli) ![GitHub top language](https://img.shields.io/github/languages/top/namig7/vermicelli)
+[![CodeFactor](https://www.codefactor.io/repository/github/namig7/vermicelli/badge/develop)](https://www.codefactor.io/repository/github/namig7/vermicelli/overview/develop)
 
 [![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=fff)](https://img.shields.io/docker/image-size/namigg/vermicelli/latest) 
 ![Docker Image Size (tag)](https://img.shields.io/docker/image-size/namigg/vermicelli/latest)
