@@ -64,6 +64,19 @@
             padding-right: 0 !important; /* Remove any added padding */
         }
     </style>
+    <style>
+        .spinner {
+          border: 4px solid rgba(0, 0, 0, 0.1);
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          border-left-color: #f59e0b; /* оттенок yellow-500 */
+          animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      </style>
 </head>
 <body data-initial-page="{{ initial_page | default('applications') }}" data-app-id="{{ app_id or '' }}">
     <!-- Header -->
@@ -109,7 +122,8 @@
             $(`.tab-link[data-page="${page}"]`).addClass('active');
 
             // Show loading indicator (optional)
-            $('#content-area').html('<p>Loading...</p>');
+            $('#content-area').html('<div class="flex justify-center items-center py-20"><div class="spinner"></div></div>');
+
 
             // Construct the URL for AJAX request
             let url = '';

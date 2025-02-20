@@ -523,7 +523,7 @@
             }
 
             function loadProjectsData(searchQuery = '') {
-                $('#projectListContainer').html('<div class="text-center py-20">Loading...</div>');
+                $('#projectListContainer').html('<div class="flex justify-center items-center py-20"><div class="spinner"></div></div>');
                 $.ajax({
                     url: '/get_projects_data',
                     type: 'GET',

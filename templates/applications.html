@@ -330,7 +330,7 @@
 
     // ============== Load & Display Applications ==============
     function loadAppsData(searchQuery = '') {
-        $('#appListContainer').html('<div class="text-center py-20">Loading...</div>');
+        $('#appListContainer').html('<div class="flex justify-center items-center py-20"><div class="spinner"></div></div>');
         $.ajax({
             url: '/get_applications_data',
             type: 'GET',
