@@ -79,3 +79,6 @@ For the advanced installation steps and features(Docker & Non-docker with Postgr
 
 ```bash
 ./update.sh --version patch --appid 10 --username myuser --password mypass --url http://myapi.example.com
+```
+
+The script increments the selected version part for the given application.
