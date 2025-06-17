@@ -1,0 +1,44 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Python virtual environment
+venv/
+
+# Flask session files
+flask_session/
+
+# Sqlite files
+instance/
+
+# Logs
+*.log
+
+# Environment and sensitive files
+*.env
+*.env.*
+
+# Cookies file
+cookies.txt
+
+# Node modules and package files
+node_modules/
+package-lock.json
+
+# Static files (runtime or generated assets)
+static/
+
+# Template cache (if applicable)
+templates/__pycache__/
+
+# Backup scripts
+*.backup
+
+# Miscellaneous
+*.swp
+*.swo
+*~
+.DS_Store
+flask_session/
+.idea/

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='public/favicon.ico') }}">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@^2.0/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-['url_for('static', filename='public/wiggle.svg')]">
+<div class="flex justify-center items-center h-screen">
+    <header class="flex items-center justify-between px-48 py-10 bg-white shadow">
+        <!-- Logo: Ensure the logo is accessible from the public folder -->
+        <div class="items-center">
+            <img src="{{ url_for('static', filename='public/logo-vermicelli.svg') }}" alt="Vermicelli Logo" class="h-16 w-16 rounded-full mr-4">
+            <!-- Title and Subtitle in a single line -->
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Vermicelli</h1>
+                <p class="text-sm text-gray-600">Application Version Control Automation</p>
+            </div>
+        </div>
+    </header>
+    <div class="w-full max-w-xs">
+        <form action="/login" method="post" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="username">
+                    Username
+                </label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" placeholder="Username" name="username" required>
+            </div>
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
+                    Password
+                </label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="******************" name="password" required>
+            </div>
+            <div class="flex items-center justify-between">
+                <button class="hover:bg-yellow-200 hover:text-yellow-800 group flex items-center rounded-md bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2" type="submit">
+                    Sign In
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+    <!-- Footer -->
+    <footer class="bg-white footer-shadow w-full px-12 py-5">
+        <p class="text-center text-gray-600">© 2024 Vermicelli.</p>
+    </footer>
+</body>
+</html>

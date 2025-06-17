@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vermicelli Dashboard</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='public/favicon.ico') }}">
+    <!-- Include Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        /* Apply box-sizing globally */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        /* Ensure the html always shows the vertical scrollbar */
+        html {
+            overflow-y: scroll;
+        }
+
+        /* Ensure the body takes full height and uses Flexbox */
+        body, html {
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tab-link {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .tab-link.active {
+            background-color: #f59e0b;
+            color: white;
+        }
+        .tab-link:hover {
+            background-color: #fef3c7;
+            color: #b45309;
+        }
+
+        /* Footer Styling */
+        .footer-shadow {
+            box-shadow: 0 -5px 10px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Prevent footer from shrinking or growing */
+        footer {
+            max-width: 100%;
+            width: 100%;
+            box-sizing: border-box;
+            flex-shrink: 0; /* Prevents footer from shrinking */
+        }
+
+        /* Override SweetAlert2's overflow hidden and padding-right on body */
+        body.swal2-shown {
+            overflow: scroll !important; /* Maintain scrollbar */
+            padding-right: 0 !important; /* Remove any added padding */
+        }
+    </style>
+    <style>
+        .spinner {
+          border: 4px solid rgba(0, 0, 0, 0.1);
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          border-left-color: #f59e0b; /* оттенок yellow-500 */
+          animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      </style>
+</head>
+<body data-initial-page="{{ initial_page | default('applications') }}" data-app-id="{{ app_id or '' }}">
+    <!-- Header -->
+    <header class="flex items-center justify-between px-12 py-6 bg-white shadow-lg">
+        <div class="flex items-center">
+            <a href="/">
+                <img src="{{ url_for('static', filename='public/logo-vermicelli.svg') }}" alt="Vermicelli Logo" class="h-12 w-12 rounded-full mr-4">
+            </a>
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Vermicelli</h1>
+                <p class="text-sm text-gray-500">Application Version Control Automation</p>
+            </div>
+        </div>
+        <nav class="flex space-x-6 text-gray-700">
+            <a href="/" class="text-gray-700 hover:text-gray-900 transition">Home</a>
+            <a href="https://github.com/namig7/vermicelli/wiki" target="_blank" rel="noopener noreferrer" class="text-gray-700 hover:text-gray-900 transition">Help</a>
+            <a href="/about" class="text-gray-700 hover:text-gray-900 transition">About</a>
+            <a href="{{ url_for('logout') }}" class="hover:text-gray-900 transition">Logout</a>
+        </nav>
+    </header>
+
+    <!-- Main Content Area -->
+    <div id="content-area" class="container mx-auto px-48 py-10">
+        <!-- Dynamic content will be loaded here -->
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white footer-shadow w-full px-12 py-5 flex items-center justify-center">
+        <a href="https://github.com/namig7/vermicelli" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-2">
+            <img src="{{ url_for('static', filename='public/logo-vermicelli.svg') }}" alt="Vermicelli Logo" class="h-6 w-6 rounded-full">
+            <span class="text-gray-600">© 2022-2025 Vermicelli</span>
+        </a>
+    </footer>
+    <!-- Scripts -->
+    <!-- Include jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script>
+        // Define the loadPage function and attach it to the window object
+        window.loadPage = function(page, appId = '', pushState = true) {
+            // Set active tab
+            $('.tab-link').removeClass('active');
+            $(`.tab-link[data-page="${page}"]`).addClass('active');
+
+            // Show loading indicator (optional)
+            $('#content-area').html('<div class="flex justify-center items-center py-20"><div class="spinner"></div></div>');
+
+
+            // Construct the URL for AJAX request
+            let url = '';
+            if (page === 'application_details' && appId) {
+                url = `/content/application_details/${appId}`;
+            } else if (page === 'guide' || page === 'about') {
+                url = `/content/${page}`;
+            } else {
+                url = `/content/${page}`;
+            }
+
+            // Load content
+            $('#content-area').load(url, function(response, status, xhr) {
+                if (status == "error") {
+                    $('#content-area').html("<p>Error loading content.</p>");
+                } else {
+                    // Re-initialize scripts after content load
+                    if (page === 'applications') {
+                        initApplicationsScripts();
+                    } else if (page === 'projects') {
+                        initProjectsScripts();
+                    } else if (page === 'application_details') {
+                        initApplicationDetailsScripts();
+                    }
+                }
+            });
+
+            // Update browser history
+            if (pushState) {
+                if (page === 'application_details' && appId) {
+                    history.pushState({page: page, appId: appId}, '', `/application/${appId}`);
+                } else {
+                    history.pushState({page: page}, '', `/${page}`);
+                }
+            }
+        };
+
+        // Document ready function
+        $(document).ready(function() {
+            // Handle navigation clicks
+            $('.tab-link').click(function(e) {
+                e.preventDefault();
+                const page = $(this).data('page');
+                window.loadPage(page);
+            });
+
+            // Handle guide and about page links
+            $('nav a[data-page]').click(function(e) {
+                e.preventDefault();
+                const page = $(this).data('page');
+                window.loadPage(page);
+            });
+
+            // Handle browser back/forward buttons
+            window.onpopstate = function(event) {
+                if (event.state && event.state.page) {
+                    if (event.state.page === 'application_details') {
+                        window.loadPage(event.state.page, event.state.appId, false);
+                    } else {
+                        window.loadPage(event.state.page, '', false);
+                    }
+                } else {
+                    window.loadPage('applications', '', false); // Default page
+                }
+            };
+
+            // Load initial page
+            const initialPage = $('body').data('initial-page') || 'applications';
+            const appId = $('body').data('app-id') || '';
+            window.loadPage(initialPage, appId, false);
+        });
+
+        // Functions to initialize page-specific scripts
+        function initApplicationsScripts() {
+            // No need to load applications.js if code is within applications.html
+        }
+
+        function initProjectsScripts() {
+            // No need to load projects.js if code is within projects.html
+        }
+
+        function initApplicationDetailsScripts() {
+            // No need to load application_details.js if code is within application_details.html
+        }
+    </script>
+
+</body>
+</html>

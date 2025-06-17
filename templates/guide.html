@@ -1,0 +1,192 @@
+<!-- guide.html -->
+<div class="container mx-auto px-12 py-10 mt-5 mb-10 bg-white shadow-lg rounded-lg">
+    <h2 class="text-4xl font-bold text-gray-800 mb-6">Vermicelli User Guide</h2>
+
+    <style>
+        .code-block {
+            position: relative;
+            background: #1e293b;
+            color: #ffffff;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            overflow-x: auto;
+        }
+        .code-block button {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: #facc15;
+            border: none;
+            padding: 0.5rem 1rem;
+            color: #1e293b;
+            font-size: 0.875rem;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s ease-in-out;
+        }
+        .code-block button:hover {
+            background: #f59e0b;
+        }
+        .toc a {
+            color: #facc15;
+            text-decoration: none;
+            transition: color 0.2s ease-in-out;
+        }
+        .toc a:hover {
+            color: #f59e0b;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+
+    <!-- Table of Contents -->
+    <div class="toc mb-8">
+        <h3 class="text-2xl font-bold text-gray-800 mb-4">Table of Contents</h3>
+        <ul class="list-disc list-inside space-y-2">
+            <li><a href="#general">General</a></li>
+            <li><a href="#installation">Installation</a></li>
+            <li><a href="#web-ui">WEB UI</a>
+                <ul class="ml-4 list-disc">
+                    <li><a href="#projects">Projects</a></li>
+                    <li><a href="#applications">Applications</a></li>
+                </ul>
+            </li>
+            <li><a href="#version-update">Version Update</a></li>
+            <li><a href="#update-script">Update.sh</a></li>
+            <li><a href="#cicd-integration">Integration with CICD</a>
+                <ul class="ml-4 list-disc">
+                    <li><a href="#github-example">GitHub Example</a></li>
+                    <li><a href="#bitbucket-example">Bitbucket Pipelines Example</a></li>
+                    <li><a href="#gitlab-example">GitLab Example</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Sections -->
+    <h3 id="general" class="text-2xl font-bold text-gray-800 mb-4">General</h3>
+    <p class="text-gray-700 text-lg mb-6">
+        Vermicelli is a sophisticated tool designed for application version control automation. This guide explains its functionality, installation, and usage.
+    </p>
+
+    <h3 id="installation" class="text-2xl font-bold text-gray-800 mb-4">Installation</h3>
+    <p class="text-gray-700 text-lg mb-6">
+        Clone the repository, set up the environment, and install dependencies:
+    </p>
+    <div class="code-block">
+        <pre><code>git clone https://github.com/namig7/vermicelli.git
+cd vermicelli
+pip install -r requirements.txt
+python main.py</code></pre>
+        <button onclick="copyToClipboard(this)">Copy</button>
+    </div>
+
+    <h3 id="web-ui" class="text-2xl font-bold text-gray-800 mb-4">WEB UI</h3>
+    
+    <h4 id="projects" class="text-xl font-bold text-gray-800 mb-3">Projects</h4>
+    <p class="text-gray-700 text-lg mb-4">
+        Projects group applications for easier management. To create a project, navigate to the Projects page and click "New Project."
+    </p>
+
+    <h4 id="applications" class="text-xl font-bold text-gray-800 mb-3">Applications</h4>
+    <p class="text-gray-700 text-lg mb-4">
+        Applications represent individual software products. Use the "New" button to create an application with details like name and repository link.
+    </p>
+
+    <h3 id="version-update" class="text-2xl font-bold text-gray-800 mb-4">Version Update</h3>
+    <p class="text-gray-700 text-lg mb-4">
+        Manage version updates using the Web UI or API. Example API usage:
+    </p>
+    <div class="code-block">
+{% raw %}
+        <pre><code>POST http://localhost:8000/app/{app_id}/update_version
+Payload:
+{
+    "version_part": "major" | "minor" | "patch"
+}
+</code></pre>
+{% endraw %}
+        <button onclick="copyToClipboard(this)">Copy</button>
+    </div>
+
+    <h3 id="update-script" class="text-2xl font-bold text-gray-800 mb-4">Update.sh</h3>
+    <p class="text-gray-700 text-lg mb-4">
+        Use <code>update.sh</code> for automating version updates:
+    </p>
+    <div class="code-block">
+        <pre><code>./update.sh --appid 1 --version patch --username admin --password password --url http://localhost:8000</code></pre>
+        <button onclick="copyToClipboard(this)"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v8.25A2.25 2.25 0 0 0 6 16.5h2.25m8.25-8.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-7.5A2.25 2.25 0 0 1 8.25 18v-1.5m8.25-8.25h-6a2.25 2.25 0 0 0-2.25 2.25v6" />
+          </svg>
+          Copy</button>
+    </div>
+
+    <h3 id="cicd-integration" class="text-2xl font-bold text-gray-800 mb-4">Integration with CICD</h3>
+    
+    <h4 id="github-example" class="text-xl font-bold text-gray-800 mb-3">GitHub Example</h4>
+    <div class="code-block">
+        <pre><code>{% raw %}
+name: Update Version
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y curl jq
+      - name: Run update.sh
+        run: ./update.sh --appid 1 --version patch --username ${{ secrets.USERNAME }} --password ${{ secrets.PASSWORD }} --url ${{ secrets.BASE_URL }}
+{% endraw %}</code></pre>
+        <button onclick="copyToClipboard(this)">Copy</button>
+    </div>
+
+    <h4 id="bitbucket-example" class="text-xl font-bold text-gray-800 mb-3">Bitbucket Pipelines Example</h4>
+    <div class="code-block">
+        <pre><code>{% raw %}
+pipelines:
+  default:
+    - step:
+        name: Update Version
+        image: ubuntu
+        script:
+          - apt-get update && apt-get install -y curl jq
+          - ./update.sh --appid 1 --version patch --username ${{ secrets.USERNAME }} --password ${{ secrets.PASSWORD }} --url ${{ secrets.BASE_URL }}
+{% endraw %}</code></pre>
+        <button onclick="copyToClipboard(this)">Copy</button>
+    </div>
+
+    <h4 id="gitlab-example" class="text-xl font-bold text-gray-800 mb-3">GitLab Example</h4>
+    <div class="code-block">
+        <pre><code>{% raw %}
+stages:
+  - update-version
+
+update-version:
+  stage: update-version
+  image: ubuntu
+  script:
+    - apt-get update && apt-get install -y curl jq
+    - ./update.sh --appid 1 --version patch --username ${{ secrets.USERNAME }} --password ${{ secrets.PASSWORD }} --url ${{ secrets.BASE_URL }}
+{% endraw %}</code></pre>
+        <button onclick="copyToClipboard(this)">Copy</button>
+    </div>
+</div>
+
+<script>
+    function copyToClipboard(button) {
+        const codeBlock = button.previousElementSibling.innerText;
+        navigator.clipboard.writeText(codeBlock).then(() => {
+            alert("Code copied to clipboard!");
+        });
+    }
+</script>

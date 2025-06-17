@@ -1,0 +1,742 @@
+<!-- application_details.html -->
+
+<!-- Back link -->
+<div id="app-details" data-app-id="{{ app.id }}" class="container mx-auto px-48 py-10 mt-5">
+    <a href="#" onclick="window.loadPage('applications'); return false;" class="text-yellow-500 hover:text-yellow-600 font-medium">← Back</a>
+    
+    <div class="mt-6 bg-white p-6 rounded-lg shadow-md">
+       <h1 class="flex text-2xl font-bold text-gray-800">{{ app.name }} &nbsp; <a href="#" onclick="openEditAppModal({{ app.id }})" class="flex items-center text-gray-500 hover:text-gray-600">               
+        </a></h1>
+        <p class="text-gray-600 mt-2"><strong>ID:</strong> {{ app.id }}</p>
+        
+
+<!-- The Project of the Application -->
+<p class="text-gray-600">
+    <strong>Project:</strong> 
+    {% if project_name and project_id %}
+    <a href="#" onclick="openProjectDetails({{ project_id }}); return false;" class="text-yellow-500 hover:text-yellow-600 hover:underline">
+        {{ project_name }}
+    </a>
+{% else %}
+    N/A
+{% endif %}
+    </p>
+    
+
+<!-- The Link to the Application Repo -->
+<p class="text-gray-600">
+<strong>Link:</strong> 
+{% if app.link %}
+    <a href="{{ app.link }}" class="text-yellow-500 hover:text-yellow-600 hover:underline">
+        {{ app.link }}
+    </a>
+{% else %}
+    No link available
+{% endif %}
+</p>
+
+<!-- Labels -->
+<p class="text-gray-600"><strong>Label:</strong> {{ app.label or 'No labels' }}</p>
+
+        <p class="text-gray-600"><strong>Created At:</strong> {{ app.created_at }}</p>
+        <div class="space-x-4 mt-2 flex">
+            <a href="#" onclick="openEditAppModal({{ app.id }}); return false;" class="flex items-center text-gray-500 hover:text-gray-600">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6 mr-1">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+                </svg>
+                Edit
+            </a>
+            <a href="#" onclick="deleteApplication({{ app.id }}); return false;" class="flex items-center text-gray-500 hover:text-gray-600">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6 mr-1">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                </svg>
+                Delete
+            </a>      
+        </div>
+
+        <div class="bg-gray-50 border border-gray-200 rounded p-4">
+            <h4 class="font-bold text-gray-800">Version {{ latest_version.number if latest_version else 'No versions available' }}</h4>
+            <p class="text-sm text-gray-600">Released on: {{ latest_version.change_date if latest_version else 'N/A' }}</p>
+            <p class="text-sm text-gray-600">No release notes available.</p>
+        </div>
+        <!-- Version History -->
+        <p class="text-gray-600">
+            <a href="#" id="openVersionHistory" class="flex items-center text-gray-500 hover:text-gray-600" data-app-id="{{ app.id }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6 mr-1">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7.875 14.25l1.214 1.942a2.25 2.25 0 001.908 1.058h2.006c.776 0 1.497-.4 1.908-1.058l1.214-1.942M2.41 9h4.636a2.25 2.25 0 011.872 1.002l.164.246a2.25 2.25 0 001.872 1.002h2.092a2.25 2.25 0 001.872-1.002l.164-.246A2.25 2.25 0 0116.954 9h4.636M2.41 9a2.25 2.25 0 00-.16.832V12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 12V9.832c0-.287-.055-.57-.16-.832M2.41 9a2.25 2.25 0 01.382-.632l3.285-3.832a2.25 2.25 0 011.708-.786h8.43c.657 0 1.281.287 1.709.786l3.284 3.832c.163.19.291.404.382.632M4.5 20.25h15A2.25 2.25 0 0021.75 18v-2.625c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125V18a2.25 2.25 0 002.25 2.25z" />
+                </svg>
+                Version History
+            </a>
+        </p>
+        
+<!-- Version Control Block -->
+
+<pre id="curl-major-{{ app.id }}" class="hidden">curl -X POST -H "Content-Type: application/json" -d '{"version_part": "major"}' http://localhost:8000/app/{{ app.id }}/update_version</pre>
+<pre id="curl-minor-{{ app.id }}" class="hidden">curl -X POST -H "Content-Type: application/json" -d '{"version_part": "minor"}' http://localhost:8000/app/{{ app.id }}/update_version</pre>
+<pre id="curl-patch-{{ app.id }}" class="hidden">curl -X POST -H "Content-Type: application/json" -d '{"version_part": "patch"}' http://localhost:8000/app/{{ app.id }}/update_version</pre>
+<div class="space-x-4 mt-2 flex">
+        <button onclick="copyToClipboard('curl-major-{{ app.id }}')" class="flex items-center text-gray-500 hover:text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6 mr-1">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" />
+            </svg>
+            Major
+        </button>
+        <button onclick="copyToClipboard('curl-minor-{{ app.id }}')" class="flex items-center text-gray-500 hover:text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6 mr-1">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" />
+            </svg>
+            Minor
+        </button>
+        <button onclick="copyToClipboard('curl-patch-{{ app.id }}')" class="flex items-center text-gray-500 hover:text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6 mr-1">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" />
+            </svg>
+            Patch
+        </button>
+    </div>
+</div>
+
+<!-- Modal for editing application -->
+<div id="editAppModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center">
+<div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-hidden">
+    <!-- Header of the modal -->
+    <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
+        <h3 id="modalTitle" class="text-lg font-bold text-gray-800">Edit Application</h3>
+        <button onclick="closeEditAppModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+    <!-- Modal content -->
+    <div class="p-6 space-y-4">
+        <form id="editAppForm">
+            <div>
+                <label for="appNameInput" class="block text-sm font-medium text-gray-700">Application Name</label>
+                <input type="text" id="appNameInput" name="name" class="form-input block w-full mt-1" required>
+            </div>
+            <div>
+                <label for="projectSelect" class="block text-sm font-medium text-gray-700">Project</label>
+                <select id="projectSelect" name="project" class="form-select block w-full mt-1">
+                    <!-- Options will be dynamically loaded via AJAX -->
+                    <option value="">No project</option>
+                </select>
+            </div>
+            <div>
+                <label for="appLinkInput" class="block text-sm font-medium text-gray-700">Git Repository Link</label>
+                <input type="url" id="appLinkInput" name="link" class="form-input block w-full mt-1">
+            </div>
+        </form>
+    </div>
+    <!-- Footer with action buttons -->
+    <div class="p-4 border-t border-gray-200 bg-gray-100 text-right">
+        <button onclick="saveEditApp()" class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 focus:outline-none">Save</button>
+        <button onclick="closeEditAppModal()" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 focus:outline-none">Cancel</button>
+    </div>
+</div>
+</div>
+
+<!-- Version History Modal -->
+<div id="versionModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-hidden">
+        <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
+            <h3 class="text-lg font-bold text-gray-800">Version History</h3>
+            <button onclick="closeVersionModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div class="p-6">
+            <div id="versionContent" class="text-gray-700 space-y-4"></div>
+            <div id="paginationControls" class="flex justify-between items-center mt-4">
+                <button id="prevPage" class="text-gray-500 hover:text-yellow-500 focus:outline-none invisible">Previous</button>
+                <div id="pageNumbers" class="text-sm text-gray-600"></div>
+                <button id="nextPage" class="text-gray-500 hover:text-yellow-500 focus:outline-none invisible">Next</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--JavaScript for this page -->
+<script>
+    let currentAppId = null;
+
+    function openEditAppModal(appId) {
+        currentAppId = appId;
+
+        // Loading the Data of the Application via AJAX
+        $.ajax({
+            url: `/application/${appId}`,
+            type: 'GET',
+            success: function(data) {
+                // Filling up the form with data
+                $('#appNameInput').val(data.name);
+                $('#appLinkInput').val(data.link);
+
+                // Loading list of the projects with the dropdown list
+                loadProjects(data.project_id);
+
+                // Openning the modal window
+                $('#editAppModal').removeClass('hidden').addClass('flex');
+            },
+            error: function(xhr) {
+                alert('Error loading application details');
+            }
+        });
+    }
+
+    function loadProjects(selectedProjectId) {
+        // Loading the projects via AJAX
+        $.ajax({
+            url: '/get_projects',
+            type: 'GET',
+            success: function(projects) {
+                $('#projectSelect').empty().append('<option value="">No project</option>');
+                projects.forEach(function(project) {
+                    const selected = project.id === selectedProjectId ? 'selected' : '';
+                    $('#projectSelect').append(`<option value="${project.id}" ${selected}>${project.name}</option>`);
+                });
+            },
+            error: function() {
+                alert('Error loading projects');
+            }
+        });
+    }
+
+    function closeEditAppModal() {
+        $('#editAppModal').removeClass('flex').addClass('hidden');
+        $('#editAppForm')[0].reset();
+    }
+
+    function saveEditApp() {
+        const appData = {
+            name: $('#appNameInput').val().trim(),
+            project_id: $('#projectSelect').val(),
+            link: $('#appLinkInput').val().trim(),
+        };
+
+        // Processing the check
+        if (!appData.name) {
+            alert('Application name cannot be empty!');
+            return;
+        }
+
+        // Sending the new data to the BackEnd via AJAX
+        $.ajax({
+            url: `/edit_application/${currentAppId}`,
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(appData),
+            success: function() {
+                closeEditAppModal();
+                location.reload();  // Reloading page after the successful edit
+            },
+            error: function(xhr) {
+                alert('Error saving application');
+            }
+        });
+    }
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+let versionsData = [];
+let currentPage = 1;
+const versionsPerPage = 5;
+
+// Opening the modal window with the Version History
+$('#openVersionHistory').on('click', function(e) {
+    e.preventDefault();
+    const appId = $(this).data('app-id');  // Getting Application ID
+
+    // Loading the Version History via AJAX
+    $.ajax({
+        url: `/app/${appId}/versions`,
+        type: 'GET',
+        success: function(data) {
+            if (data.length > 0) {
+                versionsData = data;  // Saving all the Versions
+                displayVersions(currentPage);  // Show the first page
+                updatePaginationControls();  // Reload the pagination buttons and page numbers
+                openVersionModal();  // Open the modal window after loading the data
+            } else {
+                $('#versionContent').html('No versions available.');
+                $('#paginationControls').addClass('hidden');
+            }
+        },
+        error: function() {
+            $('#versionContent').html('Error loading version history.');
+            $('#paginationControls').addClass('hidden');
+        }
+    });
+});
+
+// Displaying the Versions based on the current page
+function displayVersions(page) {
+    let startIndex = (page - 1) * versionsPerPage;
+    let endIndex = startIndex + versionsPerPage;
+    let versionsToShow = versionsData.slice(startIndex, endIndex);
+
+    let versionList = '';
+    versionsToShow.forEach(function(version) {
+        versionList += `<div class="bg-gray-50 border border-gray-200 rounded p-4">
+                            <h4 class="font-bold text-gray-800">Version ${version.number}</h4>
+                            <p class="text-sm text-gray-600">Released on: ${new Date(version.change_date).toLocaleString()}</p>
+                            <p class="text-sm text-gray-600">${version.notes || 'No release notes available.'}</p>
+                        </div>`;
+    });
+
+    $('#versionContent').html(versionList);  // Renew the content of the modal window
+}
+
+// Renewing the pagination buttons and page numbers
+function updatePaginationControls() {
+    let totalPages = Math.ceil(versionsData.length / versionsPerPage);
+    $('#pageNumbers').html(''); // Очистка номеров страниц
+
+    // Maximum number of the page numbers to display (now it is 5)
+    const maxVisiblePages = 5;
+
+    // "Previous" Button
+    if (currentPage === 1) {
+        $('#prevPage').addClass('invisible');
+    } else {
+        $('#prevPage').removeClass('invisible');
+    }
+
+    // "Next" Button
+    if (currentPage === totalPages) {
+        $('#nextPage').addClass('invisible');
+    } else {
+        $('#nextPage').removeClass('invisible');
+    }
+
+    // Installation of the Event handlers
+    $('#prevPage').off('click').on('click', function() {
+        if (currentPage > 1) {
+            currentPage--;
+            displayVersions(currentPage);
+            updatePaginationControls();
+        }
+    });
+
+    $('#nextPage').off('click').on('click', function() {
+        if (currentPage < totalPages) {
+            currentPage++;
+            displayVersions(currentPage);
+            updatePaginationControls();
+        }
+    });
+
+    // Display of the page numbers
+    const addPageNumber = (page) => {
+        $('#pageNumbers').append(`<span class="mx-2 cursor-pointer ${page === currentPage ? 'font-bold text-yellow-500' : 'hover:text-yellow-500'}" onclick="goToPage(${page})">${page}</span>`);
+    };
+
+    // Displaying the first page
+    if (currentPage > 1) addPageNumber(1);
+
+    // Adding "..." before the current page, if needed
+    if (currentPage > maxVisiblePages) {
+        $('#pageNumbers').append('<span class="mx-2">...</span>');
+    }
+
+    // Show a few pages around the current
+    let startPage = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages - 1, currentPage + Math.floor(maxVisiblePages / 2));
+
+    for (let i = startPage; i <= endPage; i++) {
+        addPageNumber(i);
+    }
+
+    // Adding "..." after the current page, if needed
+    if (endPage < totalPages - 1) {
+        $('#pageNumbers').append('<span class="mx-2">...</span>');
+    }
+
+    // Displaying the last page
+    if (totalPages > 1 && currentPage < totalPages) addPageNumber(totalPages);
+}
+
+// Switching to the selected page
+function goToPage(page) {
+    currentPage = page;
+    displayVersions(currentPage);
+    updatePaginationControls();
+}
+
+
+// Openning the Modal Window
+function openVersionModal() {
+        $('#versionModal').removeClass('hidden').addClass('flex');
+    }
+
+// Closing the Modal Window
+function closeVersionModal() {
+        $('#versionModal').removeClass('flex').addClass('hidden');
+    }
+</script>
+
+<script>
+function copyToClipboard(elementId) {
+    var text = document.getElementById(elementId).textContent;
+    navigator.clipboard.writeText(text)
+    .then(() => {
+        var iconType = elementId.split('-')[1];
+        var button = document.querySelector('button[onclick="copyToClipboard(\'' + elementId + '\')"]');
+        var icon = button.querySelector("svg");
+        var originalSvg = icon.innerHTML;
+        icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" class="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75" /></svg>';
+        setTimeout(() => {
+            icon.innerHTML = originalSvg;
+        }, 700);
+    }, function(err) {
+        console.error('Could not copy text: ', err);
+    });
+}
+</script>
+
+<script>
+    (function() {
+        // Use IIFE to prevent global scope pollution
+
+        // Get the current app ID from data attribute
+        const currentAppId = $('#app-details').data('app-id');
+
+        // Function to open the edit application modal
+        function openEditAppModal(appId) {
+            // Fetch application data via AJAX
+            $.ajax({
+                url: `/api/application/${appId}`,
+                type: 'GET',
+                success: function(data) {
+                    // Filling up form with data
+                    $('#appNameInput').val(data.name || '');
+                    $('#appLinkInput').val(data.link || '');
+            
+                    // Loading list of projects
+                    loadProjects(data.project_id);
+            
+                    // Opening new modal window
+                    $('#editAppModal').removeClass('hidden').addClass('flex');
+                },
+                error: function(xhr) {
+                    alert('Error loading application details');
+                }
+            });            
+        }
+
+        // Function to load projects
+        function loadProjects(selectedProjectId) {
+            $.ajax({
+                url: '/get_projects',
+                type: 'GET',
+                success: function(projects) {
+                    $('#projectSelect').empty().append('<option value="">No project</option>');
+                    projects.forEach(function(project) {
+                        const selected = project.id === selectedProjectId ? 'selected' : '';
+                        $('#projectSelect').append(`<option value="${project.id}" ${selected}>${project.name}</option>`);
+                    });
+                },
+                error: function() {
+                    alert('Error loading projects');
+                }
+            });
+        }
+
+        // Function to close the edit application modal
+        function closeEditAppModal() {
+            $('#editAppModal').removeClass('flex').addClass('hidden');
+            $('#editAppForm')[0].reset();
+        }
+
+        // Function to save the edited application
+        function saveEditApp() {
+            const appData = {
+                name: $('#appNameInput').val().trim(),
+                project_id: $('#projectSelect').val(),
+                link: $('#appLinkInput').val().trim(),
+            };
+
+            if (!appData.name) {
+                alert('Application name cannot be empty!');
+                return;
+            }
+
+            $.ajax({
+                url: `/edit_application/${currentAppId}`,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(appData),
+                success: function() {
+                    closeEditAppModal();
+                    window.loadPage('application_details', currentAppId); // Reload the page via AJAX
+                },
+                error: function(xhr) {
+                    alert('Error saving application');
+                }
+            });
+        }
+
+        // Function to delete the application
+        function deleteApplication(appId) {
+            if (!confirm('Are you sure you want to delete this application?')) {
+                return;
+            }
+            $.ajax({
+                url: `/delete_application/${appId}`,
+                type: 'DELETE',
+                success: function(response) {
+                    alert(response.message);
+                    window.loadPage('applications'); // Redirect to applications page
+                },
+                error: function(xhr) {
+                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error deleting application';
+                    alert(`Error: ${error}`);
+                }
+            });
+        }
+
+        // Variables for version history
+        let versionsData = [];
+        let currentPage = 1;
+        const versionsPerPage = 5;
+
+        // Event handler for opening version history modal
+        $('#openVersionHistory').on('click', function(e) {
+            e.preventDefault();
+            const appId = $(this).data('app-id');
+
+            // Fetch version history via AJAX
+            $.ajax({
+                url: `/app/${appId}/versions`,
+                type: 'GET',
+                success: function(data) {
+                    if (data.length > 0) {
+                        versionsData = data;
+                        currentPage = 1;
+                        displayVersions(currentPage);
+                        updatePaginationControls();
+                        openVersionModal();
+                    } else {
+                        $('#versionContent').html('No versions available.');
+                        $('#paginationControls').addClass('hidden');
+                        openVersionModal();
+                    }
+                },
+                error: function() {
+                    $('#versionContent').html('Error loading version history.');
+                    $('#paginationControls').addClass('hidden');
+                    openVersionModal();
+                }
+            });
+        });
+
+        // Function to display versions on the current page
+        function displayVersions(page) {
+            let startIndex = (page - 1) * versionsPerPage;
+            let endIndex = startIndex + versionsPerPage;
+            let versionsToShow = versionsData.slice(startIndex, endIndex);
+
+            let versionList = '';
+            versionsToShow.forEach(function(version) {
+                    versionList += `
+                        <div class="bg-gray-50 border border-gray-200 rounded p-4 flex items-start space-x-4">
+                            <div class="flex items-center justify-center">
+                                <img src="{{ url_for('static', filename='public/version.svg') }}" alt="Version Icon" class="w-12 h-12">
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800">Version ${version.number}</h4>
+                                <p class="text-sm text-gray-600">Released on: ${new Date(version.change_date).toLocaleString()}</p>
+                                <p class="text-sm text-gray-600">${version.notes || 'No release notes available.'}</p>
+                            </div>
+                        </div>`;
+                });
+                
+
+            $('#versionContent').html(versionList);
+        }
+
+        // Function to update pagination controls
+        function updatePaginationControls() {
+            let totalPages = Math.ceil(versionsData.length / versionsPerPage);
+            $('#pageNumbers').html('');
+
+            // Show or hide "Previous" button
+            if (currentPage === 1) {
+                $('#prevPage').addClass('invisible');
+            } else {
+                $('#prevPage').removeClass('invisible');
+            }
+
+            // Show or hide "Next" button
+            if (currentPage === totalPages || totalPages === 0) {
+                $('#nextPage').addClass('invisible');
+            } else {
+                $('#nextPage').removeClass('invisible');
+            }
+
+            // Set up click handlers
+            $('#prevPage').off('click').on('click', function() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    displayVersions(currentPage);
+                    updatePaginationControls();
+                }
+            });
+
+            $('#nextPage').off('click').on('click', function() {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    displayVersions(currentPage);
+                    updatePaginationControls();
+                }
+            });
+
+            // Display page numbers
+            const maxVisiblePages = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+            if (endPage - startPage < maxVisiblePages - 1) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+
+            for (let page = startPage; page <= endPage; page++) {
+                $('#pageNumbers').append(`
+                    <span class="mx-2 cursor-pointer ${page === currentPage ? 'font-bold text-yellow-500' : 'hover:text-yellow-500'}" onclick="goToPage(${page})">${page}</span>
+                `);
+            }
+        }
+
+        // Function to go to a specific page
+        function goToPage(page) {
+            currentPage = page;
+            displayVersions(currentPage);
+            updatePaginationControls();
+        }
+
+        // Function to open the version history modal
+        function openVersionModal() {
+            $('#versionModal').removeClass('hidden').addClass('flex');
+        }
+
+        // Function to close the version history modal
+        function closeVersionModal() {
+            $('#versionModal').removeClass('flex').addClass('hidden');
+        }
+
+        // Expose functions to the global scope if needed
+        window.openEditAppModal = openEditAppModal;
+        window.closeEditAppModal = closeEditAppModal;
+        window.saveEditApp = saveEditApp;
+        window.deleteApplication = deleteApplication;
+        window.goToPage = goToPage;
+    })(); // End of IIFE
+
+
+</script>
+
+<!-- Project Details Modal -->
+<div id="projectModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 items-center justify-center flex">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-hidden">
+        <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
+            <h3 id="modalProjectName" class="text-lg font-bold text-gray-800">Project Name</h3>
+            <button onclick="closeProjectModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div class="p-6 space-y-4">
+            <div>
+                <h4 class="text-sm font-semibold text-gray-600">Project Description:</h4>
+                <p id="modalProjectDescription" class="text-sm text-gray-700">Description of the project will be here...</p>
+            </div>
+            <div>
+                <h4 class="text-sm font-semibold text-gray-600">Created At:</h4>
+                <p id="modalProjectCreatedAt" class="text-sm text-gray-700">Project creation date will appear here...</p>
+            </div>
+            <div>
+                <h4 class="text-sm font-semibold text-gray-600">Source Link:</h4>
+                <a id="modalProjectSourceLink" href="#" target="_blank" class="text-sm text-yellow-500 hover:text-yellow-600 hover:underline">Source link will appear here...</a>
+            </div>
+            <div>
+                <h4 class="text-sm font-semibold text-gray-600">Project Status:</h4>
+                <span id="modalProjectStatus" class="px-2 py-1 rounded-full"></span>
+            </div>
+            <div>
+                <h4 class="text-sm font-semibold text-gray-600">Applications:</h4>
+                <ul id="modalProjectApplications" class="list-disc pl-5 text-sm text-gray-700"></ul>
+            </div>
+        </div>
+        <div class="p-4 border-t border-gray-200 bg-gray-100 text-right">
+            <button onclick="closeProjectModal()" class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 focus:outline-none">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function getStatusLabel(status) {
+        let statusClass = '';
+        switch (status) {
+            case 'Draft': statusClass = 'bg-gray-200 text-gray-800'; break;
+            case 'Planned': statusClass = 'bg-blue-200 text-blue-800'; break;
+            case 'In Progress': statusClass = 'bg-yellow-200 text-yellow-800'; break;
+            case 'On Hold': statusClass = 'bg-orange-200 text-orange-800'; break;
+            case 'Completed': statusClass = 'bg-green-200 text-green-800'; break;
+            case 'Cancelled': statusClass = 'bg-red-200 text-red-800'; break;
+            case 'Under Review': statusClass = 'bg-purple-200 text-purple-800'; break;
+            case 'Delayed': statusClass = 'bg-pink-200 text-pink-800'; break;
+            default: statusClass = 'bg-gray-200 text-gray-800';
+        }
+        return `<span class="px-2 py-1 rounded-full text-xs font-semibold ${statusClass}">${status}</span>`;
+    }
+
+    function openProjectDetails(projectId) {
+        $.ajax({
+            url: `/project/${projectId}`,
+            type: 'GET',
+            success: function(project) {
+                $('#modalProjectName').text(project.name);
+                $('#modalProjectDescription').text(project.description || 'No description provided.');
+                $('#modalProjectCreatedAt').text(project.created_at);
+                if (project.source_link) {
+                    $('#modalProjectSourceLink').attr('href', project.source_link).text(project.source_link);
+                } else {
+                    $('#modalProjectSourceLink').attr('href', '#').text('No source link provided.');
+                }
+                $('#modalProjectStatus').html(getStatusLabel(project.status));
+
+                $('#modalProjectApplications').empty();
+                if (project.applications && project.applications.length > 0) {
+                    project.applications.forEach(function(app) {
+                        $('#modalProjectApplications').append(
+                            `<li>
+                                <a href="#" class="text-yellow-500 hover:text-yellow-600" 
+                                   onclick="window.loadPage('application_details', ${app.id}); return false;">
+                                    ${app.name}
+                                </a>
+                             </li>`
+                        );
+                    });
+                } else {
+                    $('#modalProjectApplications').append('<li>No applications associated.</li>');
+                }                
+
+                $('#projectModal').removeClass('hidden');
+            },
+            error: function(xhr) {
+                alert('Error fetching project details.');
+            }
+        });
+    }
+
+
+    function closeProjectModal() {
+        $('#projectModal').addClass('hidden');
+    }
+</script>
