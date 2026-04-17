@@ -38,7 +38,7 @@ Simple self-hosted version control automation to track and manage the versions o
 ## Getting Started
 
 > [!WARNING]
-> `.env` file should be created prior.
+> `.env` file should be created prior. You can start from `.env.example`.
 
 The minimum content of the `.env`:
 
@@ -55,6 +55,18 @@ DB=verdb
 # List of users. Please specify using this format: "USERS=username:password;username2:password2"
 USERS=admin:password;testuser:testpass
 ```
+
+Quick start (local, SQLite):
+
+```bash
+cp .env.example .env
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python main.py
+```
+
+Then open `http://localhost:8000` and log in using one of the users from `USERS` in your `.env`.
 
 This script runs the container in detached mode, mapping port 8000 and using the `.env` file.
 

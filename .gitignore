@@ -5,6 +5,7 @@ __pycache__/
 
 # Python virtual environment
 venv/
+.venv/
 
 # Flask session files
 flask_session/
