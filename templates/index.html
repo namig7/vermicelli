@@ -8,6 +8,17 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        (function() {
+            const storedTheme = localStorage.getItem('themePreference');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const initialTheme = storedTheme === 'dark' || storedTheme === 'light'
+                ? storedTheme
+                : (prefersDark ? 'dark' : 'light');
+            document.documentElement.dataset.theme = initialTheme;
+            document.documentElement.style.colorScheme = initialTheme;
+        })();
+    </script>
 
     <style>
         /* Apply box-sizing globally */
@@ -28,6 +39,146 @@
         body {
             display: flex;
             flex-direction: column;
+            min-height: 100vh;
+            background-color: #f9fafb;
+            color: #374151;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .app-shell-header {
+            gap: 1rem;
+        }
+
+        .app-shell-brand {
+            min-width: 0;
+        }
+
+        .app-shell-nav {
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            row-gap: 0.75rem;
+            gap: 1.5rem;
+        }
+
+        .app-shell-nav > * {
+            margin-left: 0 !important;
+        }
+
+        .app-content {
+            flex: 1 0 auto;
+            min-width: 0;
+            width: 100%;
+            overflow-wrap: break-word;
+        }
+
+        .app-content a {
+            overflow-wrap: anywhere;
+        }
+
+        .page-toolbar {
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem !important;
+        }
+
+        .page-toolbar nav {
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .page-toolbar nav > * {
+            margin-left: 0 !important;
+        }
+
+        .toolbar-actions {
+            min-width: 0;
+            gap: 0.75rem;
+        }
+
+        .toolbar-actions > * {
+            margin-left: 0 !important;
+        }
+
+        .toolbar-search {
+            min-width: 12rem;
+        }
+
+        .primary-action,
+        .pagination-button {
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        .primary-action svg,
+        .pagination-button svg {
+            flex-shrink: 0;
+        }
+
+        .responsive-table-wrap {
+            overflow: hidden;
+            border-radius: 0.75rem;
+            margin-top: 1.25rem !important;
+            margin-bottom: 1.25rem !important;
+        }
+
+        .responsive-table {
+            table-layout: fixed;
+            width: 100%;
+        }
+
+        .responsive-table th,
+        .responsive-table td {
+            vertical-align: middle;
+            line-height: 1.35;
+        }
+
+        .responsive-table th:not(.col-id):not(.col-actions),
+        .responsive-table td:not(.col-id):not(.col-actions) {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .responsive-table .col-id,
+        .responsive-table .col-actions {
+            white-space: nowrap;
+        }
+
+        .responsive-name-link {
+            display: block;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .table-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: flex-end;
+        }
+
+        .table-action-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: 9999px;
+            flex: 0 0 auto;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .table-action-button:hover {
+            background-color: #fef3c7;
+        }
+
+        .table-action-button svg {
+            flex-shrink: 0;
+        }
+
+        .version-icon {
+            transition: filter 0.2s ease;
         }
 
         .tab-link {
@@ -55,13 +206,297 @@
             max-width: 100%;
             width: 100%;
             box-sizing: border-box;
+            margin-top: auto;
             flex-shrink: 0; /* Prevents footer from shrinking */
+        }
+
+        @media (max-width: 1024px) {
+            .app-shell-header {
+                padding-left: 1.5rem !important;
+                padding-right: 1.5rem !important;
+            }
+
+            .app-content {
+                padding-left: 1.5rem !important;
+                padding-right: 1.5rem !important;
+            }
+
+            #content-area > .container {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-shell-header {
+                align-items: flex-start !important;
+            }
+
+            .app-shell-nav {
+                width: 100%;
+                justify-content: flex-start;
+                column-gap: 1rem;
+            }
+
+            .page-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .page-toolbar nav,
+            .toolbar-actions,
+            .toolbar-search {
+                width: 100%;
+            }
+
+            .toolbar-actions {
+                display: grid !important;
+                grid-template-columns: minmax(0, 1fr) auto;
+                column-gap: 0.75rem;
+            }
+
+            #paginationControls {
+                gap: 0.75rem;
+            }
+
+            #pageNumbers {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .responsive-table .hide-sm {
+                display: none !important;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .app-shell-header {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+
+            .app-shell-brand h1 {
+                font-size: 1.5rem !important;
+                line-height: 2rem !important;
+            }
+
+            .app-shell-brand p {
+                font-size: 0.75rem !important;
+                line-height: 1rem !important;
+            }
+
+            .app-content {
+                padding: 1rem !important;
+            }
+
+            #content-area > .container {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+
+            .toolbar-actions {
+                grid-template-columns: 1fr;
+                row-gap: 0.75rem;
+            }
+
+            .primary-action {
+                justify-content: center;
+                width: 100%;
+            }
+
+            .responsive-table th,
+            .responsive-table td {
+                padding-left: 0.75rem !important;
+                padding-right: 0.75rem !important;
+                font-size: 0.875rem !important;
+            }
+
+            .responsive-table .col-id {
+                width: 4rem !important;
+            }
+
+            .responsive-table .col-actions {
+                width: 4.5rem !important;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .app-shell-nav {
+                gap: 0.5rem;
+            }
+
+            .theme-toggle-button {
+                width: 1.75rem;
+                height: 1.75rem;
+            }
+
+            .tab-link {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+            }
         }
 
         /* Override SweetAlert2's overflow hidden and padding-right on body */
         body.swal2-shown {
             overflow: scroll !important; /* Maintain scrollbar */
             padding-right: 0 !important; /* Remove any added padding */
+        }
+
+        .theme-toggle {
+            display: inline-flex;
+            align-items: center;
+            position: relative;
+            gap: 0.25rem;
+            padding: 0.25rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 9999px;
+            background-color: #f9fafb;
+            color: #4b5563;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
+            transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .theme-toggle-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 9999px;
+            color: #6b7280;
+            background-color: transparent;
+            transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .theme-toggle-button:hover {
+            background-color: #fef3c7;
+            color: #b45309;
+        }
+
+        .theme-toggle-button.active {
+            background-color: #f59e0b;
+            color: #ffffff;
+            box-shadow: 0 1px 3px rgba(180, 83, 9, 0.35);
+        }
+
+        .theme-toggle-button:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            box-shadow: 0 0 0 2px #f59e0b;
+        }
+
+        html[data-theme="dark"] body {
+            background-color: #111827;
+            color: #d1d5db;
+        }
+
+        html[data-theme="dark"] .bg-white,
+        html[data-theme="dark"] .swal2-popup.bg-white {
+            background-color: #1f2937 !important;
+        }
+
+        html[data-theme="dark"] .bg-gray-50,
+        html[data-theme="dark"] .hover\:bg-gray-50:hover {
+            background-color: #111827 !important;
+        }
+
+        html[data-theme="dark"] .bg-gray-100,
+        html[data-theme="dark"] .hover\:bg-gray-100:hover {
+            background-color: #374151 !important;
+        }
+
+        html[data-theme="dark"] .bg-gray-200,
+        html[data-theme="dark"] .hover\:bg-gray-200:hover {
+            background-color: #4b5563 !important;
+        }
+
+        html[data-theme="dark"] .border-gray-200,
+        html[data-theme="dark"] .border-gray-300 {
+            border-color: #4b5563 !important;
+        }
+
+        html[data-theme="dark"] .text-gray-900,
+        html[data-theme="dark"] .text-gray-800,
+        html[data-theme="dark"] .text-gray-700,
+        html[data-theme="dark"] .text-gray-600,
+        html[data-theme="dark"] .text-gray-500,
+        html[data-theme="dark"] .hover\:text-gray-900:hover,
+        html[data-theme="dark"] .hover\:text-gray-600:hover,
+        html[data-theme="dark"] .text-black,
+        html[data-theme="dark"] .text-black-500 {
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] .text-gray-300 {
+            color: #d1d5db !important;
+        }
+
+        html[data-theme="dark"] .text-gray-400 {
+            color: #cbd5e1 !important;
+        }
+
+        html[data-theme="dark"] svg {
+            color: currentColor;
+        }
+
+        html[data-theme="dark"] .site-logo {
+            filter: brightness(0) invert(1);
+        }
+
+        html[data-theme="dark"] .version-icon {
+            filter: brightness(0) invert(1);
+        }
+
+        html[data-theme="dark"] input,
+        html[data-theme="dark"] textarea,
+        html[data-theme="dark"] select,
+        html[data-theme="dark"] button[aria-haspopup="listbox"],
+        html[data-theme="dark"] .form-input,
+        html[data-theme="dark"] .form-select,
+        html[data-theme="dark"] .form-textarea {
+            background-color: #111827 !important;
+            border-color: #4b5563 !important;
+            color: #f3f4f6 !important;
+        }
+
+        html[data-theme="dark"] input::placeholder,
+        html[data-theme="dark"] textarea::placeholder {
+            color: #9ca3af !important;
+        }
+
+        html[data-theme="dark"] .shadow,
+        html[data-theme="dark"] .shadow-md,
+        html[data-theme="dark"] .shadow-lg {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.45), 0 4px 6px -4px rgba(0, 0, 0, 0.45) !important;
+        }
+
+        html[data-theme="dark"] .footer-shadow {
+            box-shadow: 0 -5px 10px -5px rgba(0, 0, 0, 0.55);
+        }
+
+        html[data-theme="dark"] .theme-toggle {
+            background-color: #0f172a;
+            border-color: #475569;
+            color: #d1d5db;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.45);
+        }
+
+        html[data-theme="dark"] .theme-toggle-button {
+            color: #e5e7eb;
+        }
+
+        html[data-theme="dark"] .theme-toggle-button:hover {
+            background-color: #334155;
+            color: #fef3c7;
+        }
+
+        html[data-theme="dark"] .theme-toggle-button.active {
+            background-color: #f59e0b;
+            color: #111827;
+            box-shadow: 0 1px 4px rgba(251, 191, 36, 0.35);
+        }
+
+        html[data-theme="dark"] .table-action-button:hover {
+            background-color: #374151;
         }
     </style>
     <style>
@@ -80,17 +515,29 @@
 </head>
 <body data-initial-page="{{ initial_page | default('applications') }}" data-app-id="{{ app_id or '' }}">
     <!-- Header -->
-    <header class="flex items-center justify-between px-12 py-6 bg-white shadow-lg">
-        <div class="flex items-center">
+    <header class="app-shell-header flex items-center justify-between px-12 py-6 bg-white shadow-lg">
+        <div class="app-shell-brand flex items-center">
             <a href="/">
-                <img src="{{ url_for('static', filename='public/logo-vermicelli.svg') }}" alt="Vermicelli Logo" class="h-12 w-12 rounded-full mr-4">
+                <img src="{{ url_for('static', filename='public/logo-vermicelli.svg') }}" alt="Vermicelli Logo" class="site-logo h-12 w-12 rounded-full mr-4">
             </a>
             <div>
                 <h1 class="text-3xl font-bold text-gray-900">Vermicelli</h1>
                 <p class="text-sm text-gray-500">Application Version Control Automation</p>
             </div>
         </div>
-        <nav class="flex space-x-6 text-gray-700">
+        <nav class="app-shell-nav flex items-center space-x-6 text-gray-700">
+            <div class="theme-toggle" role="group" aria-label="Theme preference">
+                <button type="button" class="theme-toggle-button" data-theme-value="dark" aria-label="Use dark mode" title="Dark mode">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0 1 18 15.75 9.75 9.75 0 0 1 8.25 6c0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25 9.75 9.75 0 0 0 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+                    </svg>
+                </button>
+                <button type="button" class="theme-toggle-button" data-theme-value="light" aria-label="Use light mode" title="Light mode">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+                    </svg>
+                </button>
+            </div>
             <a href="/" class="text-gray-700 hover:text-gray-900 transition">Home</a>
             <a href="https://github.com/namig7/vermicelli/wiki" target="_blank" rel="noopener noreferrer" class="text-gray-700 hover:text-gray-900 transition">Help</a>
             <a href="/about" class="text-gray-700 hover:text-gray-900 transition">About</a>
@@ -99,15 +546,15 @@
     </header>
 
     <!-- Main Content Area -->
-    <div id="content-area" class="container mx-auto px-48 py-10">
+    <div id="content-area" class="app-content container mx-auto px-48 py-10">
         <!-- Dynamic content will be loaded here -->
     </div>
 
     <!-- Footer -->
     <footer class="bg-white footer-shadow w-full px-12 py-5 flex items-center justify-center">
         <a href="https://github.com/namig7/vermicelli" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-2">
-            <img src="{{ url_for('static', filename='public/logo-vermicelli.svg') }}" alt="Vermicelli Logo" class="h-6 w-6 rounded-full">
-            <span class="text-gray-600">© 2022-2025 Vermicelli</span>
+            <img src="{{ url_for('static', filename='public/logo-vermicelli.svg') }}" alt="Vermicelli Logo" class="site-logo h-6 w-6 rounded-full">
+            <span class="text-gray-600">© 2022-2026 Vermicelli</span>
         </a>
     </footer>
     <!-- Scripts -->
@@ -115,6 +562,55 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     <script>
+        (function() {
+            const themeMedia = window.matchMedia('(prefers-color-scheme: dark)');
+            const themeButtons = document.querySelectorAll('.theme-toggle-button');
+
+            function getSavedTheme() {
+                const savedTheme = localStorage.getItem('themePreference');
+                return savedTheme === 'dark' || savedTheme === 'light' ? savedTheme : null;
+            }
+
+            function getDefaultTheme() {
+                return themeMedia.matches ? 'dark' : 'light';
+            }
+
+            function applyTheme(theme) {
+                const activeTheme = theme || getSavedTheme() || getDefaultTheme();
+                document.documentElement.dataset.theme = activeTheme;
+                document.documentElement.style.colorScheme = activeTheme;
+                themeButtons.forEach(function(button) {
+                    const isActive = button.dataset.themeValue === activeTheme;
+                    button.classList.toggle('active', isActive);
+                    button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                });
+            }
+
+            themeButtons.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    const nextTheme = button.dataset.themeValue;
+                    localStorage.setItem('themePreference', nextTheme);
+                    applyTheme(nextTheme);
+                });
+            });
+
+            if (themeMedia.addEventListener) {
+                themeMedia.addEventListener('change', function() {
+                    if (!getSavedTheme()) {
+                        applyTheme(getDefaultTheme());
+                    }
+                });
+            } else if (themeMedia.addListener) {
+                themeMedia.addListener(function() {
+                    if (!getSavedTheme()) {
+                        applyTheme(getDefaultTheme());
+                    }
+                });
+            }
+
+            applyTheme();
+        })();
+
         // Define the loadPage function and attach it to the window object
         window.loadPage = function(page, appId = '', pushState = true) {
             // Set active tab

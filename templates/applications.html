@@ -1,14 +1,14 @@
 <!-- applications.html -->
 <div>
     <!-- Header for Applications -->
-    <header class="flex justify-between items-center mb-4">
+    <header class="page-toolbar flex justify-between items-center mb-4">
         <!-- Navigation Tabs -->
         <nav class="flex space-x-6 text-gray-700">
             <a href="/applications" data-page="applications" class="tab-link active">Applications</a>
             <a href="/projects" data-page="projects" class="tab-link">Projects</a>
         </nav>
-        <div class="flex items-center space-x-4">
-            <form id="searchForm" class="relative">
+        <div class="toolbar-actions flex items-center space-x-4">
+            <form id="searchForm" class="toolbar-search relative">
                 <input
                     class="focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 focus:outline-none
                            w-full text-sm text-black placeholder-gray-500 border border-gray-200
@@ -37,11 +37,11 @@
             </form>
             <button
                 onclick="openModal()"
-                class="hover:bg-yellow-200 hover:text-yellow-800 group flex items-center
+                class="primary-action hover:bg-yellow-200 hover:text-yellow-800 group flex items-center gap-2
                        rounded-md bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2"
             >
                 <svg
-                    class="group-hover:text-yellow-600 text-yellow-500 mr-2"
+                    class="group-hover:text-yellow-600 text-yellow-500 flex-shrink-0"
                     width="12"
                     height="20"
                     fill="currentColor"
@@ -67,7 +67,7 @@
         </div>
 
         <!-- Pagination Controls -->
-        <div id="paginationControls" class="flex justify-between items-center mt-4">
+        <div id="paginationControls" class="flex flex-wrap justify-between items-center mt-4">
             <button
                 id="prevPage"
                 class="pagination-button hover:bg-yellow-200 hover:text-yellow-800 group flex items-center
@@ -353,23 +353,23 @@
         let appsToShow = appsData.slice(startIndex, endIndex);
 
         let appListHtml = `
-            <div class="bg-white shadow-md rounded my-6">
-                <table class="table-fixed text-left w-full border-collapse">
+            <div class="responsive-table-wrap bg-white shadow-md rounded-lg border border-gray-200 my-6">
+                <table class="responsive-table text-left border-collapse">
                     <thead>
                         <tr>
-                            <th class="w-16 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">
+                            <th class="col-id w-16 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">
                                 ID
                             </th>
-                            <th class="w-1/4 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">
+                            <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">
                                 Name
                             </th>
-                            <th class="w-24 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">
+                            <th class="hide-sm w-40 whitespace-nowrap py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">
                                 Latest Version
                             </th>
-                            <th class="w-32 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">
+                            <th class="hide-sm w-40 whitespace-nowrap py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">
                                 Release Date
                             </th>
-                            <th class="w-16 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">
+                            <th class="col-actions w-20 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">
                             </th>
                         </tr>
                     </thead>
@@ -395,7 +395,7 @@
 
             appListHtml += `
                 <tr class="hover:bg-gray-50 app-row" data-id="${app.id}">
-                    <td class="text-lg text-gray-600 py-4 px-6 border-b border-gray-200">
+                    <td class="col-id text-lg text-gray-600 py-4 px-6 border-b border-gray-200">
                         <span class="inline-block bg-gray-200 text-gray-800 rounded-full px-3 py-1 text-sm font-semibold">
                             ${app.id}
                         </span>
@@ -403,24 +403,24 @@
                     <td class="text-base text-gray-600 py-4 px-6 border-b border-gray-200">
                         <a
                             href="#"
-                            class="app-details-link text-black-500 hover:text-black-600 truncate hover:underline"
+                            class="app-details-link responsive-name-link text-black-500 hover:text-black-600 hover:underline"
                             data-id="${app.id}"
-                            style="max-width: 150px;"
+                            title="${appName}"
                         >
                             ${truncatedName}
                         </a>
                     </td>
-                    <td class="text-base py-4 px-6 border-b border-gray-200">
+                    <td class="hide-sm whitespace-nowrap text-base py-4 px-6 border-b border-gray-200">
                         <span>${app.version_info || 'N/A'}</span>
                     </td>
-                    <td class="text-base text-gray-600 py-4 px-6 border-b border-gray-200">
+                    <td class="hide-sm whitespace-nowrap text-base text-gray-600 py-4 px-6 border-b border-gray-200">
                         ${dateStr}
                     </td>
-                    <td class="text-base text-gray-600 py-4 px-6 border-b border-gray-200">
-                        <div class="flex space-x-2">
+                    <td class="col-actions text-base text-gray-600 py-4 px-6 border-b border-gray-200">
+                        <div class="table-actions">
                             <!-- Details Button -->
                             <button
-                                class="app-details-link text-yellow-500 hover:text-yellow-600 flex items-center"
+                                class="app-details-link table-action-button text-yellow-500 hover:text-yellow-600"
                                 data-id="${app.id}"
                                 aria-label="View Application Details"
                             >
@@ -481,7 +481,7 @@
 
                             <!-- Delete Button -->
                             <button
-                                class="delete-button text-yellow-500 hover:text-red-600 flex items-center"
+                                class="delete-button table-action-button text-yellow-500 hover:text-red-600"
                                 data-id="${app.id}"
                                 aria-label="Delete Application"
                             >
