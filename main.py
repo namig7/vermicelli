@@ -7,7 +7,7 @@ import re  # for URL validation
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError, available_timezones
 from flask import Flask, request, jsonify, render_template, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import func, or_, text
+from sqlalchemy import func, inspect, or_, text
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from flask_session import Session
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
@@ -74,6 +74,39 @@ ACCESS_READ_WRITE = 'read_write'
 PROJECT_ACCESS_LEVELS = (ACCESS_VIEW_ONLY, ACCESS_READ_WRITE)
 APPLICATION_ACCESS_LEVELS = (ACCESS_NO_ACCESS, ACCESS_VIEW_ONLY, ACCESS_READ_WRITE)
 DEFAULT_TIMEZONE = 'UTC'
+DEFAULT_DATETIME_FORMAT = 'iso_24'
+DATETIME_FORMAT_OPTIONS = {
+    'iso_24': {
+        'label': '2026-04-28 14:30',
+        'datetime': '%Y-%m-%d %H:%M',
+        'date': '%Y-%m-%d',
+    },
+    'us_12': {
+        'label': 'Apr 28, 2026 2:30 PM',
+        'datetime': '%b %d, %Y %-I:%M %p',
+        'date': '%b %d, %Y',
+    },
+    'us_numeric_12': {
+        'label': '04/28/2026 2:30 PM',
+        'datetime': '%m/%d/%Y %-I:%M %p',
+        'date': '%m/%d/%Y',
+    },
+    'eu_24': {
+        'label': '28 Apr 2026 14:30',
+        'datetime': '%d %b %Y %H:%M',
+        'date': '%d %b %Y',
+    },
+    'eu_numeric_24': {
+        'label': '28/04/2026 14:30',
+        'datetime': '%d/%m/%Y %H:%M',
+        'date': '%d/%m/%Y',
+    },
+    'weekday_24': {
+        'label': 'Tue, Apr 28, 2026 14:30',
+        'datetime': '%a, %b %d, %Y %H:%M',
+        'date': '%a, %b %d, %Y',
+    },
+}
 PREFERRED_TIMEZONES = (
     'UTC',
     'Asia/Baku',
@@ -87,6 +120,34 @@ PREFERRED_TIMEZONES = (
     'Asia/Dubai',
     'Asia/Tokyo',
 )
+_USER_SCHEMA_READY = False
+
+
+def normalize_datetime_format(format_key):
+    return format_key if format_key in DATETIME_FORMAT_OPTIONS else DEFAULT_DATETIME_FORMAT
+
+
+def get_datetime_format_options():
+    return [
+        {
+            'value': value,
+            'label': config['label'],
+        }
+        for value, config in DATETIME_FORMAT_OPTIONS.items()
+    ]
+
+
+def is_valid_datetime_format(format_key):
+    return format_key in DATETIME_FORMAT_OPTIONS
+
+
+def get_user_datetime_format(user=None):
+    user = user or get_current_user()
+    return normalize_datetime_format(
+        getattr(user, 'datetime_format', DEFAULT_DATETIME_FORMAT)
+        if user and getattr(user, 'datetime_format', None)
+        else DEFAULT_DATETIME_FORMAT
+    )
 
 
 def is_valid_timezone(timezone_name):
@@ -127,13 +188,43 @@ def to_user_datetime(value, user=None):
     return value.astimezone(get_user_timezone(user))
 
 
-def format_datetime_for_user(value, user=None, fmt='%Y-%m-%d %H:%M %Z'):
+def format_datetime_for_user(value, user=None, fmt=None):
     local_value = to_user_datetime(value, user)
-    return local_value.strftime(fmt) if local_value else 'N/A'
+    if not local_value:
+        return 'N/A'
+    format_key = get_user_datetime_format(user)
+    return local_value.strftime(fmt or DATETIME_FORMAT_OPTIONS[format_key]['datetime'])
 
 
 def format_date_for_user(value, user=None):
-    return format_datetime_for_user(value, user, '%Y-%m-%d')
+    format_key = get_user_datetime_format(user)
+    return format_datetime_for_user(value, user, DATETIME_FORMAT_OPTIONS[format_key]['date'])
+
+
+def ensure_user_schema():
+    """Adds lightweight preference columns for existing local databases."""
+    global _USER_SCHEMA_READY
+    if _USER_SCHEMA_READY:
+        return
+    try:
+        inspector = inspect(db.engine)
+        if 'users' not in inspector.get_table_names():
+            return
+        existing_columns = {column['name'] for column in inspector.get_columns('users')}
+        if 'datetime_format' not in existing_columns:
+            db.session.execute(text(
+                f"ALTER TABLE users ADD COLUMN datetime_format VARCHAR(32) NOT NULL DEFAULT '{DEFAULT_DATETIME_FORMAT}'"
+            ))
+            db.session.commit()
+        _USER_SCHEMA_READY = True
+    except Exception as error:
+        db.session.rollback()
+        logging.warning("Could not verify user preference schema: %s", error)
+
+
+@app.before_request
+def ensure_runtime_schema():
+    ensure_user_schema()
 
 
 def json_error(message, status_code=403):
@@ -514,6 +605,7 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False, index=True)
     full_name = db.Column(db.String(120))
     timezone = db.Column(db.String(64), nullable=False, default=DEFAULT_TIMEZONE)
+    datetime_format = db.Column(db.String(32), nullable=False, default=DEFAULT_DATETIME_FORMAT)
     email = db.Column(db.String(255))
     is_active = db.Column(db.Boolean, nullable=False, default=True)
     can_create_projects = db.Column(db.Boolean, nullable=False, default=False)
@@ -666,7 +758,7 @@ def application_details_content(app_id):
     if not can_view_application(current, app_obj):
         return json_error('You do not have access to this application.', 403)
     latest_version = Version.query.filter_by(application_id=app_id).order_by(Version.change_date.desc()).first()
-    latest_version_display = format_datetime_for_user(latest_version.change_date) if latest_version else None
+    latest_version_display = format_datetime_for_user(latest_version.change_date, current) if latest_version else None
     project_name = app_obj.projects[0].name if app_obj.projects else None
     project_id = app_obj.projects[0].id if app_obj.projects else None
     app_access_level = application_access_level_for_user(current, app_obj)
@@ -692,7 +784,7 @@ def application_details_page(app_id):
     project_name = app_obj.projects[0].name if app_obj.projects else None
     project_id = app_obj.projects[0].id if app_obj.projects else None
     latest_version = Version.query.filter_by(application_id=app_obj.id).order_by(Version.change_date.desc()).first()
-    latest_version_display = format_datetime_for_user(latest_version.change_date) if latest_version else None
+    latest_version_display = format_datetime_for_user(latest_version.change_date, current) if latest_version else None
     app_access_level = application_access_level_for_user(current, app_obj)
     return render_template(
         'application_details.html',
@@ -784,13 +876,15 @@ def fetch_applications_data():
     for app_obj in applications:
         last_version = Version.query.filter_by(application_id=app_obj.id).order_by(Version.change_date.desc()).first()
         version_info = last_version.number if last_version else 'No versions available'
-        change_date = format_datetime_for_user(last_version.change_date, user) if last_version else 'N/A'
+        change_date = format_date_for_user(last_version.change_date, user) if last_version else 'N/A'
+        change_datetime = format_datetime_for_user(last_version.change_date, user) if last_version else 'N/A'
         app_access_level = application_access_level_for_user(user, app_obj)
         apps_data.append({
             'id': app_obj.id,
             'name': app_obj.name,
             'version_info': version_info,
             'change_date': change_date,
+            'change_datetime': change_datetime,
             'access_level': app_access_level,
             'access_label': access_label(app_access_level),
             'access_code': access_code(app_access_level),
@@ -802,14 +896,15 @@ def fetch_applications_data():
 @login_required
 def get_app_versions(app_id):
     app_obj = Application.query.get_or_404(app_id)
-    if not can_view_application(get_current_user(), app_obj):
+    current = get_current_user()
+    if not can_view_application(current, app_obj):
         return json_error('You do not have access to this application.', 403)
     versions = Version.query.filter_by(application_id=app_id).order_by(Version.change_date.desc()).all()
     versions_data = []
     for version in versions:
         versions_data.append({
             'number': version.number,
-            'change_date': format_datetime_for_user(version.change_date),
+            'change_date': format_datetime_for_user(version.change_date, current),
             'notes': version.notes or ''
         })
     return jsonify(versions_data)
@@ -1120,7 +1215,7 @@ def get_project_details(project_id):
         'name': project.name,
         'description': project.description,
         'source_link': project.source_link,
-        'created_at': format_date_for_user(project.created_at),
+        'created_at': format_date_for_user(project.created_at, current),
         'status': project.status,
         'access_level': project_access_level,
         'access_label': access_label(project_access_level),
@@ -1202,27 +1297,30 @@ def edit_project(project_id):
         return jsonify({'error': 'Database error'}), 500
 
 ### User and project membership routes
-def serialize_user(user):
+def serialize_user(user, display_user=None):
+    display_user = display_user or user
     return {
         'id': user.id,
         'username': user.username,
         'full_name': user.full_name or '',
         'email': user.email or '',
         'timezone': user.timezone or DEFAULT_TIMEZONE,
+        'datetime_format': normalize_datetime_format(getattr(user, 'datetime_format', DEFAULT_DATETIME_FORMAT)),
+        'datetime_format_label': DATETIME_FORMAT_OPTIONS[normalize_datetime_format(getattr(user, 'datetime_format', DEFAULT_DATETIME_FORMAT))]['label'],
         'platform_role': user.platform_role,
         'platform_role_label': PLATFORM_ROLE_LABELS.get(user.platform_role, user.platform_role),
         'is_active': bool(user.is_active),
         'can_create_projects': bool(user.can_create_projects),
         'status': 'Active' if user.is_active else 'Disabled',
         'created_at': user.created_at.isoformat() if user.created_at else None,
-        'created_at_display': format_datetime_for_user(user.created_at, fmt='%Y-%m-%d %H:%M') if user.created_at else 'N/A',
+        'created_at_display': format_datetime_for_user(user.created_at, display_user) if user.created_at else 'N/A',
         'last_login_at': user.last_login_at.isoformat() if user.last_login_at else None,
-        'last_login_display': format_datetime_for_user(user.last_login_at, fmt='%Y-%m-%d %H:%M') if user.last_login_at else 'Never'
+        'last_login_display': format_datetime_for_user(user.last_login_at, display_user) if user.last_login_at else 'Never'
     }
 
 
-def serialize_user_details(user):
-    data = serialize_user(user)
+def serialize_user_details(user, display_user=None):
+    data = serialize_user(user, display_user)
     explicit_application_access = {
         membership.application_id: membership
         for membership in user.application_memberships
@@ -1363,7 +1461,11 @@ def serialize_application_membership(membership):
 @app.route('/content/settings')
 @login_required
 def settings_content():
-    return render_template('settings.html', timezone_options=get_timezone_options())
+    return render_template(
+        'settings.html',
+        timezone_options=get_timezone_options(),
+        datetime_format_options=get_datetime_format_options()
+    )
 
 
 @app.route('/api/me', methods=['GET'])
@@ -1372,7 +1474,7 @@ def get_me():
     user = get_current_user()
     if not user:
         return json_error('Settings are available only for database users.', 403)
-    return jsonify(serialize_user_details(user))
+    return jsonify(serialize_user_details(user, user))
 
 
 @app.route('/api/me', methods=['PUT'])
@@ -1386,15 +1488,22 @@ def update_me():
     email = data.get('email', user.email or '').strip()
     full_name = data.get('full_name', user.full_name or '').strip()
     timezone_name = data.get('timezone', user.timezone or DEFAULT_TIMEZONE).strip()
+    datetime_format = data.get(
+        'datetime_format',
+        getattr(user, 'datetime_format', DEFAULT_DATETIME_FORMAT) or DEFAULT_DATETIME_FORMAT
+    ).strip()
 
     if not is_valid_timezone(timezone_name):
         return json_error('Invalid time zone.', 400)
+    if not is_valid_datetime_format(datetime_format):
+        return json_error('Invalid date and time format.', 400)
 
     user.email = email
     user.full_name = full_name
     user.timezone = timezone_name
+    user.datetime_format = normalize_datetime_format(datetime_format)
     db.session.commit()
-    return jsonify(serialize_user_details(user))
+    return jsonify(serialize_user_details(user, user))
 
 
 @app.route('/api/me/password', methods=['POST'])
@@ -1445,7 +1554,7 @@ def list_users():
         query = User.query.filter_by(platform_role=PLATFORM_USER)
     else:
         return json_error('You do not have permission to list users.', 403)
-    return jsonify([serialize_user(user) for user in query.order_by(User.username).all()])
+    return jsonify([serialize_user(user, current) for user in query.order_by(User.username).all()])
 
 
 @app.route('/api/users', methods=['POST'])
@@ -1481,7 +1590,7 @@ def create_user():
     new_user.set_password(password)
     db.session.add(new_user)
     db.session.commit()
-    return jsonify(serialize_user(new_user)), 201
+    return jsonify(serialize_user(new_user, current)), 201
 
 
 @app.route('/api/users/<int:user_id>', methods=['PUT'])
@@ -1528,7 +1637,7 @@ def update_user(user_id):
     target.platform_role = new_platform_role
     target.can_create_projects = can_create_projects if new_platform_role == PLATFORM_USER else False
     db.session.commit()
-    return jsonify(serialize_user(target))
+    return jsonify(serialize_user(target, current))
 
 
 @app.route('/api/users/<int:user_id>', methods=['GET'])
@@ -1538,7 +1647,7 @@ def get_user_details(user_id):
     target = User.query.get_or_404(user_id)
     if not can_manage_user(current, target, target.platform_role) and not can_manage_users_page(current):
         return json_error('You do not have permission to view this user.', 403)
-    return jsonify(serialize_user_details(target))
+    return jsonify(serialize_user_details(target, current))
 
 
 @app.route('/api/users/<int:user_id>/status', methods=['PUT'])
@@ -1560,7 +1669,7 @@ def update_user_status(user_id):
     db.session.commit()
     if session.get('user_id') == user_id and not is_active:
         session.clear()
-    return jsonify(serialize_user(target))
+    return jsonify(serialize_user(target, current))
 
 
 @app.route('/api/users/<int:user_id>', methods=['DELETE'])

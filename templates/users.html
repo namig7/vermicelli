@@ -6,7 +6,7 @@
             <button type="button" class="users-subpage-tab tab-link" data-subpage="projectAccess">Access</button>
         </div>
         <div id="usersToolbarActions">
-            <button onclick="openNewUserModal()" class="primary-action hover:bg-yellow-200 hover:text-yellow-800 group flex items-center gap-2 rounded-md bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2">
+            <button onclick="openNewUserModal()" class="primary-action btn btn-primary group">
                 <svg class="group-hover:text-yellow-600 text-yellow-500 flex-shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
                 </svg>
@@ -35,7 +35,7 @@
                     />
                 </svg>
             </form>
-            <button type="button" id="openAccessModalButton" class="primary-action hover:bg-yellow-200 hover:text-yellow-800 group flex items-center gap-2 rounded-md bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2">
+            <button type="button" id="openAccessModalButton" class="primary-action btn btn-primary group">
                 <svg class="group-hover:text-yellow-600 text-yellow-500 flex-shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 3.75c-2.412 1.92-5.459 3-8.625 3.056V12c0 5.084 3.45 9.655 8.386 11.112a.75.75 0 0 0 .478 0c4.936-1.457 8.386-6.028 8.386-11.112V6.806C17.459 6.75 14.412 5.67 12 3.75Z" />
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 8.25v7.5M8.25 12h7.5" />
@@ -45,23 +45,25 @@
         </div>
     </header>
 
-    <section id="usersTable" class="users-subpage">
-        <div class="responsive-table-wrap bg-white shadow-md rounded-lg border border-gray-200 my-6">
-            <table class="responsive-table text-left border-collapse">
-                <thead>
-                    <tr>
-                        <th class="w-16 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200 text-center"></th>
-                        <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Username</th>
-                        <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Full Name</th>
-                        <th class="w-36 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Role</th>
-                        <th class="hide-sm w-44 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Created</th>
-                        <th class="col-actions w-32 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200"></th>
-                    </tr>
-                </thead>
-                <tbody id="usersTableBody"></tbody>
-            </table>
+    <section id="usersTable" class="users-subpage users-table-section">
+        <div class="users-table-list">
+            <div class="responsive-table-wrap users-table-wrap bg-white shadow-md rounded-lg border border-gray-200 my-6">
+                <table class="responsive-table text-left border-collapse">
+                    <thead>
+                        <tr>
+                            <th class="col-id w-16 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200 text-center"></th>
+                            <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Username</th>
+                            <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Full Name</th>
+                            <th class="w-36 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Role</th>
+                            <th class="hide-sm w-44 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Created</th>
+                            <th class="col-actions w-32 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody"></tbody>
+                </table>
+            </div>
         </div>
-        <div id="usersPagination" class="mt-4"></div>
+        <div id="usersPagination" class="flex flex-wrap justify-between items-center mt-4"></div>
     </section>
 
     <section id="projectAccess" class="users-subpage hidden">
@@ -142,8 +144,8 @@
                         <input id="passwordConfirmation" type="password" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500">
                     </div>
                     <div class="flex flex-wrap justify-end gap-3 pt-2">
-                        <button type="button" id="resetUserForm" class="rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800 text-sm font-medium px-4 py-2">Reset</button>
-                        <button type="submit" class="rounded-md bg-yellow-100 text-yellow-600 hover:bg-yellow-200 hover:text-yellow-800 text-sm font-medium px-4 py-2">Create User</button>
+                        <button type="button" id="resetUserForm" class="btn btn-secondary">Reset</button>
+                        <button type="submit" class="btn btn-primary">Create User</button>
                     </div>
                 </form>
             </div>
@@ -276,8 +278,8 @@
                         </div>
                     </div>
                     <div class="flex flex-wrap justify-end gap-3 pt-2">
-                        <button type="button" id="cancelAccessModal" class="rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800 text-sm font-medium px-4 py-2">Cancel</button>
-                        <button type="submit" id="saveAccessButton" class="hidden rounded-md bg-yellow-100 text-yellow-600 hover:bg-yellow-200 hover:text-yellow-800 text-sm font-medium px-4 py-2">Save Access</button>
+                        <button type="button" id="cancelAccessModal" class="btn btn-secondary">Cancel</button>
+                        <button type="submit" id="saveAccessButton" class="hidden btn btn-primary">Save Access</button>
                     </div>
                 </form>
             </div>
@@ -296,7 +298,7 @@
             </div>
             <div id="userDetailsContent" class="p-6 space-y-5"></div>
             <div class="p-4 border-t border-gray-200 bg-gray-100 text-right rounded-b-lg">
-                <button onclick="closeUserDetailsModal()" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 focus:outline-none">Close</button>
+                <button onclick="closeUserDetailsModal()" class="btn btn-secondary">Close</button>
             </div>
         </div>
     </div>
@@ -364,7 +366,7 @@
                 popup: 'bg-white rounded-lg shadow-lg',
                 title: 'text-xl font-bold text-gray-800',
                 content: 'text-gray-700',
-                confirmButton: 'hover:bg-red-200 hover:text-red-800 rounded-md bg-red-100 text-red-600 text-sm font-medium px-4 py-2',
+                confirmButton: 'btn btn-danger',
                 actions: 'flex justify-center'
             },
             buttonsStyling: false,
@@ -382,7 +384,7 @@
                 popup: 'bg-white rounded-lg shadow-lg',
                 title: 'text-xl font-bold text-gray-800',
                 content: 'text-gray-700',
-                confirmButton: 'hover:bg-green-200 hover:text-green-800 rounded-md bg-green-100 text-green-600 text-sm font-medium px-4 py-2',
+                confirmButton: 'btn btn-success',
                 actions: 'flex justify-center'
             },
             buttonsStyling: false,
@@ -404,8 +406,8 @@
                 popup: 'bg-white rounded-lg shadow-lg',
                 title: 'text-xl font-bold text-gray-800',
                 content: 'text-gray-700',
-                confirmButton: 'hover:bg-yellow-200 hover:text-yellow-800 rounded-md bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2',
-                cancelButton: 'hover:bg-gray-200 hover:text-gray-800 rounded-md bg-gray-100 text-gray-600 text-sm font-medium px-4 py-2',
+                confirmButton: 'btn btn-primary',
+                cancelButton: 'btn btn-secondary',
                 actions: 'flex justify-center space-x-4'
             },
             buttonsStyling: false,
@@ -425,7 +427,7 @@
                 popup: 'bg-white rounded-lg shadow-lg',
                 title: 'text-xl font-bold text-gray-800',
                 content: 'text-gray-700',
-                confirmButton: 'hover:bg-yellow-200 hover:text-yellow-800 rounded-md bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2',
+                confirmButton: 'btn btn-primary',
                 actions: 'flex justify-center'
             },
             buttonsStyling: false,
@@ -444,7 +446,7 @@
                 title: 'text-xl font-bold text-gray-800',
                 content: 'text-gray-700',
                 icon: 'border-0 !w-[9.5rem] !h-[9.5rem]',
-                confirmButton: 'hover:bg-yellow-200 hover:text-yellow-800 rounded-md bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2',
+                confirmButton: 'btn btn-primary',
                 actions: 'flex justify-center'
             },
             buttonsStyling: false,
@@ -550,19 +552,19 @@
 
         const adminChips = admins.map(function(user) {
             return `
-                <span class="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-sm text-blue-800">
-                    <button type="button" class="open-access-user-details min-w-0 truncate text-left font-medium text-blue-800 transition hover:text-yellow-700" data-user-id="${user.id}">${escapeHtml(accessChipUsername(user))}</button>
-                    <span class="ml-2 inline-flex items-center text-blue-600" title="Platform Admin" aria-label="Platform Admin">${adminAccessIcon}</span>
+                <span class="admin-access-summary-chip inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-sm text-blue-800">
+                    <button type="button" class="admin-access-summary-user open-access-user-details min-w-0 truncate text-left font-medium text-blue-800 transition hover:text-yellow-700" data-user-id="${user.id}">${escapeHtml(accessChipUsername(user))}</button>
+                    <span class="admin-access-summary-icon ml-2 inline-flex items-center text-blue-600" title="Platform Admin" aria-label="Platform Admin">${adminAccessIcon}</span>
                 </span>
             `;
         }).join('');
 
         $('#adminAccessSummary').html(`
-            <div class="rounded-xl border border-blue-200 bg-blue-50/60 p-4">
+            <div class="admin-access-summary-card rounded-xl border border-blue-200 bg-blue-50/60 p-4">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                        <h3 class="text-sm font-semibold text-blue-900">Platform Admins</h3>
-                        <p class="mt-1 text-sm text-blue-800">Admins have access to every project and application, so they are listed once here and not repeated below.</p>
+                        <h3 class="admin-access-summary-title text-sm font-semibold text-blue-900">Platform Admins</h3>
+                        <p class="admin-access-summary-text mt-1 text-sm text-blue-800">Admins have access to every project and application, so they are listed once here and not repeated below.</p>
                     </div>
                 </div>
                 <div class="mt-4 flex flex-wrap gap-2">
@@ -595,11 +597,12 @@
         return pages;
     }
 
-    function renderPagination(containerSelector, currentPage, totalPages, pageButtonClass, navButtonClass, layoutClass) {
-        if (totalPages <= 1) {
+    function renderPagination(containerSelector, currentPage, totalPages, pageButtonClass, navButtonClass, layoutClass, alwaysShow) {
+        if (totalPages <= 1 && !alwaysShow) {
             $(containerSelector).empty();
             return;
         }
+        totalPages = Math.max(1, totalPages);
 
         const prevHiddenClass = currentPage === 1 ? 'invisible' : '';
         const nextHiddenClass = currentPage === totalPages ? 'invisible' : '';
@@ -628,26 +631,26 @@
             `;
         }).join('');
 
-        $(containerSelector).html(`
-            <div class="${layoutClass || 'flex flex-wrap justify-between items-center mt-4'}">
-                <button
-                    type="button"
-                    class="${navButtonClass} pagination-button hover:bg-yellow-200 hover:text-yellow-800 group inline-flex items-center rounded-full bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2 shrink-0 ${prevHiddenClass}"
-                    data-direction="prev"
-                >
-                    ← Previous
-                </button>
-                <div class="flex items-center space-x-1 shrink-0">
-                    ${buttons}
-                </div>
-                <button
-                    type="button"
-                    class="${navButtonClass} pagination-button hover:bg-yellow-200 hover:text-yellow-800 group inline-flex items-center rounded-full bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2 shrink-0 ${nextHiddenClass}"
-                    data-direction="next"
-                >
-                    Next →
-                </button>
+        $(containerSelector)
+            .attr('class', layoutClass || 'flex flex-wrap justify-between items-center mt-4')
+            .html(`
+            <button
+                type="button"
+                class="pagination-button btn btn-secondary ${navButtonClass} ${prevHiddenClass}"
+                data-direction="prev"
+            >
+                ← Previous
+            </button>
+            <div class="flex items-center space-x-1">
+                ${buttons}
             </div>
+            <button
+                type="button"
+                class="pagination-button btn btn-secondary ${navButtonClass} ${nextHiddenClass}"
+                data-direction="next"
+            >
+                Next →
+            </button>
         `);
     }
 
@@ -656,16 +659,7 @@
     }
 
     function renderUsersPagination(totalPages) {
-        renderPagination(
-            '#usersPagination',
-            usersPage,
-            totalPages,
-            'users-page-button',
-            'users-page-nav',
-            totalPages <= 5
-                ? 'mt-4 flex flex-nowrap items-center justify-center gap-3'
-                : 'mt-4 flex flex-wrap justify-between items-center'
-        );
+        renderPagination('#usersPagination', usersPage, totalPages, 'users-page-button', 'users-page-nav', null, true);
     }
 
     function switchSubpage(subpageId) {
@@ -846,7 +840,7 @@
                 popup: 'bg-white rounded-lg shadow-lg',
                 title: 'text-xl font-bold text-gray-800',
                 content: 'text-gray-700',
-                confirmButton: 'hover:bg-yellow-200 hover:text-yellow-800 rounded-md bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2',
+                confirmButton: 'btn btn-primary',
                 actions: 'flex justify-center'
             },
             buttonsStyling: false,
@@ -983,13 +977,10 @@
 
         $('#usersTableBody').html(pageUsers.map(user => {
             const rowState = user.is_active ? '' : 'opacity-55 bg-gray-50';
-            const ledClass = user.is_active
-                ? 'bg-green-400 shadow-[0_0_0_3px_rgba(34,197,94,0.16),0_0_16px_rgba(74,222,128,0.9)]'
-                : 'bg-gray-400 shadow-[0_0_0_3px_rgba(156,163,175,0.16),0_0_10px_rgba(107,114,128,0.4)]';
             return `
                 <tr class="hover:bg-gray-50 cursor-pointer ${rowState}" data-id="${user.id}">
-                    <td class="py-4 px-6 border-b border-gray-200 text-center">
-                        <span class="inline-flex h-3.5 w-3.5 rounded-full ${ledClass}" title="${user.is_active ? 'Enabled' : 'Disabled'}"></span>
+                    <td class="col-id text-lg text-gray-600 py-4 px-6 border-b border-gray-200 text-center">
+                        <span class="user-status-dot ${user.is_active ? 'is-active' : 'is-disabled'}" title="${user.is_active ? 'Enabled' : 'Disabled'}"></span>
                     </td>
                     <td class="text-base text-gray-700 py-4 px-6 border-b border-gray-200">${escapeHtml(user.username)}</td>
                     <td class="text-base text-gray-600 py-4 px-6 border-b border-gray-200">${escapeHtml(user.full_name || '')}</td>
@@ -1612,8 +1603,8 @@
                 title: 'text-xl font-bold text-gray-800',
                 content: 'text-gray-700',
                 input: 'border border-gray-300 rounded-md px-3 py-2 focus:shadow-none focus:border-yellow-500 focus:outline-none',
-                confirmButton: 'hover:bg-yellow-200 hover:text-yellow-800 rounded-md bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2',
-                cancelButton: 'hover:bg-gray-200 hover:text-gray-800 rounded-md bg-gray-100 text-gray-600 text-sm font-medium px-4 py-2',
+                confirmButton: 'btn btn-primary',
+                cancelButton: 'btn btn-secondary',
                 actions: 'flex justify-center space-x-4'
             },
             buttonsStyling: false,

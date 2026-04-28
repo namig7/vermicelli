@@ -27,12 +27,57 @@
             padding: 2rem;
         }
 
+        .auth-surface {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px -1px rgba(17, 24, 39, 0.08), 0 2px 4px -2px rgba(17, 24, 39, 0.08);
+        }
+
+        .form-control {
+            width: 100%;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            background-color: #ffffff;
+            color: #374151;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            box-shadow: 0 1px 2px rgba(17, 24, 39, 0.05);
+        }
+
+        .form-control:focus {
+            border-color: #f59e0b;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.22);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 2.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            background-color: #f59e0b;
+            color: #ffffff;
+            font-size: 0.875rem;
+            font-weight: 600;
+            line-height: 1.25rem;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: #d97706;
+        }
+
         html[data-theme="dark"] body {
             background-color: #111827;
             color: #d1d5db;
         }
 
-        html[data-theme="dark"] .bg-white {
+        html[data-theme="dark"] .bg-white,
+        html[data-theme="dark"] .auth-surface {
             background-color: #1f2937 !important;
         }
 
@@ -42,7 +87,8 @@
             color: #e5e7eb !important;
         }
 
-        html[data-theme="dark"] input {
+        html[data-theme="dark"] input,
+        html[data-theme="dark"] .form-control {
             background-color: #111827 !important;
             border-color: #4b5563 !important;
             color: #f3f4f6 !important;
@@ -55,7 +101,7 @@
 </head>
 <body>
     <main class="register-main flex items-center justify-center">
-        <div class="w-full max-w-md bg-white rounded-lg shadow-md px-8 py-8">
+        <div class="w-full max-w-md auth-surface px-8 py-8">
             <div class="flex flex-col items-center text-center gap-3 mb-6">
                 <img src="{{ url_for('static', filename='public/logo-vermicelli.svg') }}" alt="Vermicelli Logo" class="site-logo h-16 w-16 rounded-full">
                 <div>
@@ -76,21 +122,21 @@
             <form action="{{ url_for('register') }}" method="post" class="space-y-4">
                 <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="username">Username</label>
-                    <input class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 focus:outline-none focus:ring-1 focus:ring-yellow-500" id="username" type="text" name="username" required>
+                    <input class="form-control" id="username" type="text" name="username" required>
                 </div>
                 <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="full_name">Full Name</label>
-                    <input class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 focus:outline-none focus:ring-1 focus:ring-yellow-500" id="full_name" type="text" name="full_name">
+                    <input class="form-control" id="full_name" type="text" name="full_name">
                 </div>
                 <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="password">Password</label>
-                    <input class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 focus:outline-none focus:ring-1 focus:ring-yellow-500" id="password" type="password" name="password" required>
+                    <input class="form-control" id="password" type="password" name="password" required>
                 </div>
                 <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="password_confirmation">Password Confirmation</label>
-                    <input class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 focus:outline-none focus:ring-1 focus:ring-yellow-500" id="password_confirmation" type="password" name="password_confirmation" required>
+                    <input class="form-control" id="password_confirmation" type="password" name="password_confirmation" required>
                 </div>
-                <button class="hover:bg-yellow-200 hover:text-yellow-800 rounded-md bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2" type="submit">
+                <button class="btn btn-primary" type="submit">
                     Register
                 </button>
                 <a href="{{ url_for('login') }}" class="ml-3 text-sm text-gray-600 hover:text-gray-800">Back to login</a>

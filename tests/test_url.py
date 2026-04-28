@@ -29,6 +29,7 @@ from main import (
     Version,
     app,
     db,
+    is_valid_datetime_format,
     is_valid_timezone,
     is_valid_url,
 )
@@ -74,6 +75,12 @@ def test_is_valid_timezone():
     assert is_valid_timezone('UTC')
     assert is_valid_timezone('Asia/Baku')
     assert not is_valid_timezone('Invalid/Timezone')
+
+
+def test_datetime_format_validator():
+    assert is_valid_datetime_format('iso_24')
+    assert is_valid_datetime_format('eu_numeric_24')
+    assert not is_valid_datetime_format('invalid-format')
 
 
 def test_first_super_admin_can_register_when_none_exists(client):
@@ -287,6 +294,7 @@ def test_user_can_update_full_name_and_timezone_without_changing_id_or_username(
         'username': 'ignored-change',
         'full_name': 'Member Renamed',
         'timezone': 'Asia/Baku',
+        'datetime_format': 'eu_numeric_24',
     })
 
     assert response.status_code == 200
@@ -295,6 +303,18 @@ def test_user_can_update_full_name_and_timezone_without_changing_id_or_username(
     assert updated.username == 'member'
     assert updated.full_name == 'Member Renamed'
     assert updated.timezone == 'Asia/Baku'
+    assert updated.datetime_format == 'eu_numeric_24'
+    assert response.get_json()['datetime_format_label'] == '28/04/2026 14:30'
+
+
+def test_user_cannot_save_invalid_datetime_format(client):
+    user = create_user('member')
+    login_as(client, user)
+
+    response = client.put('/api/me', json={'datetime_format': 'moon-clock'})
+
+    assert response.status_code == 400
+    assert User.query.get(user.id).datetime_format == 'iso_24'
 
 
 def test_account_settings_payload_includes_nested_assignments_and_metadata(client):
@@ -336,6 +356,8 @@ def test_account_settings_payload_includes_nested_assignments_and_metadata(clien
     assert response.status_code == 200
     payload = response.get_json()
     assert payload['email'] == 'member@example.com'
+    assert payload['datetime_format'] == 'iso_24'
+    assert payload['datetime_format_label'] == '2026-04-28 14:30'
     assert payload['last_login_at'] is not None
     assert payload['status'] == 'Active'
     assert len(payload['assigned_projects']) == 1
@@ -343,6 +365,19 @@ def test_account_settings_payload_includes_nested_assignments_and_metadata(clien
     apps = {app['name']: app for app in payload['assigned_projects'][0]['applications']}
     assert apps['Settings Read Only App']['access_code'] == 'RO'
     assert apps['Settings Writable App']['access_code'] == 'RW'
+
+
+def test_account_settings_content_combines_general_and_shows_datetime_format(client):
+    user = create_user('member')
+    login_as(client, user)
+
+    response = client.get('/content/settings')
+
+    assert response.status_code == 200
+    body = response.data.decode()
+    assert 'data-settings-tab="generalTab"' not in body
+    assert 'id="settingsDatetimeFormat"' in body
+    assert 'Time and Date Format' in body
 
 
 def test_deleted_projects_and_applications_are_not_shown_in_user_access(client):
@@ -426,7 +461,32 @@ def test_application_release_date_uses_user_timezone(client):
     response = client.get('/get_applications_data')
 
     assert response.status_code == 200
-    assert response.get_json()[0]['change_date'].startswith('2026-01-02 02:30')
+    payload = response.get_json()[0]
+    assert payload['change_date'] == '2026-01-02'
+    assert payload['change_datetime'].startswith('2026-01-02 02:30')
+
+
+def test_application_release_date_uses_user_datetime_format(client):
+    root = create_user('root', PLATFORM_SUPER_ADMIN)
+    root.timezone = 'Asia/Baku'
+    root.datetime_format = 'eu_numeric_24'
+    app_obj = Application(name='Formatted App')
+    db.session.add(app_obj)
+    db.session.flush()
+    db.session.add(Version(
+        application_id=app_obj.id,
+        number='1.0.0',
+        change_date=datetime(2026, 1, 1, 22, 30)
+    ))
+    db.session.commit()
+    login_as(client, root)
+
+    response = client.get('/get_applications_data')
+
+    assert response.status_code == 200
+    payload = response.get_json()[0]
+    assert payload['change_date'] == '02/01/2026'
+    assert payload['change_datetime'] == '02/01/2026 02:30'
 
 
 def test_project_start_date_uses_user_timezone(client):
@@ -445,6 +505,25 @@ def test_project_start_date_uses_user_timezone(client):
 
     assert response.status_code == 200
     assert response.get_json()['projects'][0]['start_date'] == '2026-01-02'
+
+
+def test_project_start_date_uses_user_datetime_format(client):
+    root = create_user('root', PLATFORM_SUPER_ADMIN)
+    root.timezone = 'Asia/Baku'
+    root.datetime_format = 'eu_numeric_24'
+    project = Project(
+        name='Formatted Project',
+        status='Draft',
+        start_date=datetime(2026, 1, 1, 22, 30)
+    )
+    db.session.add(project)
+    db.session.commit()
+    login_as(client, root)
+
+    response = client.get('/get_projects_data')
+
+    assert response.status_code == 200
+    assert response.get_json()['projects'][0]['start_date'] == '02/01/2026'
 
 
 def test_regular_user_cannot_create_project(client):
