@@ -1,0 +1,1002 @@
+<!-- settings.html -->
+<div>
+    <header class="page-toolbar mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">Account Settings</h1>
+            <p class="text-sm text-gray-500">A cleaner home for your account details, access, security, and preferences.</p>
+        </div>
+    </header>
+
+    <nav class="mb-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-label="Account settings sections">
+        <button type="button" class="settings-tab-button primary-action group active flex items-center gap-3 rounded-md bg-yellow-300 px-4 py-3 text-left text-sm font-medium text-yellow-900 ring-2 ring-yellow-400 shadow-md hover:bg-yellow-200 hover:text-yellow-800" data-settings-tab="overviewTab">
+            <svg class="h-5 w-5 flex-shrink-0 text-yellow-500 group-hover:text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Zm6-10.125a1.875 1.875 0 1 1-3.75 0 1.875 1.875 0 0 1 3.75 0Zm1.294 6.336a6.721 6.721 0 0 1-3.17.789 6.721 6.721 0 0 1-3.168-.789 3.376 3.376 0 0 1 6.338 0Z" />
+            </svg>
+            <span class="min-w-0">
+                <span class="block font-semibold">Overview</span>
+            </span>
+        </button>
+        <button type="button" class="settings-tab-button primary-action group flex items-center gap-3 rounded-md bg-yellow-100 px-4 py-3 text-left text-sm font-medium text-yellow-600 hover:bg-yellow-200 hover:text-yellow-800" data-settings-tab="generalTab">
+            <svg class="h-5 w-5 flex-shrink-0 text-yellow-500 group-hover:text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6.75v-1.5A2.25 2.25 0 0 0 13.5 3h-3A2.25 2.25 0 0 0 8.25 5.25v1.5m7.5 0h1.5A2.25 2.25 0 0 1 19.5 9v9a2.25 2.25 0 0 1-2.25 2.25h-10.5A2.25 2.25 0 0 1 4.5 18V9a2.25 2.25 0 0 1 2.25-2.25h1.5m7.5 0h-7.5" />
+            </svg>
+            <span class="min-w-0">
+                <span class="block font-semibold">General</span>
+            </span>
+        </button>
+        <button type="button" class="settings-tab-button primary-action group flex items-center gap-3 rounded-md bg-yellow-100 px-4 py-3 text-left text-sm font-medium text-yellow-600 hover:bg-yellow-200 hover:text-yellow-800" data-settings-tab="accessTab">
+            <svg class="h-5 w-5 flex-shrink-0 text-yellow-500 group-hover:text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-1.5 0h12a1.5 1.5 0 0 1 1.5 1.5v6a3 3 0 0 1-3 3h-9a3 3 0 0 1-3-3v-6a1.5 1.5 0 0 1 1.5-1.5Z" />
+            </svg>
+            <span class="min-w-0">
+                <span class="block font-semibold">Access</span>
+            </span>
+        </button>
+        <button type="button" class="settings-tab-button primary-action group flex items-center gap-3 rounded-md bg-yellow-100 px-4 py-3 text-left text-sm font-medium text-yellow-600 hover:bg-yellow-200 hover:text-yellow-800" data-settings-tab="preferencesTab">
+            <svg class="h-5 w-5 flex-shrink-0 text-yellow-500 group-hover:text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M3.75 6h2.25m4.5 12h9.75m-16.5 0h2.25M6 6a2.25 2.25 0 1 1 4.5 0A2.25 2.25 0 0 1 6 6Zm0 12a2.25 2.25 0 1 1 4.5 0A2.25 2.25 0 0 1 6 18Zm8.25-6h6m-16.5 0h8.25" />
+            </svg>
+            <span class="min-w-0">
+                <span class="block font-semibold">Preferences</span>
+            </span>
+        </button>
+    </nav>
+
+    <section id="overviewTab" class="settings-tab-panel">
+        <section class="bg-white border border-gray-200 rounded-lg shadow-md p-6">
+            <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+                <div class="flex items-start gap-4">
+                    <div id="settingsAvatar" class="inline-flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-yellow-500 text-2xl font-bold text-white shadow-sm"></div>
+                    <div class="min-w-0">
+                        <h2 id="settingsDisplayName" class="truncate text-2xl font-bold text-gray-800"></h2>
+                        <p id="settingsUsernameMeta" class="mt-1 text-sm text-gray-500"></p>
+                        <div class="mt-3 flex flex-wrap gap-2">
+                            <span id="settingsRoleBadge" class="inline-flex items-center rounded-md border px-2.5 py-1 text-xs font-semibold"></span>
+                            <span id="settingsStatusBadge" class="inline-flex items-center rounded-md border px-2.5 py-1 text-xs font-semibold"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid min-w-0 gap-3 sm:grid-cols-2 lg:min-w-[18rem] lg:grid-cols-1">
+                    <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Created</p>
+                        <p id="settingsCreatedAt" class="mt-1 text-sm font-medium text-gray-700"></p>
+                    </div>
+                    <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Last Seen</p>
+                        <p id="settingsLastSeen" class="mt-1 text-sm font-medium text-gray-700"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                <div class="rounded-lg border border-gray-200 px-4 py-3">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">ID</p>
+                    <p id="settingsUserIdDisplay" class="mt-1 break-all text-sm font-medium text-gray-700"></p>
+                </div>
+                <div class="rounded-lg border border-gray-200 px-4 py-3">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Email</p>
+                    <p id="settingsEmailDisplay" class="mt-1 break-all text-sm font-medium text-gray-700"></p>
+                </div>
+                <div class="rounded-lg border border-gray-200 px-4 py-3">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Time Zone</p>
+                    <p id="settingsTimezoneDisplay" class="mt-1 text-sm font-medium text-gray-700"></p>
+                </div>
+                <div class="rounded-lg border border-gray-200 px-4 py-3">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Access Scope</p>
+                    <p id="settingsAccessSummary" class="mt-1 text-sm font-medium text-gray-700"></p>
+                </div>
+                <div class="rounded-lg border border-gray-200 px-4 py-3">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Project Creation</p>
+                    <p id="settingsProjectCreation" class="mt-1 text-sm font-medium text-gray-700"></p>
+                </div>
+                <div class="rounded-lg border border-gray-200 px-4 py-3">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Assignments</p>
+                    <p id="settingsAssignmentsMeta" class="mt-1 text-sm font-medium text-gray-700"></p>
+                </div>
+            </div>
+        </section>
+    </section>
+
+    <section id="generalTab" class="settings-tab-panel hidden">
+        <section class="bg-white border border-gray-200 rounded-lg shadow-md p-6">
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-800">General</h2>
+                    <p class="text-sm text-gray-500">Your editable account information lives here in one place.</p>
+                </div>
+                <p id="generalSettingsMessage" class="text-sm text-gray-600"></p>
+            </div>
+
+            <div class="mt-6 grid gap-4 xl:grid-cols-2">
+                <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-4">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Username</p>
+                            <p id="settingsGeneralUsername" class="mt-2 break-all text-sm font-medium text-gray-700"></p>
+                        </div>
+                        <span class="rounded-md border border-gray-200 bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-500">Locked</span>
+                    </div>
+                </div>
+
+                <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-4">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Email</p>
+                            <p id="settingsGeneralEmail" class="mt-2 break-all text-sm font-medium text-gray-700"></p>
+                        </div>
+                        <button type="button" class="inline-flex items-center gap-2 rounded-md bg-yellow-100 px-3 py-1.5 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200 hover:text-yellow-800" data-edit-field="email">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a2.25 2.25 0 1 1 3.182 3.182L10.582 17.13a4.5 4.5 0 0 1-1.897 1.13L6 19l.74-2.685a4.5 4.5 0 0 1 1.13-1.897l8.992-8.931Z" />
+                            </svg>
+                            Edit
+                        </button>
+                    </div>
+                </div>
+
+                <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-4">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Full Name</p>
+                            <p id="settingsGeneralFullName" class="mt-2 break-all text-sm font-medium text-gray-700"></p>
+                        </div>
+                        <button type="button" class="inline-flex items-center gap-2 rounded-md bg-yellow-100 px-3 py-1.5 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200 hover:text-yellow-800" data-edit-field="full_name">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a2.25 2.25 0 1 1 3.182 3.182L10.582 17.13a4.5 4.5 0 0 1-1.897 1.13L6 19l.74-2.685a4.5 4.5 0 0 1 1.13-1.897l8.992-8.931Z" />
+                            </svg>
+                            Edit
+                        </button>
+                    </div>
+                </div>
+
+                <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-4">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Password</p>
+                            <p class="mt-2 text-sm font-medium text-gray-700">Change your password from a dedicated popup window.</p>
+                        </div>
+                        <button type="button" class="inline-flex items-center gap-2 rounded-md bg-yellow-100 px-3 py-1.5 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200 hover:text-yellow-800" data-edit-field="password">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-1.5 0h12a1.5 1.5 0 0 1 1.5 1.5v6a3 3 0 0 1-3 3h-9a3 3 0 0 1-3-3v-6a1.5 1.5 0 0 1 1.5-1.5Z" />
+                            </svg>
+                            Edit
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+
+    <section id="accessTab" class="settings-tab-panel hidden">
+        <div class="grid gap-6 xl:grid-cols-[minmax(18rem,0.8fr)_minmax(0,1.2fr)]">
+            <section class="bg-white border border-gray-200 rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-bold text-gray-800">Access</h2>
+                <p class="mt-2 text-sm text-gray-500">Projects come first, then the applications inside each project.</p>
+
+                <div class="mt-5 space-y-4">
+                    <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Assignment Summary</p>
+                        <p id="settingsAssignmentsMetaDuplicate" class="mt-1 text-sm font-medium text-gray-700"></p>
+                    </div>
+                    <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Meaning</p>
+                        <div class="mt-2 space-y-2 text-sm text-gray-700">
+                            <p><span class="font-medium text-gray-800">Manager</span> can manage the whole project and all applications in it.</p>
+                            <p><span class="font-medium text-gray-800">Operator</span> sees only the access granted inside that project.</p>
+                            <p><span class="font-medium text-gray-800">RO / RW</span> badges show application-level access.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="bg-white border border-gray-200 rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-bold text-gray-800">Assigned Projects and Applications</h2>
+                <p class="mt-2 text-sm text-gray-500">This is your full access map inside the system.</p>
+                <div id="settingsAssignments" class="mt-5 space-y-4"></div>
+            </section>
+        </div>
+    </section>
+
+    <section id="preferencesTab" class="settings-tab-panel hidden">
+        <section class="bg-white border border-gray-200 rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold text-gray-800">Preferences</h2>
+            <p class="mt-2 text-sm text-gray-500">Control how the app looks and how its times are shown.</p>
+
+            <div class="mt-6 grid gap-6 xl:grid-cols-[minmax(18rem,0.8fr)_minmax(0,1.2fr)]">
+                <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-4">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Time Zone</p>
+                            <p id="settingsPreferenceTimezone" class="mt-2 text-sm font-medium text-gray-700"></p>
+                        </div>
+                        <button type="button" class="inline-flex items-center gap-2 rounded-md bg-yellow-100 px-3 py-1.5 text-xs font-semibold text-yellow-700 transition hover:bg-yellow-200 hover:text-yellow-800" data-edit-field="timezone">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a2.25 2.25 0 1 1 3.182 3.182L10.582 17.13a4.5 4.5 0 0 1-1.897 1.13L6 19l.74-2.685a4.5 4.5 0 0 1 1.13-1.897l8.992-8.931Z" />
+                            </svg>
+                            Edit
+                        </button>
+                    </div>
+                </div>
+
+                <div class="rounded-lg border border-gray-200 bg-gray-50 p-4">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Theme</p>
+                    <div class="mt-3 inline-flex flex-wrap items-center gap-2 rounded-full border border-gray-200 bg-white p-1" role="group" aria-label="Theme preference">
+                        <button type="button" class="settings-theme-button rounded-full px-4 py-2 text-sm font-medium transition" data-settings-theme="light">Light</button>
+                        <button type="button" class="settings-theme-button rounded-full px-4 py-2 text-sm font-medium transition" data-settings-theme="dark">Dark</button>
+                        <button type="button" class="settings-theme-button rounded-full px-4 py-2 text-sm font-medium transition" data-settings-theme="system">System</button>
+                    </div>
+                    <p id="settingsThemeMessage" class="mt-3 text-sm text-gray-600"></p>
+                </div>
+            </div>
+        </section>
+    </section>
+
+    <div id="projectModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-visible relative">
+            <div class="p-4 rounded-t-lg border-b border-gray-200 bg-gray-100 relative">
+                <div class="flex items-center space-x-2">
+                    <span id="modalProjectNameDisplay" class="text-lg font-bold text-gray-800 block"></span>
+                    <button id="editNameBtn" class="text-yellow-500 hover:text-blue-500 focus:outline-none">
+                        <input type="text" id="modalProjectNameInput" class="hidden w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-1 focus:outline-none focus:ring-yellow-500" />
+                    </button>
+                </div>
+                <button type="button" onclick="closeProjectModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="p-4 space-y-4">
+                <div class="flex items-center space-x-2">
+                    <h4 class="text-sm font-semibold text-gray-600 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6 mr-2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
+                        </svg>
+                        Launched on:
+                    </h4>
+                    <p id="modalProjectCreatedAt" class="text-sm text-gray-500">Date*</p>
+                </div>
+                <div>
+                    <h4 class="text-sm font-semibold text-gray-600 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6 mr-2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+                        </svg>
+                        Description:
+                    </h4>
+                    <p id="modalProjectDescriptionDisplay" class="mt-1 text-sm text-gray-600 whitespace-pre-wrap"></p>
+                    <textarea id="modalProjectDescription" rows="3" class="w-full mt-1 p-2 border border-gray-300 rounded-md focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500"></textarea>
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <h4 class="text-sm font-semibold text-gray-600 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6 mr-2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
+                            </svg>
+                            URL:
+                        </h4>
+                    </div>
+                    <div class="relative">
+                        <span id="modalProjectSourceLinkDisplay" class="text-sm mt-1 break-all"></span>
+                        <input type="url" id="modalProjectSourceLinkInput" class="hidden w-full mt-1 p-2 pr-10 border border-gray-300 rounded-md focus:ring-1 focus:outline-none focus:ring-yellow-500" placeholder="https://github.com/username/repo" />
+                        <button id="editLinkBtn" class="absolute inset-y-0 right-0 flex items-center pr-2 text-yellow-500 hover:text-blue-500 focus:outline-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 012.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-sm font-semibold text-gray-600 flex items-center">Access:</h4>
+                    <p id="modalProjectAccessLevel" class="text-sm text-gray-600"></p>
+                </div>
+                <div>
+                    <h4 class="text-sm font-semibold text-gray-600 flex items-center mb-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6 mr-2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605" />
+                        </svg>
+                        Status:
+                    </h4>
+                    <div class="relative">
+                        <button type="button" id="editProjectStatus-button" class="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500 sm:text-sm" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="block truncate" id="editProjectStatus-selected">Select Status</span>
+                            <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                <svg class="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.23 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                                </svg>
+                            </span>
+                        </button>
+                        <span id="editProjectStatus-display" class="text-sm text-gray-600"></span>
+                        <ul class="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm hidden" id="editProjectStatus-options" role="listbox">
+                            <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-200 hover:text-yellow-800" data-value="Draft"><span class="block truncate">Draft</span><span class="absolute inset-y-0 right-0 flex items-center pr-4 hidden"><svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586l-3.293-3.293a1 1 0 10-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z" clip-rule="evenodd" /></svg></span></li>
+                            <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-200 hover:text-yellow-800" data-value="Planned"><span class="block truncate">Planned</span><span class="absolute inset-y-0 right-0 flex items-center pr-4 hidden"><svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586l-3.293-3.293a1 1 0 10-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z" clip-rule="evenodd" /></svg></span></li>
+                            <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-200 hover:text-yellow-800" data-value="In Progress"><span class="block truncate">In Progress</span><span class="absolute inset-y-0 right-0 flex items-center pr-4 hidden"><svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586l-3.293-3.293a1 1 0 10-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z" clip-rule="evenodd" /></svg></span></li>
+                            <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-200 hover:text-yellow-800" data-value="Completed"><span class="block truncate">Completed</span><span class="absolute inset-y-0 right-0 flex items-center pr-4 hidden"><svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586l-3.293-3.293a1 1 0 10-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z" clip-rule="evenodd" /></svg></span></li>
+                        </ul>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-sm font-semibold text-gray-600 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6 mr-2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 6.878V6a2.25 2.25 0 0 1 2.25-2.25h7.5A2.25 2.25 0 0 1 18 6v.878m-12 0c.235-.083.487-.128.75-.128h10.5c.263 0 .515.045.75.128m-12 0A2.25 2.25 0 0 0 4.5 9v.878m13.5-3A2.25 2.25 0 0 1 19.5 9v.878m0 0a2.246 2.246 0 0 0-.75-.128H5.25c-.263 0-.515.045-.75.128m15 0A2.25 2.25 0 0 1 21 12v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6c0-.98.626-1.813 1.5-2.122" />
+                        </svg>
+                        Applications:
+                    </h4>
+                    <ul id="modalProjectApplications" class="list-disc pl-5 text-sm text-gray-700"></ul>
+                </div>
+            </div>
+            <div class="rounded-b-lg p-4 border-t border-gray-200 bg-gray-100 text-right">
+                <button id="saveChangesBtn" onclick="updateProject()" class="hidden px-4 py-2 bg-yellow-500 text-white rounded-lg focus:outline-none mr-2 transition-colors duration-300 hover:bg-yellow-100 hover:text-yellow-800 active:bg-yellow-500 active:text-white">Save Changes</button>
+                <button type="button" onclick="closeProjectModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 focus:outline-none">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="settingsEditModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-75 p-4">
+        <div class="w-full max-w-md overflow-hidden rounded-lg bg-white shadow-lg">
+            <div class="flex items-center justify-between border-b border-gray-200 bg-gray-100 px-4 py-4">
+                <div>
+                    <h3 id="settingsEditModalTitle" class="text-lg font-bold text-gray-800"></h3>
+                    <p id="settingsEditModalSubtitle" class="mt-1 text-sm text-gray-500"></p>
+                </div>
+                <button type="button" id="settingsEditModalClose" class="text-gray-400 transition hover:text-gray-600">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <form id="settingsEditForm" class="space-y-4 p-6">
+                <div id="settingsEditFields"></div>
+                <p id="settingsEditModalMessage" class="text-sm text-gray-600"></p>
+                <div class="flex items-center justify-end gap-3">
+                    <button type="button" id="settingsEditCancel" class="rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="rounded-md bg-yellow-100 px-4 py-2 text-sm font-medium text-yellow-700 transition hover:bg-yellow-200 hover:text-yellow-800">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    let currentUser = null;
+    let activeEditField = null;
+    const themeMedia = window.matchMedia('(prefers-color-scheme: dark)');
+    const editIcon = `
+<svg xmlns="http://www.w3.org/2000/svg" fill="none"
+     viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+  <path stroke-linecap="round" stroke-linejoin="round"
+        d="m16.862 4.487 1.687-1.688a1.875 1.875 0 012.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+</svg>`;
+    const cancelIcon = `
+<svg xmlns="http://www.w3.org/2000/svg" fill="none"
+     viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+  <path stroke-linecap="round" stroke-linejoin="round"
+        d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+</svg>`;
+    let originalProjectData = { name: '', description: '', source_link: '', status: '' };
+    let currentEditingProjectId = null;
+    let inEditModeLink = false;
+
+    function switchSettingsTab(tabId) {
+        $('.settings-tab-panel').addClass('hidden');
+        $(`#${tabId}`).removeClass('hidden');
+
+        $('.settings-tab-button')
+            .removeClass('ring-2 ring-yellow-400 bg-yellow-300 text-yellow-900 shadow-md')
+            .addClass('bg-yellow-100 text-yellow-600');
+
+        $(`.settings-tab-button[data-settings-tab="${tabId}"]`)
+            .removeClass('bg-yellow-100 text-yellow-600')
+            .addClass('ring-2 ring-yellow-400 bg-yellow-300 text-yellow-900 shadow-md');
+    }
+
+    function showMessage(selector, message, isError) {
+        $(selector)
+            .text(message)
+            .toggleClass('text-red-600', !!isError)
+            .toggleClass('text-green-600', !isError);
+    }
+
+    function requestError(error) {
+        return error && error.responseJSON && error.responseJSON.error
+            ? error.responseJSON.error
+            : 'Request failed.';
+    }
+
+    function escapeHtml(value) {
+        return $('<div>').text(value == null ? '' : String(value)).html();
+    }
+
+    function getStoredThemeSetting() {
+        const storedTheme = localStorage.getItem('themePreference');
+        return ['light', 'dark', 'system'].includes(storedTheme) ? storedTheme : 'system';
+    }
+
+    function getResolvedTheme(themeSetting) {
+        if (themeSetting === 'light' || themeSetting === 'dark') {
+            return themeSetting;
+        }
+        return themeMedia.matches ? 'dark' : 'light';
+    }
+
+    function applyThemeSetting(themeSetting) {
+        const resolvedTheme = getResolvedTheme(themeSetting);
+        document.documentElement.dataset.theme = resolvedTheme;
+        document.documentElement.style.colorScheme = resolvedTheme;
+
+        $('.settings-theme-button').each(function() {
+            const isActive = $(this).data('settings-theme') === themeSetting;
+            $(this)
+                .toggleClass('bg-yellow-300 text-yellow-900 shadow-sm', isActive)
+                .toggleClass('bg-transparent text-gray-600 hover:bg-yellow-100 hover:text-yellow-700', !isActive)
+                .attr('aria-pressed', isActive ? 'true' : 'false');
+        });
+
+        $('#settingsThemeMessage').text(`Theme preference: ${themeSetting.charAt(0).toUpperCase() + themeSetting.slice(1)}.`);
+
+        document.querySelectorAll('.theme-toggle-button').forEach(function(button) {
+            const headerTheme = button.dataset.themeValue;
+            const isActive = headerTheme === themeSetting || (themeSetting === 'system' && headerTheme === 'system');
+            button.classList.toggle('active', isActive);
+            button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        });
+    }
+
+    function accessBadge(code, label) {
+        let badgeClass = 'bg-gray-100 text-gray-700 border-gray-200';
+        if (code === 'RW') {
+            badgeClass = 'bg-green-100 text-green-700 border-green-200';
+        } else if (code === 'RO') {
+            badgeClass = 'bg-gray-100 text-gray-700 border-gray-200';
+        } else if (code === 'Manager' || code === 'Admin') {
+            badgeClass = 'bg-blue-100 text-blue-700 border-blue-200';
+        } else if (code === 'Operator') {
+            badgeClass = 'bg-yellow-100 text-yellow-700 border-yellow-200';
+        } else if (code === 'No Access') {
+            badgeClass = 'bg-gray-100 text-gray-500 border-gray-200';
+        }
+        return `<span class="inline-flex items-center rounded-md border px-2.5 py-1 text-xs font-semibold ${badgeClass}" title="${escapeHtml(label || code || '')}">${escapeHtml(code || 'N/A')}</span>`;
+    }
+
+    function roleBadgeClass(role) {
+        switch (role) {
+            case 'admin':
+                return 'bg-blue-100 text-blue-700 border-blue-200';
+            default:
+                return 'bg-gray-100 text-gray-700 border-gray-200';
+        }
+    }
+
+    function statusBadgeClass(isActive) {
+        return isActive
+            ? 'bg-green-100 text-green-700 border-green-200'
+            : 'bg-gray-100 text-gray-600 border-gray-200';
+    }
+
+    function setSourceLinkDisplay(link) {
+        if (!link) {
+            $('#modalProjectSourceLinkDisplay').text('');
+            return;
+        }
+        $('#modalProjectSourceLinkDisplay').html(`
+            <a href="${link}" target="_blank" class="text-yellow-600 hover:underline hover:text-yellow-700">
+                ${link}
+            </a>
+        `);
+    }
+
+    function applyProjectEditState(canEdit) {
+        $('#modalProjectDescriptionDisplay').toggleClass('hidden', canEdit);
+        $('#modalProjectDescription').toggleClass('hidden', !canEdit).prop('readonly', !canEdit);
+        $('#editNameBtn, #editLinkBtn').toggleClass('hidden', !canEdit);
+        $('#editProjectStatus-button').toggleClass('hidden', !canEdit);
+        $('#editProjectStatus-display').toggleClass('hidden', canEdit);
+        if (!canEdit) {
+            $('#modalProjectNameInput, #modalProjectSourceLinkInput, #saveChangesBtn').addClass('hidden');
+            $('#modalProjectNameDisplay, #modalProjectSourceLinkDisplay').removeClass('hidden');
+            $('#editProjectStatus-options').addClass('hidden');
+        }
+    }
+
+    function checkIfModified() {
+        const currentDesc = $('#modalProjectDescription').val().trim();
+        const currentLink = $('#modalProjectSourceLinkInput').val().trim();
+        const currentStatus = $('#editProjectStatus-selected').text().trim();
+        const changed = (
+            currentDesc !== originalProjectData.description ||
+            currentLink !== originalProjectData.source_link ||
+            currentStatus !== originalProjectData.status
+        );
+        $('#saveChangesBtn').toggleClass('hidden', !changed);
+    }
+
+    function initializeCustomSelect(buttonId, optionsId, selectedId) {
+        const triggerBtn = document.getElementById(buttonId);
+        const optionsList = document.getElementById(optionsId);
+        const selectedSpan = document.getElementById(selectedId);
+        if (!triggerBtn || !optionsList || !selectedSpan) return;
+
+        const listItems = optionsList.querySelectorAll('li');
+
+        triggerBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            optionsList.classList.toggle('hidden');
+            triggerBtn.setAttribute('aria-expanded', optionsList.classList.contains('hidden') ? 'false' : 'true');
+        });
+
+        listItems.forEach(function(item) {
+            item.addEventListener('click', function() {
+                const value = item.dataset.value;
+                selectedSpan.textContent = value;
+                listItems.forEach(function(other) {
+                    const icon = other.querySelector('span svg');
+                    if (icon) icon.classList.add('hidden');
+                });
+                const selectedIcon = item.querySelector('span svg');
+                if (selectedIcon) selectedIcon.classList.remove('hidden');
+                optionsList.classList.add('hidden');
+                triggerBtn.setAttribute('aria-expanded', 'false');
+                checkIfModified();
+            });
+        });
+
+        document.addEventListener('click', function(event) {
+            if (!optionsList.contains(event.target) && !triggerBtn.contains(event.target)) {
+                optionsList.classList.add('hidden');
+                triggerBtn.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
+    function renderAssignments(user) {
+        const projectCount = user.assigned_projects ? user.assigned_projects.length : 0;
+        const appCount = user.assigned_applications ? user.assigned_applications.length : 0;
+        const assignmentsMeta = `${projectCount} project${projectCount === 1 ? '' : 's'} • ${appCount} application${appCount === 1 ? '' : 's'}`;
+        $('#settingsAssignmentsMeta').text(assignmentsMeta);
+        $('#settingsAssignmentsMetaDuplicate').text(assignmentsMeta);
+
+        if (user.platform_role === 'admin' && projectCount === 0) {
+            $('#settingsAssignments').html(`
+                <div class="rounded-lg border border-blue-200 bg-blue-50 px-4 py-4">
+                    <p class="text-sm font-medium text-blue-800">Admin accounts have platform-wide access to all projects and applications.</p>
+                </div>
+            `);
+            return;
+        }
+
+        if (!projectCount) {
+            $('#settingsAssignments').html(`
+                <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-4">
+                    <p class="text-sm text-gray-500">No assigned projects yet.</p>
+                </div>
+            `);
+            return;
+        }
+
+        $('#settingsAssignments').html(user.assigned_projects.map(function(project) {
+            const projectApps = project.applications || [];
+            const appsHtml = projectApps.length
+                ? projectApps.map(function(app) {
+                    return `
+                        <div class="flex items-center justify-between gap-3 rounded-md border border-gray-200 bg-white px-3 py-2">
+                            <div class="min-w-0">
+                                <a href="/application/${app.id}" onclick="window.loadPage('application_details', ${app.id}); return false;" class="truncate text-sm font-medium text-yellow-600 hover:text-yellow-700 hover:underline">
+                                    ${escapeHtml(app.name)}
+                                </a>
+                                <p class="text-xs text-gray-500">Application access</p>
+                            </div>
+                            ${accessBadge(app.access_code, app.access_label)}
+                        </div>
+                    `;
+                }).join('')
+                : '<p class="text-sm text-gray-500">No applications linked to this project.</p>';
+
+            return `
+                <section class="rounded-lg border border-gray-200 bg-gray-50 p-4">
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                            <a href="#" class="text-base font-semibold text-yellow-600 hover:text-yellow-700 hover:underline" onclick="openProjectDetailsFromSettings(${project.id}); return false;">
+                                ${escapeHtml(project.name)}
+                            </a>
+                            <p class="text-sm text-gray-500">${escapeHtml(project.project_role_label || 'No explicit project role')}</p>
+                        </div>
+                        ${accessBadge(project.project_role_code || project.access_code, project.project_role_label || project.access_label)}
+                    </div>
+                    <div class="mt-4 space-y-2">
+                        ${appsHtml}
+                    </div>
+                </section>
+            `;
+        }).join(''));
+    }
+
+    function renderSettings(user) {
+        currentUser = user;
+        const displayName = user.full_name || user.username;
+        $('#settingsAvatar').text((user.username || '?').charAt(0).toUpperCase());
+        $('#settingsDisplayName').text(displayName);
+        $('#settingsUsernameMeta').text(`@${user.username}`);
+        $('#settingsUserIdDisplay').text(user.id);
+        $('#settingsCreatedAt').text(user.created_at_display || 'N/A');
+        $('#settingsLastSeen').text(user.last_login_display || 'Never');
+        $('#settingsEmailDisplay').text(user.email || 'Not set');
+        $('#settingsTimezoneDisplay').text(user.timezone || 'UTC');
+        $('#settingsGeneralUsername').text(user.username || 'N/A');
+        $('#settingsGeneralEmail').text(user.email || 'Not set');
+        $('#settingsGeneralFullName').text(user.full_name || 'Not set');
+        $('#settingsPreferenceTimezone').text(user.timezone || 'UTC');
+        $('#settingsProjectCreation').text(user.platform_role === 'admin' ? 'Allowed' : (user.can_create_projects ? 'Allowed' : 'Not allowed'));
+        $('#settingsAccessSummary').text(user.platform_role === 'admin'
+            ? 'Platform-wide access'
+            : user.can_create_projects
+                ? `${(user.assigned_projects || []).length} assigned project${(user.assigned_projects || []).length === 1 ? '' : 's'} • can create projects`
+                : `${(user.assigned_projects || []).length} assigned project${(user.assigned_projects || []).length === 1 ? '' : 's'}`);
+
+        $('#settingsRoleBadge')
+            .attr('class', `inline-flex items-center rounded-md border px-2.5 py-1 text-xs font-semibold ${roleBadgeClass(user.platform_role)}`)
+            .text(user.platform_role_label || user.platform_role);
+        $('#settingsStatusBadge')
+            .attr('class', `inline-flex items-center rounded-md border px-2.5 py-1 text-xs font-semibold ${statusBadgeClass(user.is_active)}`)
+            .text(user.status || 'Active');
+
+        renderAssignments(user);
+        applyThemeSetting(getStoredThemeSetting());
+    }
+
+    function buildModalFields(fieldName) {
+        if (fieldName === 'email') {
+            return {
+                title: 'Edit Email',
+                subtitle: 'Update the email address shown on your account.',
+                fields: `
+                    <div>
+                        <label for="settingsEditEmail" class="block text-sm font-medium text-gray-700">Email</label>
+                        <input id="settingsEditEmail" type="email" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500" value="${escapeHtml(currentUser.email || '')}">
+                    </div>
+                `
+            };
+        }
+
+        if (fieldName === 'full_name') {
+            return {
+                title: 'Edit Full Name',
+                subtitle: 'Update the display name used across the workspace.',
+                fields: `
+                    <div>
+                        <label for="settingsEditFullName" class="block text-sm font-medium text-gray-700">Full Name</label>
+                        <input id="settingsEditFullName" type="text" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500" value="${escapeHtml(currentUser.full_name || '')}">
+                    </div>
+                `
+            };
+        }
+
+        if (fieldName === 'timezone') {
+            return {
+                title: 'Edit Time Zone',
+                subtitle: 'Choose the time zone used for dates and activity times.',
+                fields: `
+                    <div>
+                        <label for="settingsEditTimezone" class="block text-sm font-medium text-gray-700">Time Zone</label>
+                        <select id="settingsEditTimezone" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500">
+                            {% for timezone_name in timezone_options %}
+                                <option value="{{ timezone_name }}">{{ timezone_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                `
+            };
+        }
+
+        return {
+            title: 'Change Password',
+            subtitle: 'Enter your current password first, then choose a new one.',
+            fields: `
+                <div>
+                    <label for="settingsEditCurrentPassword" class="block text-sm font-medium text-gray-700">Current Password</label>
+                    <input id="settingsEditCurrentPassword" type="password" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500">
+                </div>
+                <div>
+                    <label for="settingsEditNewPassword" class="block text-sm font-medium text-gray-700">New Password</label>
+                    <input id="settingsEditNewPassword" type="password" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500">
+                </div>
+                <div>
+                    <label for="settingsEditPasswordConfirmation" class="block text-sm font-medium text-gray-700">Confirm New Password</label>
+                    <input id="settingsEditPasswordConfirmation" type="password" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500">
+                </div>
+            `
+        };
+    }
+
+    function openEditModal(fieldName) {
+        activeEditField = fieldName;
+        const modalConfig = buildModalFields(fieldName);
+        $('#settingsEditModalTitle').text(modalConfig.title);
+        $('#settingsEditModalSubtitle').text(modalConfig.subtitle);
+        $('#settingsEditFields').html(modalConfig.fields);
+        $('#settingsEditModalMessage').text('').removeClass('text-red-600 text-green-600');
+        $('#settingsEditModal').removeClass('hidden');
+
+        if (fieldName === 'timezone') {
+            $('#settingsEditTimezone').val(currentUser.timezone || 'UTC');
+        }
+    }
+
+    function closeEditModal() {
+        activeEditField = null;
+        $('#settingsEditModal').addClass('hidden');
+        $('#settingsEditFields').empty();
+        $('#settingsEditModalMessage').text('').removeClass('text-red-600 text-green-600');
+    }
+
+    function loadSettings() {
+        $.getJSON('/api/me').done(function(user) {
+            renderSettings(user);
+        }).fail(function(error) {
+            showMessage('#generalSettingsMessage', requestError(error), true);
+        });
+    }
+
+    window.openProjectDetailsFromSettings = function(projectId) {
+        $('#modalProjectNameDisplay').removeClass('hidden');
+        $('#modalProjectNameInput').addClass('hidden');
+        $('#editLinkBtn')
+            .html(editIcon)
+            .removeClass('hover:text-red-500')
+            .addClass('hover:text-blue-500');
+
+        $.getJSON(`/project/${projectId}`).done(function(project) {
+            currentEditingProjectId = projectId;
+            originalProjectData.name = project.name;
+            originalProjectData.description = project.description || '';
+            originalProjectData.source_link = project.source_link || '';
+            originalProjectData.status = project.status || 'Draft';
+
+            $('#modalProjectNameDisplay').text(originalProjectData.name);
+            $('#modalProjectNameInput').val(originalProjectData.name);
+            $('#modalProjectDescription').val(originalProjectData.description);
+            $('#modalProjectDescriptionDisplay').text(originalProjectData.description || 'No description available.');
+            setSourceLinkDisplay(originalProjectData.source_link);
+            $('#modalProjectSourceLinkInput').val(originalProjectData.source_link);
+            $('#modalProjectCreatedAt').text(project.created_at);
+            $('#modalProjectAccessLevel').text(project.project_role_label || project.access_label || 'No Access');
+            $('#editProjectStatus-selected').text(originalProjectData.status);
+            $('#editProjectStatus-display').text(originalProjectData.status);
+
+            $('#editProjectStatus-options li').each(function() {
+                $(this).find('span svg').addClass('hidden');
+                if ($(this).data('value') === originalProjectData.status) {
+                    $(this).find('span svg').removeClass('hidden');
+                }
+            });
+
+            $('#modalProjectApplications').empty();
+            if (project.applications && project.applications.length > 0) {
+                project.applications.forEach(function(app) {
+                    $('#modalProjectApplications').append(`
+                        <li>
+                            <a href="/application/${app.id}" class="text-yellow-500 hover:text-yellow-600" onclick="window.loadPage('application_details', ${app.id}); closeProjectModal(); return false;">
+                               ${app.name}
+                            </a>
+                        </li>
+                    `);
+                });
+            } else {
+                $('#modalProjectApplications').append('<li>No applications associated.</li>');
+            }
+
+            inEditModeLink = false;
+            $('#saveChangesBtn').addClass('hidden');
+            applyProjectEditState(Boolean(project.can_edit));
+            $('#projectModal').removeClass('hidden');
+        }).fail(function() {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Failed to fetch project details.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        });
+    };
+
+    window.closeProjectModal = function() {
+        $('#projectModal').addClass('hidden');
+    };
+
+    window.updateProject = function() {
+        if (!currentEditingProjectId) return;
+        const updatedData = {
+            name: $('#modalProjectNameDisplay').text().trim(),
+            description: $('#modalProjectDescription').val().trim(),
+            source_link: $('#modalProjectSourceLinkInput').val().trim(),
+            status: $('#editProjectStatus-selected').text().trim()
+        };
+
+        $.ajax({
+            url: `/edit_project/${currentEditingProjectId}`,
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(updatedData)
+        }).done(function(resp) {
+            if (resp.message) {
+                Swal.fire({
+                    title: 'Success!',
+                    text: resp.message,
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then(function() {
+                    openProjectDetailsFromSettings(currentEditingProjectId);
+                });
+            } else {
+                Swal.fire({ title: 'Error!', text: resp.error || 'Unknown error', icon: 'error', confirmButtonText: 'OK' });
+            }
+        }).fail(function(xhr) {
+            const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error updating project';
+            Swal.fire({ title: 'Error!', text: error, icon: 'error', confirmButtonText: 'OK' });
+        });
+    };
+
+    $('#settingsEditForm').on('submit', function(e) {
+        e.preventDefault();
+
+        if (activeEditField === 'password') {
+            $.ajax({
+                url: '/api/me/password',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    current_password: $('#settingsEditCurrentPassword').val(),
+                    new_password: $('#settingsEditNewPassword').val(),
+                    password_confirmation: $('#settingsEditPasswordConfirmation').val()
+                })
+            }).done(function() {
+                closeEditModal();
+                showMessage('#generalSettingsMessage', 'Password updated successfully.', false);
+            }).fail(function(error) {
+                showMessage('#settingsEditModalMessage', requestError(error), true);
+            });
+            return;
+        }
+
+        const payload = {};
+        if (activeEditField === 'email') {
+            payload.email = $('#settingsEditEmail').val().trim();
+        } else if (activeEditField === 'full_name') {
+            payload.full_name = $('#settingsEditFullName').val().trim();
+        } else if (activeEditField === 'timezone') {
+            payload.timezone = $('#settingsEditTimezone').val().trim();
+        }
+
+        $.ajax({
+            url: '/api/me',
+            method: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify(payload)
+        }).done(function(user) {
+            const savedField = activeEditField;
+            renderSettings(user);
+            closeEditModal();
+            showMessage(savedField === 'timezone' ? '#settingsThemeMessage' : '#generalSettingsMessage', 'Changes saved successfully.', false);
+        }).fail(function(error) {
+            showMessage('#settingsEditModalMessage', requestError(error), true);
+        });
+    });
+
+    $('[data-edit-field]').on('click', function() {
+        openEditModal($(this).data('edit-field'));
+    });
+
+    $('#settingsEditCancel, #settingsEditModalClose').on('click', closeEditModal);
+
+    $('#settingsEditModal').on('click', function(e) {
+        if (e.target === this) {
+            closeEditModal();
+        }
+    });
+
+    $('.settings-theme-button').on('click', function() {
+        const nextTheme = $(this).data('settings-theme');
+        localStorage.setItem('themePreference', nextTheme);
+        applyThemeSetting(nextTheme);
+    });
+
+    initializeCustomSelect('editProjectStatus-button', 'editProjectStatus-options', 'editProjectStatus-selected');
+
+    $('#editNameBtn').off('click').on('click', function() {
+        Swal.fire({
+            title: 'Edit Project Name',
+            input: 'text',
+            inputLabel: 'Project Name',
+            inputValue: originalProjectData.name,
+            showCancelButton: true,
+            confirmButtonText: 'Save',
+            cancelButtonText: 'Cancel',
+            customClass: {
+                popup: 'bg-white rounded-lg shadow-lg',
+                title: 'text-xl font-bold text-gray-800',
+                content: 'text-gray-700',
+                input: 'border border-gray-300 rounded-md px-3 py-2 focus:shadow-none focus:border-yellow-500 focus:outline-none',
+                confirmButton: 'hover:bg-yellow-200 hover:text-yellow-800 rounded-md bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2',
+                cancelButton: 'hover:bg-gray-200 hover:text-gray-800 rounded-md bg-gray-100 text-gray-600 text-sm font-medium px-4 py-2',
+                actions: 'flex justify-center space-x-4'
+            },
+            buttonsStyling: false,
+            scrollbarPadding: false,
+            preConfirm: function(newName) {
+                if (!newName) {
+                    Swal.showValidationMessage('Project name cannot be empty');
+                }
+                return newName;
+            }
+        }).then(function(result) {
+            if (!result.isConfirmed) return;
+            $.ajax({
+                url: `/edit_project/${currentEditingProjectId}`,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    name: result.value,
+                    description: $('#modalProjectDescription').val().trim(),
+                    source_link: $('#modalProjectSourceLinkInput').val().trim() || originalProjectData.source_link,
+                    status: $('#editProjectStatus-selected').text().trim()
+                })
+            }).done(function(resp) {
+                if (resp.message) {
+                    Swal.fire({ title: 'Success!', text: resp.message, icon: 'success', confirmButtonText: 'OK' }).then(function() {
+                        openProjectDetailsFromSettings(currentEditingProjectId);
+                    });
+                } else {
+                    Swal.fire({ title: 'Error!', text: resp.error || 'Unknown error', icon: 'error', confirmButtonText: 'OK' });
+                }
+            }).fail(function(xhr) {
+                const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error updating project';
+                Swal.fire({ title: 'Error!', text: error, icon: 'error', confirmButtonText: 'OK' });
+            });
+        });
+    });
+
+    $('#editLinkBtn').on('click', function() {
+        if (!inEditModeLink) {
+            inEditModeLink = true;
+            $(this).html(cancelIcon).removeClass('hover:text-blue-500').addClass('hover:text-red-500');
+            $('#modalProjectSourceLinkDisplay').addClass('hidden');
+            $('#modalProjectSourceLinkInput').removeClass('hidden').focus();
+        } else {
+            inEditModeLink = false;
+            $(this).html(editIcon).removeClass('hover:text-red-500').addClass('hover:text-blue-500');
+            setSourceLinkDisplay(originalProjectData.source_link);
+            $('#modalProjectSourceLinkInput').val(originalProjectData.source_link).addClass('hidden');
+            $('#modalProjectSourceLinkDisplay').removeClass('hidden');
+            checkIfModified();
+        }
+    });
+
+    $('#modalProjectDescription, #modalProjectSourceLinkInput').on('input', function() {
+        checkIfModified();
+    });
+
+    $('#projectModal').on('click', function(e) {
+        if (e.target.id === 'projectModal') {
+            closeProjectModal();
+        }
+    });
+
+    if (themeMedia.addEventListener) {
+        themeMedia.addEventListener('change', function() {
+            if (getStoredThemeSetting() === 'system') {
+                applyThemeSetting('system');
+            }
+        });
+    } else if (themeMedia.addListener) {
+        themeMedia.addListener(function() {
+            if (getStoredThemeSetting() === 'system') {
+                applyThemeSetting('system');
+            }
+        });
+    }
+
+    $('.settings-tab-button').on('click', function() {
+        switchSettingsTab($(this).data('settings-tab'));
+    });
+
+    loadSettings();
+})();
+</script>

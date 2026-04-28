@@ -63,10 +63,18 @@ cp .env.example .env
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+python scripts/init_db.py
 python main.py
 ```
 
 Then open `http://localhost:8000` and log in using one of the users from `USERS` in your `.env`.
+
+There is no migration step in this setup. The database schema is managed directly from the SQLAlchemy models with these helper scripts:
+
+```bash
+python scripts/init_db.py
+python scripts/reset_db.py
+```
 
 This script runs the container in detached mode, mapping port 8000 and using the `.env` file.
 

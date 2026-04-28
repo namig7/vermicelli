@@ -14,6 +14,8 @@
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             const initialTheme = storedTheme === 'dark' || storedTheme === 'light'
                 ? storedTheme
+                : storedTheme === 'system'
+                    ? (prefersDark ? 'dark' : 'light')
                 : (prefersDark ? 'dark' : 'light');
             document.documentElement.dataset.theme = initialTheme;
             document.documentElement.style.colorScheme = initialTheme;
@@ -132,15 +134,27 @@
             line-height: 1.35;
         }
 
-        .responsive-table th:not(.col-id):not(.col-actions),
-        .responsive-table td:not(.col-id):not(.col-actions) {
+        .responsive-table th:not(.col-id):not(.col-access):not(.col-actions),
+        .responsive-table td:not(.col-id):not(.col-access):not(.col-actions) {
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
         .responsive-table .col-id,
+        .responsive-table .col-access,
         .responsive-table .col-actions {
             white-space: nowrap;
+        }
+
+        .responsive-table .col-access {
+            width: 5.75rem;
+            text-align: center;
+        }
+
+        .responsive-table .col-access,
+        .responsive-table .col-actions {
+            padding-left: 0.75rem !important;
+            padding-right: 0.75rem !important;
         }
 
         .responsive-name-link {
@@ -152,10 +166,19 @@
         }
 
         .table-actions {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(2, 2.25rem);
             align-items: center;
-            gap: 0.5rem;
-            justify-content: flex-end;
+            gap: 0.35rem;
+            justify-content: center;
+        }
+
+        .table-actions-three {
+            grid-template-columns: repeat(3, 2.25rem);
+        }
+
+        .responsive-table .project-actions-column {
+            width: 8.75rem;
         }
 
         .table-action-button {
@@ -179,6 +202,71 @@
 
         .version-icon {
             transition: filter 0.2s ease;
+        }
+
+        .user-menu {
+            position: relative;
+        }
+
+        .user-avatar-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: 9999px;
+            background-color: #f59e0b;
+            color: #ffffff;
+            font-weight: 700;
+            line-height: 1;
+            box-shadow: 0 1px 3px rgba(180, 83, 9, 0.35);
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .user-avatar-button:hover,
+        .user-avatar-button[aria-expanded="true"] {
+            background-color: #d97706;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 0.75rem);
+            right: 0;
+            z-index: 60;
+            min-width: 14rem;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            background-color: #ffffff;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.16), 0 4px 6px -4px rgba(0, 0, 0, 0.16);
+        }
+
+        .user-dropdown.hidden {
+            display: none;
+        }
+
+        .user-dropdown-name {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            overflow-wrap: anywhere;
+        }
+
+        .user-dropdown-link {
+            display: block;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-size: 0.875rem;
+            color: #4b5563;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .user-dropdown-link:hover {
+            background-color: #fef3c7;
+            color: #92400e;
         }
 
         .tab-link {
@@ -314,8 +402,16 @@
                 width: 4rem !important;
             }
 
+            .responsive-table .col-access {
+                width: 4.75rem !important;
+            }
+
             .responsive-table .col-actions {
-                width: 4.5rem !important;
+                width: 5.5rem !important;
+            }
+
+            .responsive-table .project-actions-column {
+                width: 7.5rem !important;
             }
         }
 
@@ -446,6 +542,26 @@
             filter: brightness(0) invert(1);
         }
 
+        html[data-theme="dark"] .user-dropdown {
+            background-color: #1f2937;
+            border-color: #4b5563;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.45), 0 4px 6px -4px rgba(0, 0, 0, 0.45);
+        }
+
+        html[data-theme="dark"] .user-dropdown-name {
+            border-color: #4b5563;
+            color: #e5e7eb;
+        }
+
+        html[data-theme="dark"] .user-dropdown-link {
+            color: #e5e7eb;
+        }
+
+        html[data-theme="dark"] .user-dropdown-link:hover {
+            background-color: #374151;
+            color: #fef3c7;
+        }
+
         html[data-theme="dark"] input,
         html[data-theme="dark"] textarea,
         html[data-theme="dark"] select,
@@ -527,6 +643,11 @@
         </div>
         <nav class="app-shell-nav flex items-center space-x-6 text-gray-700">
             <div class="theme-toggle" role="group" aria-label="Theme preference">
+                <button type="button" class="theme-toggle-button" data-theme-value="system" aria-label="Use system theme" title="System theme">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 5.25A2.25 2.25 0 0 1 6 3h12a2.25 2.25 0 0 1 2.25 2.25v8.5A2.25 2.25 0 0 1 18 16H6a2.25 2.25 0 0 1-2.25-2.25v-8.5Zm0 13.5h16.5" />
+                    </svg>
+                </button>
                 <button type="button" class="theme-toggle-button" data-theme-value="dark" aria-label="Use dark mode" title="Dark mode">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0 1 18 15.75 9.75 9.75 0 0 1 8.25 6c0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25 9.75 9.75 0 0 0 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
@@ -541,7 +662,28 @@
             <a href="/" class="text-gray-700 hover:text-gray-900 transition">Home</a>
             <a href="https://github.com/namig7/vermicelli/wiki" target="_blank" rel="noopener noreferrer" class="text-gray-700 hover:text-gray-900 transition">Help</a>
             <a href="/about" class="text-gray-700 hover:text-gray-900 transition">About</a>
-            <a href="{{ url_for('logout') }}" class="hover:text-gray-900 transition">Logout</a>
+            {% if current_user %}
+            <div class="user-menu">
+                <button type="button"
+                        id="userMenuButton"
+                        class="user-avatar-button"
+                        aria-label="Open account menu"
+                        aria-expanded="false"
+                        aria-controls="userMenuDropdown">
+                    {{ current_user.username[:1] | upper }}
+                </button>
+                <div id="userMenuDropdown" class="user-dropdown hidden">
+                    <div class="user-dropdown-name">{{ current_user.full_name or current_user.username }}</div>
+                    <a href="/settings" data-page="settings" class="user-dropdown-link">Account Settings</a>
+                    {% if can_manage_users %}
+                    <a href="/users" data-page="users" class="user-dropdown-link">Users</a>
+                    {% endif %}
+                    <a href="{{ url_for('logout') }}" class="user-dropdown-link">Sign out</a>
+                </div>
+            </div>
+            {% else %}
+            <a href="{{ url_for('logout') }}" class="hover:text-gray-900 transition">Sign out</a>
+            {% endif %}
         </nav>
     </header>
 
@@ -565,22 +707,29 @@
         (function() {
             const themeMedia = window.matchMedia('(prefers-color-scheme: dark)');
             const themeButtons = document.querySelectorAll('.theme-toggle-button');
+            const userMenuButton = document.getElementById('userMenuButton');
+            const userMenuDropdown = document.getElementById('userMenuDropdown');
 
             function getSavedTheme() {
                 const savedTheme = localStorage.getItem('themePreference');
-                return savedTheme === 'dark' || savedTheme === 'light' ? savedTheme : null;
+                return savedTheme === 'dark' || savedTheme === 'light' || savedTheme === 'system' ? savedTheme : null;
             }
 
             function getDefaultTheme() {
                 return themeMedia.matches ? 'dark' : 'light';
             }
 
+            function resolveTheme(theme) {
+                return theme === 'dark' || theme === 'light' ? theme : getDefaultTheme();
+            }
+
             function applyTheme(theme) {
-                const activeTheme = theme || getSavedTheme() || getDefaultTheme();
+                const themeSetting = theme || getSavedTheme() || 'system';
+                const activeTheme = resolveTheme(themeSetting);
                 document.documentElement.dataset.theme = activeTheme;
                 document.documentElement.style.colorScheme = activeTheme;
                 themeButtons.forEach(function(button) {
-                    const isActive = button.dataset.themeValue === activeTheme;
+                    const isActive = button.dataset.themeValue === themeSetting;
                     button.classList.toggle('active', isActive);
                     button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
                 });
@@ -596,19 +745,54 @@
 
             if (themeMedia.addEventListener) {
                 themeMedia.addEventListener('change', function() {
-                    if (!getSavedTheme()) {
-                        applyTheme(getDefaultTheme());
+                    const savedTheme = getSavedTheme();
+                    if (!savedTheme || savedTheme === 'system') {
+                        applyTheme(savedTheme || 'system');
                     }
                 });
             } else if (themeMedia.addListener) {
                 themeMedia.addListener(function() {
-                    if (!getSavedTheme()) {
-                        applyTheme(getDefaultTheme());
+                    const savedTheme = getSavedTheme();
+                    if (!savedTheme || savedTheme === 'system') {
+                        applyTheme(savedTheme || 'system');
                     }
                 });
             }
 
             applyTheme();
+
+            if (userMenuButton && userMenuDropdown) {
+                function closeUserMenu() {
+                    userMenuDropdown.classList.add('hidden');
+                    userMenuButton.setAttribute('aria-expanded', 'false');
+                }
+
+                userMenuButton.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    const isOpen = !userMenuDropdown.classList.contains('hidden');
+                    userMenuDropdown.classList.toggle('hidden', isOpen);
+                    userMenuButton.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+                });
+
+                userMenuDropdown.addEventListener('click', function(event) {
+                    const link = event.target.closest('a');
+                    if (link) {
+                        closeUserMenu();
+                    }
+                });
+
+                document.addEventListener('click', function(event) {
+                    if (!userMenuDropdown.classList.contains('hidden') && !event.target.closest('.user-menu')) {
+                        closeUserMenu();
+                    }
+                });
+
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') {
+                        closeUserMenu();
+                    }
+                });
+            }
         })();
 
         // Define the loadPage function and attach it to the window object
@@ -625,7 +809,7 @@
             let url = '';
             if (page === 'application_details' && appId) {
                 url = `/content/application_details/${appId}`;
-            } else if (page === 'guide' || page === 'about') {
+            } else if (page === 'guide' || page === 'about' || page === 'users' || page === 'settings') {
                 url = `/content/${page}`;
             } else {
                 url = `/content/${page}`;
@@ -643,6 +827,10 @@
                         initProjectsScripts();
                     } else if (page === 'application_details') {
                         initApplicationDetailsScripts();
+                    } else if (page === 'users') {
+                        initUsersScripts();
+                    } else if (page === 'settings') {
+                        initSettingsScripts();
                     }
                 }
             });
@@ -703,6 +891,14 @@
 
         function initApplicationDetailsScripts() {
             // No need to load application_details.js if code is within application_details.html
+        }
+
+        function initUsersScripts() {
+            // No need to load users.js if code is within users.html
+        }
+
+        function initSettingsScripts() {
+            // No need to load settings.js if code is within settings.html
         }
     </script>
 

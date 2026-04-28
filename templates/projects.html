@@ -15,12 +15,14 @@
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" />
                 </svg>
             </form>
+            {% if can_create_project %}
             <button onclick="openNewProjectModal()" class="primary-action hover:bg-yellow-200 hover:text-yellow-800 group flex items-center gap-2 rounded-md bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2">
                 <svg class="group-hover:text-yellow-600 text-yellow-500 flex-shrink-0" width="12" height="20" fill="currentColor">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M6 5a1 1 0 011 1v3h3a1 1 0 110 2H7v3a1 1 0 11-2 0v-3H2a1 1 0 110-2h3V6a1 1 0 011-1z"/>
                 </svg>
                 New Project
             </button>
+            {% endif %}
         </div>
     </header>
 
@@ -205,6 +207,7 @@
                         </svg>
                         Description:
                     </h4>
+                    <p id="modalProjectDescriptionDisplay" class="mt-1 text-sm text-gray-600 whitespace-pre-wrap"></p>
                     <textarea id="modalProjectDescription" rows="3"
                               class="w-full mt-1 p-2 border border-gray-300 rounded-md focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500"></textarea>
                 </div>
@@ -241,6 +244,12 @@
                     </div>
                 </div>
                 <div>
+                    <h4 class="text-sm font-semibold text-gray-600 flex items-center">
+                        Access:
+                    </h4>
+                    <p id="modalProjectAccessLevel" class="text-sm text-gray-600"></p>
+                </div>
+                <div>
                     <h4 class="text-sm font-semibold text-gray-600 flex items-center mb-1">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6 mr-2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605" />
@@ -261,6 +270,7 @@
                                 </svg>
                             </span>
                         </button>
+                        <span id="editProjectStatus-display" class="text-sm text-gray-600"></span>
                         <ul class="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm hidden"
                             id="editProjectStatus-options"
                             role="listbox">
@@ -335,6 +345,58 @@
         </div>
     </div>
 
+    <div id="assignUsersModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl mx-auto overflow-hidden">
+            <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
+                <h3 class="text-lg font-bold text-gray-800">Assign Users</h3>
+                <button onclick="closeAssignUsersModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6 space-y-5">
+                <input type="hidden" id="assignProjectId">
+                <input type="hidden" id="assignProjectRole" value="project_user">
+                <div>
+                    <h4 class="text-sm font-semibold text-gray-800">Assign users</h4>
+                    <p class="mb-2 text-xs text-gray-500">Select one or more users, choose whether they join the project as a manager or an operator, then define application access.</p>
+                    <div class="mb-4">
+                        <span class="block text-sm font-medium text-gray-700">Project role</span>
+                        <div class="mt-2 inline-flex rounded-md border border-gray-300 bg-white p-1">
+                            <button type="button" class="assign-project-role-button rounded-md px-3 py-1.5 text-sm font-medium" data-role="project_admin">Manager</button>
+                            <button type="button" class="assign-project-role-button rounded-md px-3 py-1.5 text-sm font-medium" data-role="project_user">Operator</button>
+                        </div>
+                    </div>
+                    <label for="assignUserSearch" class="block text-sm font-medium text-gray-700">Username</label>
+                    <input id="assignUserSearch"
+                           class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500"
+                           placeholder="Search users...">
+                    <div id="assignUsersOptions" class="mt-2 max-h-40 overflow-auto rounded-md border border-gray-200 bg-white p-2 space-y-1"></div>
+                    <div id="selectedAssignUsers" class="mt-3 flex flex-wrap gap-2"></div>
+                </div>
+                <div>
+                    <h4 class="text-sm font-semibold text-gray-800">Application access</h4>
+                    <p class="mb-2 text-xs text-gray-500">Saving applies the same project role and application access to every selected user. Managers automatically get RW access to every application in the project.</p>
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="text-left text-gray-600">
+                                <th class="py-2 font-semibold">App Name</th>
+                                <th class="py-2 font-semibold w-56">Access Level</th>
+                            </tr>
+                        </thead>
+                        <tbody id="assignApplicationsTable" class="text-gray-700"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="p-4 border-t border-gray-200 bg-gray-100 text-right rounded-b-lg space-x-2">
+                <button onclick="saveAssignedUsers()" class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 focus:outline-none">Save</button>
+                <button onclick="closeAssignUsersModal()" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 focus:outline-none">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         (function() {
             const editIcon = `
@@ -363,6 +425,11 @@
             let currentEditingProjectId = null;
             let inEditModeName = false;
             let inEditModeLink = false;
+            let assignUsers = [];
+            let assignMemberships = [];
+            let assignApplicationMemberships = [];
+            let selectedAssignUsers = new Map();
+            let currentAssignProjectRole = 'project_user';
 
             function setSourceLinkDisplay(link) {
                 if (!link) {
@@ -375,6 +442,19 @@
                     ${link}
                   </a>`;
                 $('#modalProjectSourceLinkDisplay').html(anchor);
+            }
+
+            function applyProjectEditState(canEdit) {
+                $('#modalProjectDescriptionDisplay').toggleClass('hidden', canEdit);
+                $('#modalProjectDescription').toggleClass('hidden', !canEdit).prop('readonly', !canEdit);
+                $('#editNameBtn, #editLinkBtn').toggleClass('hidden', !canEdit);
+                $('#editProjectStatus-button').toggleClass('hidden', !canEdit);
+                $('#editProjectStatus-display').toggleClass('hidden', canEdit);
+                if (!canEdit) {
+                    $('#modalProjectNameInput, #modalProjectSourceLinkInput, #saveChangesBtn').addClass('hidden');
+                    $('#modalProjectNameDisplay, #modalProjectSourceLinkDisplay').removeClass('hidden');
+                    $('#editProjectStatus-options').addClass('hidden');
+                }
             }
 
             function refreshProjectDetails(projectId) {
@@ -390,12 +470,15 @@
                         $('#modalProjectNameDisplay').text(originalProjectData.name);
                         $('#modalProjectNameInput').val(originalProjectData.name);
                         $('#modalProjectDescription').val(originalProjectData.description);
+                        $('#modalProjectDescriptionDisplay').text(originalProjectData.description || 'No description available.');
 
                         setSourceLinkDisplay(originalProjectData.source_link);
                         $('#modalProjectSourceLinkInput').val(originalProjectData.source_link);
                         $('#modalProjectCreatedAt').text(project.created_at);
+                        $('#modalProjectAccessLevel').text(project.project_role_label || project.access_label || 'No Access');
 
                         $('#editProjectStatus-selected').text(originalProjectData.status);
+                        $('#editProjectStatus-display').text(originalProjectData.status);
                         $('#editProjectStatus-options li').each(function() {
                             $(this).find('span svg').addClass('hidden');
                         });
@@ -438,6 +521,7 @@
                         $('#modalProjectSourceLinkInput').addClass('hidden');
 
                         $('#saveChangesBtn').addClass('hidden');
+                        applyProjectEditState(Boolean(project.can_edit));
                     },
                     error: function() {
                         console.error('Error reloading project data after save');
@@ -522,6 +606,265 @@
                 }
             }
 
+            function escapeHtml(value) {
+                return $('<div>').text(value == null ? '' : String(value)).html();
+            }
+
+            function applyAssignProjectRoleStyles() {
+                $('.assign-project-role-button').each(function() {
+                    const isActive = $(this).data('role') === currentAssignProjectRole;
+                    $(this)
+                        .toggleClass('bg-yellow-100 text-yellow-700', isActive)
+                        .toggleClass('bg-transparent text-gray-600 hover:bg-gray-100', !isActive);
+                });
+                const managerMode = currentAssignProjectRole === 'project_admin';
+                $('#assignApplicationsTable').toggleClass('opacity-70', managerMode);
+                $('.assign-app-option')
+                    .prop('disabled', managerMode);
+                applyAssignApplicationStyles();
+            }
+
+            function applyAssignApplicationStyles() {
+                $('.assign-app-option').each(function() {
+                    const button = $(this);
+                    const applicationId = Number(button.data('application-id'));
+                    const currentValue = $(`.assign-app-access-input[data-application-id="${applicationId}"]`).val();
+                    const isActive = button.data('value') === currentValue;
+                    button.removeClass(
+                        'bg-gray-100 text-gray-700 bg-yellow-100 text-yellow-700 bg-green-100 text-green-700 text-gray-500 hover:bg-gray-100 cursor-not-allowed opacity-70'
+                    );
+
+                    if (isActive && currentValue === 'no_access') {
+                        button.addClass('bg-gray-100 text-gray-700');
+                    } else if (isActive && currentValue === 'view_only') {
+                        button.addClass('bg-yellow-100 text-yellow-700');
+                    } else if (isActive && currentValue === 'read_write') {
+                        button.addClass('bg-green-100 text-green-700');
+                    } else {
+                        button.addClass('text-gray-500 hover:bg-gray-100');
+                    }
+
+                    if (button.prop('disabled')) {
+                        button.addClass('cursor-not-allowed opacity-70');
+                    }
+                });
+            }
+
+            function setAssignProjectRole(role) {
+                currentAssignProjectRole = role === 'project_admin' ? 'project_admin' : 'project_user';
+                $('#assignProjectRole').val(currentAssignProjectRole);
+
+                if (currentAssignProjectRole === 'project_admin') {
+                    $('.assign-app-access-input').val('read_write');
+                }
+
+                renderAssignApplications(assignCurrentProjectData);
+                applyAssignProjectRoleStyles();
+            }
+
+            let assignCurrentProjectData = null;
+
+            function renderAssignUserOptions() {
+                const filter = $('#assignUserSearch').val().trim().toLowerCase();
+                const filteredUsers = assignUsers.filter(function(user) {
+                    const username = (user.username || '').toLowerCase();
+                    const fullName = (user.full_name || '').toLowerCase();
+                    return !filter || username.includes(filter) || fullName.includes(filter);
+                });
+
+                if (filteredUsers.length === 0) {
+                    $('#assignUsersOptions').html('<div class="px-2 py-3 text-sm text-gray-500">No users found.</div>');
+                    return;
+                }
+
+                $('#assignUsersOptions').html(filteredUsers.map(function(user) {
+                    const checked = selectedAssignUsers.has(user.id) ? 'checked' : '';
+                    return `
+                        <label class="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-gray-700 hover:bg-yellow-50">
+                            <input type="checkbox"
+                                   class="assign-user-checkbox rounded border-gray-300 text-yellow-500 focus:ring-yellow-500"
+                                   value="${user.id}"
+                                   ${checked}>
+                            <span class="min-w-0">
+                                <span class="block font-medium">${escapeHtml(user.username)}</span>
+                                <span class="block truncate text-xs text-gray-500">${escapeHtml(user.full_name || '')}</span>
+                            </span>
+                        </label>
+                    `;
+                }).join(''));
+            }
+
+            function renderSelectedAssignUsers() {
+                const selectedUsers = Array.from(selectedAssignUsers.values());
+                if (selectedUsers.length === 0) {
+                    $('#selectedAssignUsers').html('<span class="text-sm text-gray-500">No users selected.</span>');
+                    return;
+                }
+
+                $('#selectedAssignUsers').html(selectedUsers.map(function(user) {
+                    return `
+                        <span class="inline-flex items-center gap-2 rounded-md border border-yellow-200 bg-yellow-50 px-2.5 py-1 text-sm font-medium text-yellow-700">
+                            ${escapeHtml(user.username)}
+                            <button type="button"
+                                    class="remove-assign-user text-yellow-600 hover:text-red-600"
+                                    data-id="${user.id}"
+                                    aria-label="Remove ${escapeHtml(user.username)}">
+                                &times;
+                            </button>
+                        </span>
+                    `;
+                }).join(''));
+            }
+
+            function renderAssignApplications(project) {
+                assignCurrentProjectData = project;
+                const applications = project.applications && project.applications.length > 0
+                    ? project.applications
+                    : [];
+
+                if (applications.length === 0) {
+                    $('#assignApplicationsTable').html(`
+                        <tr>
+                            <td colspan="2" class="py-3 text-sm text-gray-500">No applications are linked to this project yet.</td>
+                        </tr>
+                    `);
+                    return;
+                }
+
+                $('#assignApplicationsTable').html(applications.map(function(app) {
+                    const selectedMemberships = assignApplicationMemberships.filter(function(membership) {
+                        return membership.application_id === app.id && selectedAssignUsers.has(membership.user_id);
+                    });
+                    const uniqueAccessLevels = Array.from(new Set(selectedMemberships.map(function(membership) {
+                        return membership.access_level;
+                    })));
+                    const existingAccess = currentAssignProjectRole === 'project_admin'
+                        ? 'read_write'
+                        : (uniqueAccessLevels.length === 1 ? uniqueAccessLevels[0] : 'no_access');
+                    return `
+                        <tr>
+                            <td class="py-2 pr-4 text-gray-700">${escapeHtml(app.name)}</td>
+                            <td class="py-2">
+                                <input type="hidden" class="assign-app-access-input" data-application-id="${app.id}" value="${existingAccess}">
+                                <div class="inline-flex rounded-md border border-gray-300 bg-white p-1">
+                                    <button type="button" class="assign-app-option rounded-md px-3 py-1.5 text-sm font-medium ${existingAccess === 'no_access' ? 'bg-gray-100 text-gray-700' : 'text-gray-500 hover:bg-gray-100'}" data-application-id="${app.id}" data-value="no_access">No Access</button>
+                                    <button type="button" class="assign-app-option rounded-md px-3 py-1.5 text-sm font-medium ${existingAccess === 'view_only' ? 'bg-yellow-100 text-yellow-700' : 'text-gray-500 hover:bg-gray-100'}" data-application-id="${app.id}" data-value="view_only">RO</button>
+                                    <button type="button" class="assign-app-option rounded-md px-3 py-1.5 text-sm font-medium ${existingAccess === 'read_write' ? 'bg-green-100 text-green-700' : 'text-gray-500 hover:bg-gray-100'}" data-application-id="${app.id}" data-value="read_write">RW</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join(''));
+                applyAssignProjectRoleStyles();
+            }
+
+            window.openAssignUsersModal = function(projectId) {
+                $('#assignProjectId').val(projectId);
+                $('#assignUserSearch').val('');
+                $('#assignUsersOptions').html('<div class="px-2 py-3 text-sm text-gray-500">Loading users...</div>');
+                $('#selectedAssignUsers').html('');
+                $('#assignApplicationsTable').html('');
+                selectedAssignUsers = new Map();
+                currentAssignProjectRole = 'project_user';
+                applyAssignProjectRoleStyles();
+
+                $.when(
+                    $.getJSON(`/project/${projectId}`),
+                    $.getJSON('/api/users'),
+                    $.getJSON(`/api/project_memberships?project_id=${projectId}`),
+                    $.getJSON(`/api/application_memberships?project_id=${projectId}`)
+                ).done(function(projectResponse, usersResponse, membershipsResponse, applicationMembershipsResponse) {
+                    const project = projectResponse[0];
+                    assignUsers = usersResponse[0] || [];
+                    assignMemberships = membershipsResponse[0] || [];
+                    assignApplicationMemberships = applicationMembershipsResponse[0] || [];
+                    const membershipUserIds = new Set(assignMemberships.map(function(membership) {
+                        return membership.user_id;
+                    }));
+                    const distinctRoles = Array.from(new Set(assignMemberships.map(function(membership) {
+                        return membership.project_role;
+                    })));
+                    currentAssignProjectRole = distinctRoles.length === 1 ? distinctRoles[0] : 'project_user';
+
+                    assignUsers.forEach(function(user) {
+                        if (membershipUserIds.has(user.id)) {
+                            selectedAssignUsers.set(user.id, user);
+                        }
+                    });
+
+                    renderAssignUserOptions();
+                    renderSelectedAssignUsers();
+                    renderAssignApplications(project);
+                    applyAssignProjectRoleStyles();
+                    $('#assignUsersModal').removeClass('hidden');
+                }).fail(function(xhr) {
+                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Unable to load assignment details.';
+                    showSwalModal({
+                        title: 'Error!',
+                        text: error,
+                        icon: 'error',
+                        confirmText: 'OK'
+                    });
+                });
+            }
+
+            window.closeAssignUsersModal = function() {
+                $('#assignUsersModal').addClass('hidden');
+            }
+
+            window.saveAssignedUsers = function() {
+                const projectId = Number($('#assignProjectId').val());
+                const selectedUsers = Array.from(selectedAssignUsers.values());
+
+                if (selectedUsers.length === 0) {
+                    showSwalModal({
+                        title: 'Validation Error',
+                        text: 'Select at least one user.',
+                        icon: 'error',
+                        confirmText: 'OK'
+                    });
+                    return;
+                }
+
+                const applicationPayload = $('.assign-app-access-input').map(function() {
+                    return {
+                        application_id: Number($(this).data('application-id')),
+                        access_level: $(this).val()
+                    };
+                }).get();
+
+                $.ajax({
+                    url: '/api/application_memberships/bulk',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        project_id: projectId,
+                        project_role: currentAssignProjectRole,
+                        user_ids: selectedUsers.map(function(user) { return user.id; }),
+                        applications: applicationPayload
+                    })
+                }).done(function() {
+                    closeAssignUsersModal();
+                    showSwalModal({
+                        title: 'Saved!',
+                        text: 'Application access was updated.',
+                        icon: 'success',
+                        confirmText: 'OK',
+                        onConfirm: function() {
+                            loadProjectsData($('#searchForm input[name="search"]').val());
+                        }
+                    });
+                }).fail(function(xhr) {
+                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Unable to save application access.';
+                    showSwalModal({
+                        title: 'Error!',
+                        text: error,
+                        icon: 'error',
+                        confirmText: 'OK'
+                    });
+                });
+            }
+
             function loadProjectsData(searchQuery = '') {
                 $('#projectListContainer').html('<div class="flex justify-center items-center py-20"><div class="spinner"></div></div>');
                 $.ajax({
@@ -551,7 +894,8 @@
                                     <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Project Name</th>
                                     <th class="hide-sm w-40 whitespace-nowrap py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Status</th>
                                     <th class="hide-sm w-36 whitespace-nowrap py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Start Date</th>
-                                    <th class="col-actions w-20 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200"></th>
+                                    <th class="col-access whitespace-nowrap py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Access</th>
+                                    <th class="col-actions project-actions-column py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200"></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -559,6 +903,12 @@
 
                 projectsData.forEach(function(proj) {
                     let truncatedName = proj.name.length > 20 ? `<span title="${proj.name}">${proj.name.substring(0, 20)}…</span>` : proj.name;
+                    const projectAccessCode = proj.project_role_code || proj.access_code || '';
+                    const accessClass = projectAccessCode === 'Manager' || projectAccessCode === 'Admin'
+                        ? 'bg-blue-100 text-blue-700 border-blue-200'
+                        : projectAccessCode === 'Operator'
+                            ? 'bg-yellow-100 text-yellow-700 border-yellow-200'
+                            : 'bg-gray-100 text-gray-700 border-gray-200';
                     html += `
                         <tr class="hover:bg-gray-50" data-id="${proj.id}">
                             <td class="col-id text-lg text-gray-600 py-4 px-6 border-b border-gray-200">
@@ -573,8 +923,13 @@
                             </td>
                             <td class="hide-sm text-base py-4 px-6 border-b border-gray-200">${getStatusLabel(proj.status)}</td>
                             <td class="hide-sm whitespace-nowrap text-base text-gray-600 py-4 px-6 border-b border-gray-200">${proj.start_date}</td>
+                            <td class="col-access whitespace-nowrap text-base text-gray-600 py-4 px-6 border-b border-gray-200">
+                                <span class="inline-flex items-center rounded-md border px-2.5 py-1 text-xs font-semibold ${accessClass}">
+                                    ${projectAccessCode}
+                                </span>
+                            </td>
                             <td class="col-actions py-4 px-6 border-b border-gray-200">
-                                <div class="table-actions">
+                                <div class="table-actions table-actions-three">
                                     <button class="details-button table-action-button text-yellow-500 hover:text-yellow-600" data-id="${proj.id}" aria-label="View Project Details">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -589,7 +944,31 @@
                                                      20.25 9v.776"/>
                                         </svg>
                                     </button>
-                                    <button class="delete-button table-action-button text-yellow-500 hover:text-red-600" data-id="${proj.id}" aria-label="Delete Project">
+                                    <button class="${proj.can_edit ? '' : 'invisible pointer-events-none'} assign-users-button table-action-button text-yellow-500 hover:text-yellow-600" data-id="${proj.id}" aria-label="Assign Users">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                             stroke="currentColor" class="w-6 h-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M18 18.72a9.094 9.094 0 0 0 3.741-.479
+                                                     3 3 0 0 0-4.682-2.72m.941 3.198
+                                                     .001.031c0 .225-.012.447-.037.666A11.944
+                                                     11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062
+                                                     6.062 0 0 1 6 18.719m12 0a5.971
+                                                     5.971 0 0 0-.941-3.197m0 0A5.995
+                                                     5.995 0 0 0 12 12.75a5.995
+                                                     5.995 0 0 0-5.058 2.772m0 0a3
+                                                     3 0 0 0-4.681 2.72 8.986
+                                                     8.986 0 0 0 3.74.477m.94-3.197a5.971
+                                                     5.971 0 0 0-.94 3.197M15
+                                                     6.75a3 3 0 1 1-6
+                                                     0 3 3 0 0 1 6 0Zm6
+                                                     3a2.25 2.25 0 1 1-4.5
+                                                     0 2.25 2.25 0 0 1 4.5
+                                                     0Zm-13.5 0a2.25 2.25 0 1
+                                                     1-4.5 0 2.25 2.25 0 0 1
+                                                     4.5 0Z"/>
+                                        </svg>
+                                    </button>
+                                    <button class="${proj.can_edit ? '' : 'invisible pointer-events-none'} delete-button table-action-button text-yellow-500 hover:text-red-600" data-id="${proj.id}" aria-label="Delete Project">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                              stroke="currentColor" class="w-6 h-6">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -695,12 +1074,15 @@
                         $('#modalProjectNameDisplay').text(originalProjectData.name);
                         $('#modalProjectNameInput').val(originalProjectData.name);
                         $('#modalProjectDescription').val(originalProjectData.description);
+                        $('#modalProjectDescriptionDisplay').text(originalProjectData.description || 'No description available.');
 
                         setSourceLinkDisplay(originalProjectData.source_link);
                         $('#modalProjectSourceLinkInput').val(originalProjectData.source_link);
                         $('#modalProjectCreatedAt').text(project.created_at);
+                        $('#modalProjectAccessLevel').text(project.access_label || 'No Access');
 
                         $('#editProjectStatus-selected').text(originalProjectData.status);
+                        $('#editProjectStatus-display').text(originalProjectData.status);
                         $('#editProjectStatus-options li').each(function() {
                             $(this).find('span svg').addClass('hidden');
                         });
@@ -727,6 +1109,7 @@
                         }
 
                         $('#saveChangesBtn').addClass('hidden');
+                        applyProjectEditState(Boolean(project.can_edit));
                         $('#projectModal').removeClass('hidden');
                     },
                     error: function(xhr) {
@@ -923,6 +1306,56 @@
                             deleteProject(pid);
                         }
                     });
+                });
+
+                $('#projectListContainer').on('click', '.assign-users-button', function(e) {
+                    e.preventDefault();
+                    const pid = $(this).data('id');
+                    openAssignUsersModal(pid);
+                });
+
+                $('#assignUserSearch').on('input', renderAssignUserOptions);
+
+                $('#assignUsersOptions').on('change', '.assign-user-checkbox', function() {
+                    const userId = Number($(this).val());
+                    const user = assignUsers.find(function(item) {
+                        return item.id === userId;
+                    });
+                    if (!user) return;
+                    if ($(this).is(':checked')) {
+                        selectedAssignUsers.set(user.id, user);
+                    } else {
+                        selectedAssignUsers.delete(user.id);
+                    }
+                    renderSelectedAssignUsers();
+                    renderAssignUserOptions();
+                    renderAssignApplications(assignCurrentProjectData);
+                });
+
+                $('#selectedAssignUsers').on('click', '.remove-assign-user', function() {
+                    selectedAssignUsers.delete(Number($(this).data('id')));
+                    renderSelectedAssignUsers();
+                    renderAssignUserOptions();
+                    renderAssignApplications(assignCurrentProjectData);
+                });
+
+                $('#assignUsersModal').on('click', '.assign-project-role-button', function() {
+                    setAssignProjectRole($(this).data('role'));
+                });
+
+                $('#assignUsersModal').on('click', '.assign-app-option', function() {
+                    if ($(this).prop('disabled')) {
+                        return;
+                    }
+                    const applicationId = Number($(this).data('application-id'));
+                    $(`.assign-app-access-input[data-application-id="${applicationId}"]`).val($(this).data('value'));
+                    applyAssignApplicationStyles();
+                });
+
+                $('#assignUsersModal').on('click', function(e) {
+                    if (e.target.id === 'assignUsersModal') {
+                        closeAssignUsersModal();
+                    }
                 });
 
                 loadProjectsData();

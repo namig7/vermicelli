@@ -1,45 +1,42 @@
-# Byte-compiled / optimized / DLL files
+# Python bytecode
 __pycache__/
 *.py[cod]
 *$py.class
 
-# Python virtual environment
+# Virtual environments
 venv/
 .venv/
 
-# Flask session files
+# Test and tool caches
+.pytest_cache/
+templates/__pycache__/
+
+# Runtime state
 flask_session/
-
-# Sqlite files
 instance/
-
-# Logs
 *.log
-
-# Environment and sensitive files
-*.env
-*.env.*
-
-# Cookies file
 cookies.txt
 
-# Node modules and package files
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment and secrets
+.env
+.env.*
+*.env
+
+# Frontend/package artifacts
 node_modules/
 package-lock.json
 
-# Static files (runtime or generated assets)
-static/
-
-# Template cache (if applicable)
-templates/__pycache__/
-
-# Backup scripts
-*.backup
-
-# Miscellaneous
+# Editors and OS files
+.idea/
 *.swp
 *.swo
 *~
 .DS_Store
-flask_session/
-.idea/
+
+# Local backups
+*.backup

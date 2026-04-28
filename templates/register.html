@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register Super Admin</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='public/favicon.ico') }}">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@^2.0/dist/tailwind.min.css" rel="stylesheet">
+    <script>
+        (function() {
+            const themeMedia = window.matchMedia('(prefers-color-scheme: dark)');
+            const activeTheme = themeMedia.matches ? 'dark' : 'light';
+            document.documentElement.dataset.theme = activeTheme;
+            document.documentElement.style.colorScheme = activeTheme;
+        })();
+    </script>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #f9fafb;
+            color: #374151;
+        }
+
+        .register-main {
+            flex: 1 0 auto;
+            padding: 2rem;
+        }
+
+        html[data-theme="dark"] body {
+            background-color: #111827;
+            color: #d1d5db;
+        }
+
+        html[data-theme="dark"] .bg-white {
+            background-color: #1f2937 !important;
+        }
+
+        html[data-theme="dark"] .text-gray-800,
+        html[data-theme="dark"] .text-gray-700,
+        html[data-theme="dark"] .text-gray-600 {
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] input {
+            background-color: #111827 !important;
+            border-color: #4b5563 !important;
+            color: #f3f4f6 !important;
+        }
+
+        html[data-theme="dark"] .site-logo {
+            filter: brightness(0) invert(1);
+        }
+    </style>
+</head>
+<body>
+    <main class="register-main flex items-center justify-center">
+        <div class="w-full max-w-md bg-white rounded-lg shadow-md px-8 py-8">
+            <div class="flex flex-col items-center text-center gap-3 mb-6">
+                <img src="{{ url_for('static', filename='public/logo-vermicelli.svg') }}" alt="Vermicelli Logo" class="site-logo h-16 w-16 rounded-full">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">Create Super Admin</h1>
+                    <p class="text-sm text-gray-600">Initial setup is available because no super admins exist.</p>
+                </div>
+            </div>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="mb-4 rounded-md bg-yellow-100 text-yellow-800 px-4 py-3 text-sm">
+                        {{ messages[0] }}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            {% if registration_open %}
+            <form action="{{ url_for('register') }}" method="post" class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="username">Username</label>
+                    <input class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 focus:outline-none focus:ring-1 focus:ring-yellow-500" id="username" type="text" name="username" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="full_name">Full Name</label>
+                    <input class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 focus:outline-none focus:ring-1 focus:ring-yellow-500" id="full_name" type="text" name="full_name">
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="password">Password</label>
+                    <input class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 focus:outline-none focus:ring-1 focus:ring-yellow-500" id="password" type="password" name="password" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="password_confirmation">Password Confirmation</label>
+                    <input class="shadow appearance-none border rounded-md w-full py-2 px-3 text-gray-700 focus:outline-none focus:ring-1 focus:ring-yellow-500" id="password_confirmation" type="password" name="password_confirmation" required>
+                </div>
+                <button class="hover:bg-yellow-200 hover:text-yellow-800 rounded-md bg-yellow-100 text-yellow-600 text-sm font-medium px-4 py-2" type="submit">
+                    Register
+                </button>
+                <a href="{{ url_for('login') }}" class="ml-3 text-sm text-gray-600 hover:text-gray-800">Back to login</a>
+            </form>
+            {% else %}
+            <p class="text-sm text-gray-600">Public super admin registration is closed.</p>
+            <a href="{{ url_for('login') }}" class="inline-block mt-4 text-sm text-yellow-600 hover:text-yellow-700 hover:underline">Back to login</a>
+            {% endif %}
+        </div>
+    </main>
+</body>
+</html>
