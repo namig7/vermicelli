@@ -1,5 +1,6 @@
 <!-- projects.html -->
-<div>
+<div class="resource-page">
+    {% include '_resource_page_styles.html' %}
     <header class="page-toolbar flex justify-between items-center mb-4">
         <nav class="flex space-x-6 text-gray-700">
             <a href="/applications" data-page="applications" class="tab-link">Applications</a>
@@ -568,7 +569,7 @@
                     confirmButtonText: confirmText || 'OK',
                     cancelButtonText: cancelText || 'Cancel',
                     customClass: {
-                        popup: 'bg-white rounded-lg shadow-lg',
+                        popup: 'resource-page-swal bg-white rounded-lg shadow-lg',
                         title: 'text-xl font-bold text-gray-800',
                         content: 'text-gray-700',
                         confirmButton: getButtonClass(icon, 'confirm'),
@@ -1408,7 +1409,7 @@
                         confirmButtonText: 'Save',
                         cancelButtonText: 'Cancel',
                         customClass: {
-                            popup: 'bg-white rounded-lg shadow-lg',
+                            popup: 'resource-page-swal bg-white rounded-lg shadow-lg',
                             title: 'text-xl font-bold text-gray-800',
                             content: 'text-gray-700',
                             input: 'border border-gray-300 rounded-md px-3 py-2 focus:shadow-none focus:border-yellow-500 focus:outline-none',
@@ -1444,7 +1445,7 @@
                                             text: resp.message,
                                             icon: 'success',
                                             customClass: {
-                                                popup: 'bg-white rounded-lg shadow-lg',
+                                                popup: 'resource-page-swal bg-white rounded-lg shadow-lg',
                                                 title: 'text-xl font-bold text-gray-800',
                                                 content: 'text-gray-700',
                                                 confirmButton: 'btn btn-success',
@@ -1461,7 +1462,7 @@
                                             text: resp.error || 'Unknown error',
                                             icon: 'error',
                                             customClass: {
-                                                popup: 'bg-white rounded-lg shadow-lg',
+                                                popup: 'resource-page-swal bg-white rounded-lg shadow-lg',
                                                 title: 'text-xl font-bold text-gray-800',
                                                 content: 'text-gray-700',
                                                 confirmButton: 'btn btn-danger',
@@ -1479,7 +1480,7 @@
                                         text: error,
                                         icon: 'error',
                                         customClass: {
-                                            popup: 'bg-white rounded-lg shadow-lg',
+                                            popup: 'resource-page-swal bg-white rounded-lg shadow-lg',
                                             title: 'text-xl font-bold text-gray-800',
                                             content: 'text-gray-700',
                                             confirmButton: 'btn btn-danger',

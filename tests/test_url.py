@@ -255,6 +255,18 @@ def test_project_admin_cannot_open_users_page(client):
     assert response.status_code == 403
 
 
+def test_main_navigation_uses_dashboard_label(client):
+    user = create_user('member')
+    login_as(client, user)
+
+    response = client.get('/')
+
+    assert response.status_code == 200
+    body = response.data.decode()
+    assert '>Dashboard<' in body
+    assert '>Home<' not in body
+
+
 def test_user_can_belong_to_multiple_projects_with_different_rights(client):
     root = create_user('root', PLATFORM_SUPER_ADMIN)
     target = create_user('member')

@@ -1,5 +1,6 @@
 <!-- applications.html -->
-<div>
+<div class="resource-page">
+    {% include '_resource_page_styles.html' %}
     <!-- Header for Applications -->
     <header class="page-toolbar flex justify-between items-center mb-4">
         <!-- Navigation Tabs -->
@@ -311,7 +312,7 @@
             confirmButtonText: confirmText || 'OK',
             cancelButtonText: cancelText || 'Cancel',
             customClass: {
-                popup: 'bg-white rounded-lg shadow-lg',
+                popup: 'resource-page-swal bg-white rounded-lg shadow-lg',
                 title: 'text-xl font-bold text-gray-800',
                 content: 'text-gray-700',
                 confirmButton: getButtonClass(icon, 'confirm'),
