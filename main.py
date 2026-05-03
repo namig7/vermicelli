@@ -237,7 +237,7 @@ def format_date_for_user(value, user=None):
 
 def ensure_user_schema():
     """Adds lightweight preference columns for existing local databases."""
-    global _USER_SCHEMA_READY, _DATABASE_SCHEMA_READY_URI
+    global _USER_SCHEMA_READY
     if _USER_SCHEMA_READY:
         return
     try:
