@@ -899,6 +899,7 @@
                     <div class="user-dropdown-name">{{ current_user.full_name or current_user.username }}</div>
                     <a href="/settings" data-page="settings" class="user-dropdown-link">Account Settings</a>
                     {% if can_manage_users %}
+                    <a href="/system-settings" data-page="system-settings" class="user-dropdown-link">System Settings</a>
                     <a href="/users" data-page="users" class="user-dropdown-link">Users</a>
                     {% endif %}
                     <a href="{{ url_for('logout') }}" class="user-dropdown-link">Sign out</a>

@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Register Super Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vermicelli Setup</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='public/favicon.ico') }}">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@^2.0/dist/tailwind.min.css" rel="stylesheet">
     <script>
@@ -15,23 +16,47 @@
     </script>
     <style>
         body {
-            display: flex;
-            flex-direction: column;
             min-height: 100vh;
             background-color: #f9fafb;
             color: #374151;
         }
 
-        .register-main {
-            flex: 1 0 auto;
+        .setup-main {
+            min-height: 100vh;
             padding: 2rem;
         }
 
-        .auth-surface {
+        .setup-window,
+        .setup-card,
+        .setup-choice {
             border: 1px solid #e5e7eb;
             border-radius: 0.5rem;
             background-color: #ffffff;
-            box-shadow: 0 4px 6px -1px rgba(17, 24, 39, 0.08), 0 2px 4px -2px rgba(17, 24, 39, 0.08);
+        }
+
+        .setup-shell {
+            width: 100%;
+            max-width: 58rem;
+        }
+
+        .setup-window {
+            box-shadow: 0 10px 15px -3px rgba(17, 24, 39, 0.08), 0 4px 6px -4px rgba(17, 24, 39, 0.08);
+        }
+
+        .setup-choice {
+            text-align: left;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+        }
+
+        .setup-choice:hover {
+            border-color: #f59e0b;
+            box-shadow: 0 6px 16px rgba(245, 158, 11, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .setup-choice.is-active {
+            border-color: #f59e0b;
+            background-color: #fffbeb;
         }
 
         .form-control {
@@ -59,16 +84,78 @@
             min-height: 2.5rem;
             padding: 0.5rem 1rem;
             border-radius: 0.375rem;
+            border: 1px solid transparent;
             background-color: #f59e0b;
             color: #ffffff;
             font-size: 0.875rem;
             font-weight: 600;
             line-height: 1.25rem;
-            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
         .btn:hover {
             background-color: #d97706;
+        }
+
+        .btn-secondary {
+            border-color: #e5e7eb;
+            background-color: #ffffff;
+            color: #4b5563;
+        }
+
+        .btn-secondary:hover {
+            background-color: #f9fafb;
+        }
+
+        .btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.65;
+        }
+
+        .setup-pill {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 9999px;
+            background-color: #fef3c7;
+            color: #92400e;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .toggle {
+            position: relative;
+            display: inline-flex;
+            height: 2rem;
+            width: 3.5rem;
+            align-items: center;
+            border-radius: 9999px;
+            border: 1px solid #d1d5db;
+            background-color: #ffffff;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .toggle::after {
+            content: "";
+            position: absolute;
+            left: 0.25rem;
+            height: 1.5rem;
+            width: 1.5rem;
+            border-radius: 9999px;
+            background-color: #ffffff;
+            box-shadow: 0 1px 3px rgba(17, 24, 39, 0.25);
+            transition: transform 0.2s ease;
+        }
+
+        input:checked + .toggle {
+            border-color: #f59e0b;
+            background-color: #f59e0b;
+        }
+
+        input:checked + .toggle::after {
+            transform: translateX(1.5rem);
         }
 
         html[data-theme="dark"] body {
@@ -76,22 +163,44 @@
             color: #d1d5db;
         }
 
-        html[data-theme="dark"] .bg-white,
-        html[data-theme="dark"] .auth-surface {
-            background-color: #1f2937 !important;
+        html[data-theme="dark"] .setup-window,
+        html[data-theme="dark"] .setup-card,
+        html[data-theme="dark"] .setup-choice {
+            background-color: #1f2937;
+            border-color: #374151;
         }
 
+        html[data-theme="dark"] .setup-choice.is-active {
+            background-color: #2b2619;
+            border-color: #f59e0b;
+        }
+
+        html[data-theme="dark"] .bg-gray-50,
+        html[data-theme="dark"] .bg-white {
+            background-color: #111827 !important;
+        }
+
+        html[data-theme="dark"] .text-gray-900,
         html[data-theme="dark"] .text-gray-800,
         html[data-theme="dark"] .text-gray-700,
         html[data-theme="dark"] .text-gray-600 {
             color: #e5e7eb !important;
         }
 
-        html[data-theme="dark"] input,
+        html[data-theme="dark"] .text-gray-500 {
+            color: #9ca3af !important;
+        }
+
         html[data-theme="dark"] .form-control {
-            background-color: #111827 !important;
-            border-color: #4b5563 !important;
-            color: #f3f4f6 !important;
+            background-color: #111827;
+            border-color: #4b5563;
+            color: #f3f4f6;
+        }
+
+        html[data-theme="dark"] .btn-secondary {
+            background-color: #111827;
+            border-color: #4b5563;
+            color: #e5e7eb;
         }
 
         html[data-theme="dark"] .site-logo {
@@ -100,52 +209,580 @@
     </style>
 </head>
 <body>
-    <main class="register-main flex items-center justify-center">
-        <div class="w-full max-w-md auth-surface px-8 py-8">
-            <div class="flex flex-col items-center text-center gap-3 mb-6">
+    <main class="setup-main flex items-center justify-center">
+        <div class="setup-shell px-6 py-8 sm:px-8">
+            <div class="mb-8 flex flex-col items-center gap-3 text-center">
                 <img src="{{ url_for('static', filename='public/logo-vermicelli.svg') }}" alt="Vermicelli Logo" class="site-logo h-16 w-16 rounded-full">
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-800">Create Super Admin</h1>
-                    <p class="text-sm text-gray-600">Initial setup is available because no super admins exist.</p>
+                    <p class="text-sm font-semibold uppercase tracking-wide text-yellow-600">Welcome</p>
+                    <h1 class="text-3xl font-bold text-gray-900">Welcome to Vermicelli</h1>
+                    <p class="mt-2 text-sm text-gray-600">Start fresh or restore an encrypted backup.</p>
                 </div>
             </div>
 
             {% with messages = get_flashed_messages() %}
                 {% if messages %}
-                    <div class="mb-4 rounded-md bg-yellow-100 text-yellow-800 px-4 py-3 text-sm">
+                    <div class="mb-6 rounded-md bg-yellow-100 px-4 py-3 text-sm text-yellow-800">
                         {{ messages[0] }}
                     </div>
                 {% endif %}
             {% endwith %}
 
             {% if registration_open %}
-            <form action="{{ url_for('register') }}" method="post" class="space-y-4">
-                <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="username">Username</label>
-                    <input class="form-control" id="username" type="text" name="username" required>
+            <section id="welcomeStep" class="setup-window p-5">
+                <div class="grid gap-4 md:grid-cols-2">
+                    <button type="button" id="startSetupChoice" class="setup-choice p-6">
+                        <h2 class="text-xl font-bold text-gray-900">Start Initial Setup</h2>
+                        <p class="mt-2 text-sm text-gray-600">Choose storage, then create the first admin account.</p>
+                    </button>
+                    <button type="button" id="restoreChoice" class="setup-choice p-6">
+                        <h2 class="text-xl font-bold text-gray-900">Restore from Backup</h2>
+                        <p class="mt-2 text-sm text-gray-600">Import an encrypted Vermicelli backup into a clean installation.</p>
+                    </button>
                 </div>
-                <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="full_name">Full Name</label>
-                    <input class="form-control" id="full_name" type="text" name="full_name">
+            </section>
+
+            <section id="databaseChoiceStep" class="setup-window hidden p-5">
+                <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <span class="setup-pill">Database Choice</span>
+                        <h2 class="mt-3 text-2xl font-bold text-gray-900">Choose a database</h2>
+                        <p class="mt-1 text-sm text-gray-600">Select how this installation will store data. Database and application configuration are generated automatically when setup finishes.</p>
+                    </div>
+                    <button type="button" class="btn btn-secondary setup-back" data-target="welcomeStep">Back</button>
                 </div>
-                <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="password">Password</label>
-                    <input class="form-control" id="password" type="password" name="password" required>
+                <div class="grid gap-4 md:grid-cols-2">
+                    <button type="button" id="chooseSqlite" class="setup-choice is-active p-5" data-database-choice="sqlite" aria-pressed="true">
+                        <h3 class="text-lg font-bold text-gray-900">SQLite</h3>
+                        <p class="mt-2 text-sm text-gray-600">Use a local database managed by Vermicelli.</p>
+                    </button>
+                    <button type="button" id="choosePostgres" class="setup-choice p-5" data-database-choice="postgres" aria-pressed="false">
+                        <h3 class="text-lg font-bold text-gray-900">PostgreSQL</h3>
+                        <p class="mt-2 text-sm text-gray-600">Connect to a PostgreSQL database.</p>
+                    </button>
                 </div>
-                <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="password_confirmation">Password Confirmation</label>
-                    <input class="form-control" id="password_confirmation" type="password" name="password_confirmation" required>
+                <div class="mt-5 flex flex-wrap items-center gap-3">
+                    <button type="button" id="continueDatabaseChoice" class="btn">Next</button>
                 </div>
-                <button class="btn btn-primary" type="submit">
-                    Register
-                </button>
-                <a href="{{ url_for('login') }}" class="ml-3 text-sm text-gray-600 hover:text-gray-800">Back to login</a>
-            </form>
+            </section>
+
+            <section id="databaseConfigStep" class="setup-window hidden p-5">
+                <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <span class="setup-pill">Database Configuration</span>
+                        <h2 id="databaseConfigTitle" class="mt-3 text-2xl font-bold text-gray-900">Configure SQLite</h2>
+                        <p id="databaseConfigDescription" class="mt-1 text-sm text-gray-600">Database and application configuration are generated automatically.</p>
+                    </div>
+                    <button type="button" class="btn btn-secondary setup-back" data-target="databaseChoiceStep">Back</button>
+                </div>
+
+                <div id="sqliteConfigPanel" class="setup-card p-5">
+                    <h3 class="text-lg font-bold text-gray-900">SQLite</h3>
+                    <p class="mt-2 text-sm text-gray-600">Database and application configuration are generated automatically.</p>
+                </div>
+
+                <form id="postgresSetupForm" class="setup-card hidden p-5">
+                    <input type="hidden" name="setup_database_engine" value="postgres">
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700" for="postgresHost">Host</label>
+                            <input id="postgresHost" name="postgres_host" class="form-control mt-1" value="localhost" placeholder="localhost">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700" for="postgresPort">Port</label>
+                            <input id="postgresPort" name="postgres_port" class="form-control mt-1" value="5432" inputmode="numeric">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700" for="postgresDatabase">Database name</label>
+                            <input id="postgresDatabase" name="postgres_database" class="form-control mt-1" value="verdb">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700" for="postgresUsername">Username</label>
+                            <input id="postgresUsername" name="postgres_username" class="form-control mt-1" value="postgres">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700" for="postgresPassword">Password</label>
+                            <input id="postgresPassword" name="postgres_password" class="form-control mt-1" type="password" autocomplete="new-password">
+                        </div>
+                        <div class="flex items-end justify-between gap-4">
+                            <div>
+                                <span class="block text-sm font-bold text-gray-700">SSL mode</span>
+                                <span class="text-sm text-gray-500">Require SSL for PostgreSQL.</span>
+                            </div>
+                            <label class="inline-flex items-center">
+                                <input id="postgresSsl" name="postgres_ssl" type="checkbox" value="true" class="sr-only">
+                                <span class="toggle" aria-hidden="true"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mt-5 flex flex-wrap items-center gap-3">
+                        <button type="button" id="testPostgresConnection" class="btn btn-secondary">Test Connection</button>
+                        <span id="databaseTestMessage" class="text-sm text-gray-600"></span>
+                    </div>
+                </form>
+
+                <div class="mt-5 flex flex-wrap items-center gap-3">
+                    <button type="button" id="continueDatabaseConfig" class="btn">Next</button>
+                    <span id="databaseConfigMessage" class="text-sm text-gray-600"></span>
+                </div>
+            </section>
+
+            <section id="adminSetupStep" class="setup-window hidden p-5">
+                <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <span class="setup-pill">Account Creation</span>
+                        <h2 class="mt-3 text-2xl font-bold text-gray-900">Create your admin account</h2>
+                        <p class="mt-1 text-sm text-gray-600">This account will manage Vermicelli after setup is complete.</p>
+                    </div>
+                    <button type="button" id="adminBackButton" class="btn btn-secondary">Back</button>
+                </div>
+                <form id="initialSetupForm" action="{{ url_for('register') }}" method="post" class="setup-card p-5">
+                    <div id="databaseHiddenFields"></div>
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700" for="username">Username</label>
+                            <input class="form-control mt-1" id="username" type="text" name="username" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700" for="full_name">Full Name</label>
+                            <input class="form-control mt-1" id="full_name" type="text" name="full_name">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700" for="email">Email</label>
+                            <input class="form-control mt-1" id="email" type="email" name="email">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700" for="password">Password</label>
+                            <input class="form-control mt-1" id="password" type="password" name="password" required autocomplete="new-password">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700" for="password_confirmation">Confirm Password</label>
+                            <input class="form-control mt-1" id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password">
+                        </div>
+                    </div>
+                    <div class="mt-5 flex flex-wrap items-center gap-3">
+                        <button class="btn" type="submit" id="finishInitialSetup">Finish</button>
+                        <span id="initialSetupMessage" class="text-sm text-gray-600"></span>
+                    </div>
+                </form>
+            </section>
+
+            <section id="restoreBackupStep" class="setup-window hidden p-5">
+                <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <span class="setup-pill">Restore from Backup</span>
+                        <h2 class="mt-3 text-2xl font-bold text-gray-900">Backup file</h2>
+                        <p class="mt-1 text-sm text-gray-600">Supported formats: encrypted Vermicelli backups with <strong>.vmbak</strong> or encrypted JSON backup files.</p>
+                    </div>
+                    <button type="button" class="btn btn-secondary setup-back" data-target="welcomeStep">Back</button>
+                </div>
+                <div class="setup-card p-5">
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700" for="bootstrapBackupFile">Backup file upload</label>
+                            <input id="bootstrapBackupFile" type="file" accept="application/json,.json,.vmbak" class="mt-1 block w-full text-sm text-gray-700">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700" for="bootstrapBackupPassword">Backup encryption password</label>
+                            <input class="form-control mt-1" id="bootstrapBackupPassword" type="password" autocomplete="new-password">
+                        </div>
+                    </div>
+                    <div class="mt-5 flex flex-wrap items-center gap-3">
+                        <button type="button" id="verifyBackupButton" class="btn btn-secondary">Verify backup before restore</button>
+                        <button type="button" id="continueRestoreTarget" class="btn hidden">Continue</button>
+                        <span id="backupValidationMessage" class="text-sm text-gray-600"></span>
+                    </div>
+                    <div id="backupValidationSummary" class="mt-4 hidden rounded-md bg-gray-50 p-4 text-sm text-gray-600"></div>
+                </div>
+            </section>
+
+            <section id="restoreTargetStep" class="setup-window hidden p-5">
+                <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <span class="setup-pill">Restore Target Database</span>
+                        <h2 class="mt-3 text-2xl font-bold text-gray-900">SQLite</h2>
+                        <p class="mt-1 text-sm text-gray-600">SQLite is the restore target available during first-run setup.</p>
+                    </div>
+                    <button type="button" class="btn btn-secondary setup-back" data-target="restoreBackupStep">Back</button>
+                </div>
+                <div class="setup-card p-5">
+                    <h3 class="text-lg font-bold text-gray-900">SQLite</h3>
+                    <p class="mt-2 text-sm text-gray-600">The backup will be restored into this installation. Database and application configuration are generated automatically.</p>
+                    <button type="button" id="continueRestoreConfirm" class="btn mt-5">Continue</button>
+                </div>
+            </section>
+
+            <section id="restoreConfirmStep" class="setup-window hidden p-5">
+                <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <span class="setup-pill">Restore Confirmation</span>
+                        <h2 class="mt-3 text-2xl font-bold text-gray-900">Confirm restore</h2>
+                    </div>
+                    <button type="button" class="btn btn-secondary setup-back" data-target="restoreTargetStep">Back</button>
+                </div>
+                <div class="setup-card p-5">
+                    <p class="text-sm text-gray-600">This action will overwrite the selected database. Please confirm that you have a copy of existing data.</p>
+                    <label class="mt-4 block text-sm font-bold text-gray-700" for="restoreConfirmation">Type RESTORE to continue</label>
+                    <input id="restoreConfirmation" class="form-control mt-1" autocomplete="off">
+                    <div class="mt-5 flex flex-wrap items-center gap-3">
+                        <button type="button" id="bootstrapImportButton" class="btn">Restore Backup</button>
+                        <span id="bootstrapImportMessage" class="text-sm text-gray-600"></span>
+                    </div>
+                </div>
+            </section>
+
+            <section id="finishStep" class="setup-window hidden p-8 text-center">
+                <span class="setup-pill">Finish</span>
+                <h2 class="mt-4 text-2xl font-bold text-gray-900">You are all set up</h2>
+                <p class="mt-2 text-sm text-gray-600">Vermicelli is ready.</p>
+                <a id="finishLink" href="{{ url_for('index') }}" class="btn mt-6">Finish</a>
+            </section>
             {% else %}
-            <p class="text-sm text-gray-600">Public super admin registration is closed.</p>
-            <a href="{{ url_for('login') }}" class="inline-block mt-4 text-sm text-yellow-600 hover:text-yellow-700 hover:underline">Back to login</a>
+            <section class="setup-window p-6 text-center">
+                <h2 class="text-xl font-bold text-gray-900">Initial setup is closed</h2>
+                <p class="mt-2 text-sm text-gray-600">An admin account already exists.</p>
+                <a href="{{ url_for('login') }}" class="btn mt-5">Back to login</a>
+            </section>
             {% endif %}
         </div>
     </main>
+
+    {% if registration_open %}
+    <script>
+        (function() {
+            const panels = {
+                welcomeStep: document.getElementById('welcomeStep'),
+                databaseChoiceStep: document.getElementById('databaseChoiceStep'),
+                databaseConfigStep: document.getElementById('databaseConfigStep'),
+                adminSetupStep: document.getElementById('adminSetupStep'),
+                restoreBackupStep: document.getElementById('restoreBackupStep'),
+                restoreTargetStep: document.getElementById('restoreTargetStep'),
+                restoreConfirmStep: document.getElementById('restoreConfirmStep'),
+                finishStep: document.getElementById('finishStep')
+            };
+            const initialSetupForm = document.getElementById('initialSetupForm');
+            const postgresSetupForm = document.getElementById('postgresSetupForm');
+            const databaseHiddenFields = document.getElementById('databaseHiddenFields');
+            const adminBackButton = document.getElementById('adminBackButton');
+            const initialSetupMessage = document.getElementById('initialSetupMessage');
+            const databaseChoiceButtons = document.querySelectorAll('[data-database-choice]');
+            const continueDatabaseChoice = document.getElementById('continueDatabaseChoice');
+            const databaseConfigTitle = document.getElementById('databaseConfigTitle');
+            const databaseConfigDescription = document.getElementById('databaseConfigDescription');
+            const sqliteConfigPanel = document.getElementById('sqliteConfigPanel');
+            const continueDatabaseConfig = document.getElementById('continueDatabaseConfig');
+            const databaseConfigMessage = document.getElementById('databaseConfigMessage');
+            const testPostgresButton = document.getElementById('testPostgresConnection');
+            const databaseTestMessage = document.getElementById('databaseTestMessage');
+            const fileInput = document.getElementById('bootstrapBackupFile');
+            const passwordInput = document.getElementById('bootstrapBackupPassword');
+            const verifyBackupButton = document.getElementById('verifyBackupButton');
+            const continueRestoreTarget = document.getElementById('continueRestoreTarget');
+            const validationMessage = document.getElementById('backupValidationMessage');
+            const validationSummary = document.getElementById('backupValidationSummary');
+            const continueRestoreConfirm = document.getElementById('continueRestoreConfirm');
+            const restoreConfirmation = document.getElementById('restoreConfirmation');
+            const importButton = document.getElementById('bootstrapImportButton');
+            const importMessage = document.getElementById('bootstrapImportMessage');
+            const finishLink = document.getElementById('finishLink');
+            let selectedDatabase = 'sqlite';
+            let postgresVerified = false;
+            let backupVerified = false;
+
+            function showPanel(name) {
+                Object.keys(panels).forEach(function(key) {
+                    if (panels[key]) panels[key].classList.toggle('hidden', key !== name);
+                });
+            }
+
+            function showMessage(element, text, isError) {
+                element.textContent = text || '';
+                element.classList.toggle('text-red-600', !!isError);
+                element.classList.toggle('text-green-600', !!text && !isError);
+                element.classList.toggle('text-gray-600', !text);
+            }
+
+            function setDatabaseHiddenFields(formData) {
+                databaseHiddenFields.innerHTML = '';
+                formData.forEach(function(value, key) {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    input.value = value;
+                    databaseHiddenFields.appendChild(input);
+                });
+            }
+
+            function setSelectedDatabase(engine) {
+                if (engine !== selectedDatabase) {
+                    postgresVerified = false;
+                    showMessage(databaseTestMessage, '', false);
+                    showMessage(databaseConfigMessage, '', false);
+                }
+                selectedDatabase = engine;
+                databaseChoiceButtons.forEach(function(button) {
+                    const isSelected = button.dataset.databaseChoice === engine;
+                    button.classList.toggle('is-active', isSelected);
+                    button.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+                });
+            }
+
+            function showDatabaseConfiguration() {
+                const isPostgres = selectedDatabase === 'postgres';
+                databaseConfigTitle.textContent = isPostgres ? 'Configure PostgreSQL' : 'Configure SQLite';
+                databaseConfigDescription.textContent = isPostgres
+                    ? 'Enter the connection details and confirm they work before continuing.'
+                    : 'Database and application configuration are generated automatically.';
+                sqliteConfigPanel.classList.toggle('hidden', isPostgres);
+                postgresSetupForm.classList.toggle('hidden', !isPostgres);
+                showMessage(databaseConfigMessage, '', false);
+                showPanel('databaseConfigStep');
+            }
+
+            function sqliteSetupFormData() {
+                const formData = new FormData();
+                formData.append('setup_database_engine', 'sqlite');
+                return formData;
+            }
+
+            function backupFormData(targetMessage) {
+                const file = fileInput && fileInput.files ? fileInput.files[0] : null;
+                if (!file) {
+                    showMessage(targetMessage, 'Choose a backup file first.', true);
+                    return null;
+                }
+                if (!passwordInput.value) {
+                    showMessage(targetMessage, 'Enter the backup encryption password.', true);
+                    return null;
+                }
+                const formData = new FormData();
+                formData.append('backup', file);
+                formData.append('backup_password', passwordInput.value);
+                return formData;
+            }
+
+            document.getElementById('startSetupChoice').addEventListener('click', function() {
+                showPanel('databaseChoiceStep');
+            });
+            document.getElementById('restoreChoice').addEventListener('click', function() {
+                showPanel('restoreBackupStep');
+            });
+            databaseChoiceButtons.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    setSelectedDatabase(button.dataset.databaseChoice || 'sqlite');
+                });
+            });
+            continueDatabaseChoice.addEventListener('click', function() {
+                showDatabaseConfiguration();
+            });
+
+            document.querySelectorAll('.setup-back').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    showPanel(button.dataset.target || 'welcomeStep');
+                });
+            });
+
+            adminBackButton.addEventListener('click', function() {
+                showDatabaseConfiguration();
+            });
+
+            testPostgresButton.addEventListener('click', function() {
+                postgresVerified = false;
+                testPostgresButton.disabled = true;
+                showMessage(databaseConfigMessage, '', false);
+                showMessage(databaseTestMessage, 'Testing connection...', false);
+                fetch('/api/setup/test-database', {
+                    method: 'POST',
+                    body: new FormData(postgresSetupForm),
+                    credentials: 'same-origin'
+                })
+                    .then(function(response) {
+                        return response.json().catch(function() {
+                            return {};
+                        }).then(function(payload) {
+                            if (!response.ok) throw new Error(payload.error || 'Connection failed.');
+                            return payload;
+                        });
+                    })
+                    .then(function(payload) {
+                        postgresVerified = true;
+                        showMessage(databaseTestMessage, payload.message || 'Database connection succeeded.', false);
+                    })
+                    .catch(function(error) {
+                        showMessage(databaseTestMessage, error.message || 'Connection failed.', true);
+                    })
+                    .finally(function() {
+                        testPostgresButton.disabled = false;
+                    });
+            });
+
+            postgresSetupForm.querySelectorAll('input').forEach(function(input) {
+                input.addEventListener('input', function() {
+                    postgresVerified = false;
+                    showMessage(databaseTestMessage, '', false);
+                    showMessage(databaseConfigMessage, '', false);
+                });
+                input.addEventListener('change', function() {
+                    postgresVerified = false;
+                    showMessage(databaseTestMessage, '', false);
+                    showMessage(databaseConfigMessage, '', false);
+                });
+            });
+
+            continueDatabaseConfig.addEventListener('click', function() {
+                if (selectedDatabase === 'postgres' && !postgresVerified) {
+                    showMessage(databaseConfigMessage, 'Test the PostgreSQL connection before continuing.', true);
+                    return;
+                }
+                setDatabaseHiddenFields(
+                    selectedDatabase === 'postgres'
+                        ? new FormData(postgresSetupForm)
+                        : sqliteSetupFormData()
+                );
+                showPanel('adminSetupStep');
+            });
+
+            initialSetupForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                const submitButton = document.getElementById('finishInitialSetup');
+                submitButton.disabled = true;
+                showMessage(initialSetupMessage, 'Finishing setup...', false);
+                fetch(initialSetupForm.action, {
+                    method: 'POST',
+                    body: new FormData(initialSetupForm),
+                    headers: {
+                        'X-Setup-Wizard': 'true'
+                    },
+                    credentials: 'same-origin'
+                })
+                    .then(function(response) {
+                        return response.json().catch(function() {
+                            return {};
+                        }).then(function(payload) {
+                            if (!response.ok) throw new Error(payload.error || payload.message || 'Setup failed.');
+                            return payload;
+                        });
+                    })
+                    .then(function(payload) {
+                        finishLink.href = payload.redirect_url || '/';
+                        showPanel('finishStep');
+                    })
+                    .catch(function(error) {
+                        showMessage(initialSetupMessage, error.message || 'Setup failed.', true);
+                    })
+                    .finally(function() {
+                        submitButton.disabled = false;
+                    });
+            });
+
+            verifyBackupButton.addEventListener('click', function() {
+                const formData = backupFormData(validationMessage);
+                if (!formData) return;
+                backupVerified = false;
+                continueRestoreTarget.classList.add('hidden');
+                validationSummary.classList.add('hidden');
+                verifyBackupButton.disabled = true;
+                showMessage(validationMessage, 'Validating backup...', false);
+                fetch('/api/bootstrap/backup/verify', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin'
+                })
+                    .then(function(response) {
+                        return response.json().catch(function() {
+                            return {};
+                        }).then(function(payload) {
+                            if (!response.ok) throw new Error(payload.error || 'Backup validation failed.');
+                            return payload;
+                        });
+                    })
+                    .then(function(payload) {
+                        const summary = payload.summary || {};
+                        backupVerified = true;
+                        continueRestoreTarget.classList.remove('hidden');
+                        validationSummary.innerHTML = [
+                            '<strong>Backup Validation</strong>',
+                            '<div class="mt-2 grid gap-2 sm:grid-cols-4">',
+                            '<span>Users: ' + (summary.users || 0) + '</span>',
+                            '<span>Projects: ' + (summary.projects || 0) + '</span>',
+                            '<span>Applications: ' + (summary.applications || 0) + '</span>',
+                            '<span>Versions: ' + (summary.versions || 0) + '</span>',
+                            '</div>'
+                        ].join('');
+                        validationSummary.classList.remove('hidden');
+                        showMessage(validationMessage, payload.message || 'Backup is valid.', false);
+                    })
+                    .catch(function(error) {
+                        showMessage(validationMessage, error.message || 'Backup validation failed.', true);
+                    })
+                    .finally(function() {
+                        verifyBackupButton.disabled = false;
+                    });
+            });
+
+            continueRestoreTarget.addEventListener('click', function() {
+                if (!backupVerified) {
+                    showMessage(validationMessage, 'Verify backup before restore.', true);
+                    return;
+                }
+                showPanel('restoreTargetStep');
+            });
+
+            continueRestoreConfirm.addEventListener('click', function() {
+                showPanel('restoreConfirmStep');
+            });
+
+            importButton.addEventListener('click', function() {
+                const formData = backupFormData(importMessage);
+                if (!formData) return;
+                if (!backupVerified) {
+                    showMessage(importMessage, 'Verify backup before restore.', true);
+                    return;
+                }
+                if (restoreConfirmation.value !== 'RESTORE') {
+                    showMessage(importMessage, 'Type RESTORE to continue.', true);
+                    return;
+                }
+                formData.append('restore_confirmation', restoreConfirmation.value);
+                importButton.disabled = true;
+                showMessage(importMessage, 'Restoring backup...', false);
+                fetch('/api/bootstrap/backup/import', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin'
+                })
+                    .then(function(response) {
+                        return response.json().catch(function() {
+                            return {};
+                        }).then(function(payload) {
+                            if (!response.ok) throw new Error(payload.error || 'Backup restore failed.');
+                            return payload;
+                        });
+                    })
+                    .then(function(payload) {
+                        finishLink.href = '/login';
+                        showPanel('finishStep');
+                        showMessage(importMessage, payload.message || 'Backup restored successfully.', false);
+                    })
+                    .catch(function(error) {
+                        showMessage(importMessage, error.message || 'Backup restore failed.', true);
+                    })
+                    .finally(function() {
+                        importButton.disabled = false;
+                    });
+            });
+
+            [fileInput, passwordInput].forEach(function(input) {
+                input.addEventListener(input.type === 'file' ? 'change' : 'input', function() {
+                    backupVerified = false;
+                    continueRestoreTarget.classList.add('hidden');
+                    validationSummary.classList.add('hidden');
+                    showMessage(validationMessage, '', false);
+                    showMessage(importMessage, '', false);
+                });
+            });
+        })();
+    </script>
+    {% endif %}
 </body>
 </html>

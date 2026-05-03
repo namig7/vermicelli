@@ -1,0 +1,272 @@
+<!-- system_settings.html -->
+<style>
+    #importBackupButton {
+        background-color: #FF653F;
+        color: #ffffff;
+    }
+
+    #importBackupButton:hover {
+        background-color: #e95a38;
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] #importBackupButton,
+    html[data-theme="dark"] #importBackupButton:hover {
+        color: #111827;
+    }
+</style>
+
+<div>
+    <header class="page-toolbar mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">System Settings</h1>
+            <p class="text-sm text-gray-500">Admin-only backup export and restore controls.</p>
+        </div>
+    </header>
+
+    <section class="bg-white border border-gray-200 rounded-lg shadow-md p-6">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+                <h2 class="text-xl font-bold text-gray-800">Encrypted Backups</h2>
+                <p class="mt-2 text-sm text-gray-500">Export a password-encrypted backup or restore one into this Vermicelli instance.</p>
+            </div>
+            <p id="systemBackupMessage" class="text-sm text-gray-600"></p>
+        </div>
+
+        <div class="mt-6 grid gap-6 lg:grid-cols-2">
+            <div class="flex h-full flex-col rounded-lg border border-gray-200 bg-gray-50 p-5">
+                <div class="flex-1">
+                    <div class="min-w-0">
+                        <h3 class="text-base font-semibold text-gray-800">Export Backup</h3>
+                        <p class="mt-2 text-sm text-gray-500">Download an encrypted file containing users, projects, applications, versions, memberships, settings, and password hashes.</p>
+                    </div>
+                </div>
+                <div class="mt-5 flex flex-col gap-3 border-t border-gray-200 pt-4 sm:flex-row sm:items-center sm:justify-end">
+                    <button type="button" id="exportBackupButton" class="btn btn-primary w-full sm:w-auto">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M4.5 19.5h15" />
+                        </svg>
+                        Export
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex h-full flex-col rounded-lg border border-gray-200 bg-gray-50 p-5">
+                <div class="flex-1">
+                    <h3 class="text-base font-semibold text-gray-800">Restore Backup</h3>
+                    <p class="mt-2 text-sm text-gray-500">Restore replaces the current database. You will verify your admin password before entering the backup password.</p>
+                </div>
+                <div class="mt-5 flex flex-col gap-3 border-t border-gray-200 pt-4 sm:flex-row sm:items-center">
+                    <input id="backupImportFile" type="file" accept="application/json,.json,.vmbak" class="block w-full min-w-0 text-sm text-gray-700 file:mr-4 file:rounded-md file:border-0 file:bg-yellow-100 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-yellow-700 hover:file:bg-yellow-200">
+                    <button type="button" id="importBackupButton" class="btn w-full sm:w-auto">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 21V9m0 0 4.5 4.5M12 9l-4.5 4.5M4.5 4.5h15" />
+                        </svg>
+                        Restore
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+(function() {
+    function showMessage(selector, message, isError) {
+        $(selector)
+            .text(message)
+            .toggleClass('text-red-600', !!isError)
+            .toggleClass('text-green-600', !isError);
+    }
+
+    function responseFilename(response) {
+        const disposition = response.headers.get('Content-Disposition') || '';
+        const match = disposition.match(/filename="?([^"]+)"?/);
+        return match ? match[1] : 'vermicelli-backup.vmbak';
+    }
+
+    function promptPassword(title, text) {
+        return Swal.fire({
+            title,
+            text,
+            input: 'password',
+            inputAttributes: {
+                autocapitalize: 'off',
+                autocomplete: 'new-password'
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Continue',
+            cancelButtonText: 'Cancel',
+            customClass: {
+                popup: 'bg-white rounded-lg shadow-lg',
+                title: 'text-xl font-bold text-gray-800',
+                content: 'text-gray-700',
+                input: 'border border-gray-300 rounded-md px-3 py-2 focus:shadow-none focus:border-yellow-500 focus:outline-none',
+                confirmButton: 'btn btn-primary',
+                cancelButton: 'btn btn-secondary',
+                actions: 'flex justify-center space-x-4'
+            },
+            buttonsStyling: false,
+            scrollbarPadding: false,
+            preConfirm: function(password) {
+                if (!password) {
+                    Swal.showValidationMessage('Password is required.');
+                    return false;
+                }
+                return password;
+            }
+        }).then(function(result) {
+            return result.isConfirmed ? result.value : null;
+        });
+    }
+
+    function verifyAdminPassword(adminPassword) {
+        return fetch('/api/system/verify-admin-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ admin_password: adminPassword }),
+            credentials: 'same-origin'
+        }).then(function(response) {
+            return response.json().catch(function() {
+                return {};
+            }).then(function(payload) {
+                if (!response.ok) {
+                    throw new Error(payload.error || 'Current admin password is incorrect.');
+                }
+                return payload;
+            });
+        });
+    }
+
+    function downloadSystemBackup() {
+        promptPassword('Encrypt Backup', 'Enter the password that will be required to restore this backup.').then(function(backupPassword) {
+            if (!backupPassword) return;
+            showMessage('#systemBackupMessage', 'Preparing encrypted backup...', false);
+            fetch('/api/system/backup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ backup_password: backupPassword }),
+                credentials: 'same-origin'
+            })
+                .then(function(response) {
+                    if (!response.ok) {
+                        return response.json().catch(function() {
+                            return {};
+                        }).then(function(payload) {
+                            throw new Error(payload.error || 'Backup export failed.');
+                        });
+                    }
+                    const filename = responseFilename(response);
+                    return response.blob().then(function(blob) {
+                        return { blob, filename };
+                    });
+                })
+                .then(function(result) {
+                    const downloadUrl = URL.createObjectURL(result.blob);
+                    const link = document.createElement('a');
+                    link.href = downloadUrl;
+                    link.download = result.filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    URL.revokeObjectURL(downloadUrl);
+                    showMessage('#systemBackupMessage', 'Encrypted backup exported successfully.', false);
+                })
+                .catch(function(error) {
+                    showMessage('#systemBackupMessage', error.message || 'Backup export failed.', true);
+                });
+        });
+    }
+
+    function importSystemBackup() {
+        const fileInput = document.getElementById('backupImportFile');
+        const file = fileInput && fileInput.files ? fileInput.files[0] : null;
+        if (!file) {
+            showMessage('#systemBackupMessage', 'Choose a backup file first.', true);
+            return;
+        }
+
+        let adminPassword = '';
+        promptPassword('Verify Admin Password', 'Enter your current admin account password.').then(function(password) {
+            if (!password) return null;
+            adminPassword = password;
+            showMessage('#systemBackupMessage', 'Verifying admin password...', false);
+            return verifyAdminPassword(adminPassword);
+        }).then(function(verified) {
+            if (!verified) return null;
+            return promptPassword('Decrypt Backup', 'Enter the encryption password for this backup file.');
+        }).then(function(backupPassword) {
+            if (!backupPassword) return;
+            Swal.fire({
+                title: 'Restore backup?',
+                text: 'This will replace all current Vermicelli data and sign you out.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Restore Backup',
+                cancelButtonText: 'Cancel',
+                customClass: {
+                    popup: 'bg-white rounded-lg shadow-lg',
+                    title: 'text-xl font-bold text-gray-800',
+                    content: 'text-gray-700',
+                    confirmButton: 'btn btn-danger',
+                    cancelButton: 'btn btn-secondary',
+                    actions: 'flex justify-center space-x-4'
+                },
+                buttonsStyling: false,
+                scrollbarPadding: false
+            }).then(function(result) {
+                if (!result.isConfirmed) return;
+
+                const formData = new FormData();
+                formData.append('backup', file);
+                formData.append('admin_password', adminPassword);
+                formData.append('backup_password', backupPassword);
+                showMessage('#systemBackupMessage', 'Restoring encrypted backup...', false);
+
+                fetch('/api/system/backup/import', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin'
+                })
+                    .then(function(response) {
+                        return response.json().catch(function() {
+                            return {};
+                        }).then(function(payload) {
+                            if (!response.ok) {
+                                throw new Error(payload.error || 'Backup restore failed.');
+                            }
+                            return payload;
+                        });
+                    })
+                    .then(function(payload) {
+                        Swal.fire({
+                            title: 'Restored',
+                            text: payload.message || 'Backup restored successfully. Please sign in again.',
+                            icon: 'success',
+                            confirmButtonText: 'OK',
+                            customClass: {
+                                popup: 'bg-white rounded-lg shadow-lg',
+                                title: 'text-xl font-bold text-gray-800',
+                                content: 'text-gray-700',
+                                confirmButton: 'btn btn-success',
+                                actions: 'flex justify-center'
+                            },
+                            buttonsStyling: false,
+                            scrollbarPadding: false
+                        }).then(function() {
+                            window.location.href = '/login';
+                        });
+                    })
+                    .catch(function(error) {
+                        showMessage('#systemBackupMessage', error.message || 'Backup restore failed.', true);
+                    });
+            });
+        }).catch(function(error) {
+            showMessage('#systemBackupMessage', error.message || 'Backup restore failed.', true);
+        });
+    }
+
+    $('#exportBackupButton').on('click', downloadSystemBackup);
+    $('#importBackupButton').on('click', importSystemBackup);
+})();
+</script>

@@ -1,5 +1,7 @@
 import os
 import sys
+import io
+import json
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
@@ -29,6 +31,8 @@ from main import (
     Version,
     app,
     db,
+    decrypt_backup_payload,
+    encrypt_backup_payload,
     is_valid_datetime_format,
     is_valid_timezone,
     is_valid_url,
@@ -62,6 +66,113 @@ def login_as(client, user):
         sess['user_id'] = user.id
         sess['username'] = user.username
         sess['platform_role'] = user.platform_role
+
+
+def make_backup_payload():
+    admin = User(username='restored-admin', full_name='Restored Admin', platform_role=PLATFORM_ADMIN)
+    admin.set_password('password')
+    member = User(username='restored-member', full_name='Restored Member', platform_role=PLATFORM_USER)
+    member.set_password('password')
+    return {
+        'format': 'vermicelli-backup',
+        'version': 1,
+        'exported_at': '2026-04-29T10:00:00Z',
+        'data': {
+            'users': [
+                {
+                    'id': 1,
+                    'username': admin.username,
+                    'full_name': admin.full_name,
+                    'timezone': 'UTC',
+                    'datetime_format': 'iso_24',
+                    'email': 'admin@example.com',
+                    'is_active': True,
+                    'can_create_projects': False,
+                    'last_login_at': None,
+                    'password_hash': admin.password_hash,
+                    'platform_role': PLATFORM_ADMIN,
+                    'created_at': '2026-04-29T10:00:00',
+                    'updated_at': '2026-04-29T10:00:00',
+                },
+                {
+                    'id': 2,
+                    'username': member.username,
+                    'full_name': member.full_name,
+                    'timezone': 'Asia/Baku',
+                    'datetime_format': 'eu_numeric_24',
+                    'email': 'member@example.com',
+                    'is_active': True,
+                    'can_create_projects': True,
+                    'last_login_at': None,
+                    'password_hash': member.password_hash,
+                    'platform_role': PLATFORM_USER,
+                    'created_at': '2026-04-29T10:00:00',
+                    'updated_at': '2026-04-29T10:00:00',
+                },
+            ],
+            'projects': [
+                {
+                    'id': 1,
+                    'name': 'Restored Project',
+                    'description': 'From backup',
+                    'source_link': 'https://example.com/project',
+                    'status': 'In Progress',
+                    'created_at': '2026-04-29T10:00:00',
+                    'start_date': '2026-04-29T10:00:00',
+                }
+            ],
+            'applications': [
+                {
+                    'id': 1,
+                    'name': 'Restored Application',
+                    'created_at': '2026-04-29T10:00:00',
+                    'updated_at': '2026-04-29T10:00:00',
+                    'link': 'https://example.com/app',
+                    'label': 'restored',
+                }
+            ],
+            'versions': [
+                {
+                    'id': 1,
+                    'application_id': 1,
+                    'number': '1.2.3',
+                    'version_type': 'release',
+                    'change_date': '2026-04-29T10:00:00',
+                    'notes': 'Restored release',
+                }
+            ],
+            'project_applications': [
+                {'project_id': 1, 'application_id': 1}
+            ],
+            'project_memberships': [
+                {
+                    'id': 1,
+                    'user_id': 2,
+                    'project_id': 1,
+                    'project_role': PROJECT_ADMIN,
+                    'access_level': ACCESS_READ_WRITE,
+                    'created_at': '2026-04-29T10:00:00',
+                    'updated_at': '2026-04-29T10:00:00',
+                }
+            ],
+            'application_memberships': [
+                {
+                    'id': 1,
+                    'user_id': 2,
+                    'application_id': 1,
+                    'access_level': ACCESS_READ_WRITE,
+                    'created_at': '2026-04-29T10:00:00',
+                    'updated_at': '2026-04-29T10:00:00',
+                }
+            ],
+        }
+    }
+
+
+def make_encrypted_backup_payload(password='backup-password'):
+    payload, error = encrypt_backup_payload(make_backup_payload(), password)
+    assert error is None
+    return payload
 
 
 def test_is_valid_url():
@@ -108,6 +219,50 @@ def test_second_public_super_admin_registration_is_blocked(client):
 
     assert response.status_code == 403
     assert User.query.filter_by(username='second').first() is None
+
+
+def test_login_page_links_initial_setup_without_super_admin_language(client):
+    response = client.get('/login')
+
+    assert response.status_code == 200
+    body = response.data.decode()
+    assert 'Start initial setup' in body
+    assert 'Register super admin' not in body
+
+
+def test_register_page_shows_bootstrap_import_only_when_open(client):
+    open_response = client.get('/register')
+
+    assert open_response.status_code == 200
+    body = open_response.data.decode()
+    assert 'Welcome to Vermicelli' in body
+    assert 'Start Initial Setup' in body
+    assert 'Database Choice' in body
+    assert 'Account Creation' in body
+    assert 'Database Configuration' in body
+    assert 'Restore from Backup' in body
+    assert 'Restore Target Database' in body
+    assert 'Type RESTORE to continue' in body
+    assert 'Database and application configuration are generated automatically' in body
+    assert 'default database name' not in body
+    assert 'SECRET_KEY' not in body
+    assert 'JWT_SECRET_KEY' not in body
+    assert 'SESSION_TYPE' not in body
+    assert 'setup-panel' not in body
+    assert 'id="databaseConfigStep"' in body
+    assert 'id="continueDatabaseChoice"' in body
+    assert 'id="continueDatabaseConfig"' in body
+    assert 'id="postgresSetupStep"' not in body
+    assert body.count('setup-window') >= 8
+    assert b'id="bootstrapBackupFile"' in open_response.data
+    assert b'id="bootstrapBackupPassword"' in open_response.data
+    assert b'id="bootstrapImportButton"' in open_response.data
+
+    create_user('root', PLATFORM_SUPER_ADMIN)
+    closed_response = client.get('/register')
+
+    assert closed_response.status_code == 200
+    assert b'id="bootstrapBackupFile"' not in closed_response.data
 
 
 def test_super_admin_can_create_another_super_admin(client):
@@ -390,6 +545,252 @@ def test_account_settings_content_combines_general_and_shows_datetime_format(cli
     assert 'data-settings-tab="generalTab"' not in body
     assert 'id="settingsDatetimeFormat"' in body
     assert 'Time and Date Format' in body
+
+
+def test_system_settings_page_is_admin_only_and_linked_from_avatar_menu(client):
+    admin = create_user('admin', PLATFORM_ADMIN)
+    login_as(client, admin)
+
+    shell_response = client.get('/')
+    assert shell_response.status_code == 200
+    assert b'System Settings' in shell_response.data
+    assert b'data-page="system-settings"' in shell_response.data
+
+    admin_response = client.get('/content/system-settings')
+    assert admin_response.status_code == 200
+    admin_body = admin_response.data.decode()
+    assert 'System Settings' in admin_body
+    assert 'Export Backup' in admin_body
+    assert 'Restore Backup' in admin_body
+
+    user = create_user('member')
+    login_as(client, user)
+
+    shell_user_response = client.get('/')
+    assert b'System Settings' not in shell_user_response.data
+    user_response = client.get('/content/system-settings')
+    assert user_response.status_code == 403
+
+
+def test_account_settings_no_longer_contains_system_tab(client):
+    admin = create_user('admin', PLATFORM_ADMIN)
+    login_as(client, admin)
+
+    response = client.get('/content/settings')
+
+    assert response.status_code == 200
+    body = response.data.decode()
+    assert 'data-settings-tab="systemTab"' not in body
+    assert 'Export Backup' not in body
+
+
+def test_admin_can_export_encrypted_system_backup(client):
+    admin = create_user('admin', PLATFORM_ADMIN)
+    project = Project(name='Backup Project', status='Draft')
+    app_obj = Application(name='Backup App')
+    app_obj.projects.append(project)
+    db.session.add_all([project, app_obj])
+    db.session.flush()
+    db.session.add(Version(application_id=app_obj.id, number='1.0.0'))
+    db.session.commit()
+    login_as(client, admin)
+
+    response = client.post('/api/system/backup', json={'backup_password': 'backup-password'})
+
+    assert response.status_code == 200
+    assert response.mimetype == 'application/json'
+    assert 'attachment' in response.headers['Content-Disposition']
+    assert response.headers['Content-Disposition'].endswith('.vmbak"')
+    encrypted_payload = json.loads(response.data.decode())
+    assert encrypted_payload['format'] == 'vermicelli-encrypted-backup'
+    assert 'ciphertext' in encrypted_payload
+    assert 'data' not in encrypted_payload
+    payload, error = decrypt_backup_payload(encrypted_payload, 'backup-password')
+    assert error is None
+    assert payload['format'] == 'vermicelli-backup'
+    assert payload['data']['users'][0]['username'] == 'admin'
+    assert payload['data']['projects'][0]['name'] == 'Backup Project'
+    assert payload['data']['applications'][0]['name'] == 'Backup App'
+    assert payload['data']['project_applications'] == [{'application_id': app_obj.id, 'project_id': project.id}]
+
+
+def test_export_system_backup_requires_encryption_password(client):
+    admin = create_user('admin', PLATFORM_ADMIN)
+    login_as(client, admin)
+
+    response = client.post('/api/system/backup', json={})
+
+    assert response.status_code == 400
+    assert b'encryption password is required' in response.data
+
+
+def test_regular_user_cannot_export_or_import_system_backup(client):
+    user = create_user('member')
+    login_as(client, user)
+
+    export_response = client.post('/api/system/backup', json={'backup_password': 'backup-password'})
+    import_response = client.post('/api/system/backup/import', json={
+        'backup': make_encrypted_backup_payload(),
+        'admin_password': 'password',
+        'backup_password': 'backup-password',
+    })
+
+    assert export_response.status_code == 403
+    assert import_response.status_code == 403
+
+
+def test_admin_can_import_system_backup_and_replaces_data(client):
+    admin = create_user('admin', PLATFORM_ADMIN)
+    old_project = Project(name='Old Project', status='Draft')
+    db.session.add(old_project)
+    db.session.commit()
+    login_as(client, admin)
+    payload = make_encrypted_backup_payload()
+
+    response = client.post(
+        '/api/system/backup/import',
+        data={
+            'backup': (io.BytesIO(json.dumps(payload).encode('utf-8')), 'backup.vmbak'),
+            'admin_password': 'password',
+            'backup_password': 'backup-password',
+        },
+        content_type='multipart/form-data'
+    )
+
+    assert response.status_code == 200
+    assert Project.query.filter_by(name='Old Project').first() is None
+    assert Project.query.filter_by(name='Restored Project').one()
+    assert Application.query.filter_by(name='Restored Application').one()
+    restored_admin = User.query.filter_by(username='restored-admin').one()
+    assert restored_admin.platform_role == PLATFORM_ADMIN
+    assert restored_admin.check_password('password')
+    restored_member = User.query.filter_by(username='restored-member').one()
+    assert restored_member.can_create_projects is True
+    assert ProjectMembership.query.filter_by(user_id=restored_member.id).one().project_role == PROJECT_ADMIN
+    with client.session_transaction() as sess:
+        assert 'user_id' not in sess
+
+
+def test_admin_import_requires_current_admin_password_before_backup_password(client):
+    admin = create_user('admin', PLATFORM_ADMIN)
+    login_as(client, admin)
+
+    response = client.post('/api/system/backup/import', json={
+        'backup': make_encrypted_backup_payload(),
+        'admin_password': 'wrong',
+        'backup_password': 'backup-password',
+    })
+
+    assert response.status_code == 400
+    assert b'Current admin password is incorrect' in response.data
+    assert User.query.filter_by(username='admin').one()
+
+
+def test_admin_import_rejects_wrong_backup_password(client):
+    admin = create_user('admin', PLATFORM_ADMIN)
+    login_as(client, admin)
+
+    response = client.post('/api/system/backup/import', json={
+        'backup': make_encrypted_backup_payload(),
+        'admin_password': 'password',
+        'backup_password': 'wrong',
+    })
+
+    assert response.status_code == 400
+    assert b'Backup password is incorrect' in response.data
+    assert User.query.filter_by(username='admin').one()
+
+
+def test_admin_password_verification_endpoint(client):
+    admin = create_user('admin', PLATFORM_ADMIN)
+    login_as(client, admin)
+
+    failed_response = client.post('/api/system/verify-admin-password', json={'admin_password': 'wrong'})
+    ok_response = client.post('/api/system/verify-admin-password', json={'admin_password': 'password'})
+
+    assert failed_response.status_code == 400
+    assert ok_response.status_code == 200
+
+
+def test_bootstrap_backup_import_allowed_only_when_database_is_empty(client):
+    payload = make_encrypted_backup_payload()
+
+    response = client.post('/api/bootstrap/backup/import', json={
+        'backup': payload,
+        'backup_password': 'backup-password',
+        'restore_confirmation': 'RESTORE',
+    })
+
+    assert response.status_code == 200
+    restored_admin = User.query.filter_by(username='restored-admin').one()
+    assert restored_admin.platform_role == PLATFORM_ADMIN
+    assert restored_admin.check_password('password')
+    assert Application.query.filter_by(name='Restored Application').one()
+
+    blocked_response = client.post('/api/bootstrap/backup/import', json={
+        'backup': payload,
+        'backup_password': 'backup-password',
+        'restore_confirmation': 'RESTORE',
+    })
+
+    assert blocked_response.status_code == 403
+
+
+def test_bootstrap_backup_can_be_verified_before_restore(client):
+    response = client.post('/api/bootstrap/backup/verify', json={
+        'backup': make_encrypted_backup_payload(),
+        'backup_password': 'backup-password',
+    })
+
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert payload['message'] == 'Backup is valid.'
+    assert payload['summary']['users'] == 2
+    assert payload['summary']['projects'] == 1
+    assert payload['summary']['applications'] == 1
+
+
+def test_bootstrap_backup_import_requires_restore_confirmation(client):
+    response = client.post('/api/bootstrap/backup/import', json={
+        'backup': make_encrypted_backup_payload(),
+        'backup_password': 'backup-password',
+    })
+
+    assert response.status_code == 400
+    assert b'Type RESTORE' in response.data
+    assert User.query.count() == 0
+
+
+def test_bootstrap_backup_import_rejects_non_empty_database_without_admin(client):
+    db.session.add(Project(name='Orphan Project', status='Draft'))
+    db.session.commit()
+
+    response = client.post('/api/bootstrap/backup/import', json={
+        'backup': make_encrypted_backup_payload(),
+        'backup_password': 'backup-password',
+        'restore_confirmation': 'RESTORE',
+    })
+
+    assert response.status_code == 403
+    assert User.query.count() == 0
+
+
+def test_backup_import_rejects_payload_without_admin(client):
+    admin = create_user('admin', PLATFORM_ADMIN)
+    login_as(client, admin)
+    payload = make_backup_payload()
+    payload['data']['users'][0]['platform_role'] = PLATFORM_USER
+    encrypted_payload, error = encrypt_backup_payload(payload, 'backup-password')
+    assert error is None
+
+    response = client.post('/api/system/backup/import', json={
+        'backup': encrypted_payload,
+        'admin_password': 'password',
+        'backup_password': 'backup-password',
+    })
+
+    assert response.status_code == 400
+    assert b'at least one admin user' in response.data
 
 
 def test_deleted_projects_and_applications_are_not_shown_in_user_access(client):

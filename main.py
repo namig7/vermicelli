@@ -1,13 +1,20 @@
 import os
+import json
+import base64
+import hashlib
+import hmac
+import secrets
 from dotenv import load_dotenv
 from datetime import datetime
 from functools import wraps
 import logging
 import re  # for URL validation
+from pathlib import Path
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError, available_timezones
-from flask import Flask, request, jsonify, render_template, redirect, url_for, session, flash
+from flask import Flask, request, jsonify, render_template, redirect, url_for, session, flash, Response
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import func, inspect, or_, text
+from sqlalchemy import create_engine, func, inspect, or_, text
+from sqlalchemy.engine import URL
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from flask_session import Session
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
@@ -16,10 +23,12 @@ from werkzeug.security import check_password_hash, generate_password_hash
 load_dotenv()
 
 app = Flask(__name__)
+BASE_DIR = Path(__file__).resolve().parent
+ENV_PATH = BASE_DIR / '.env'
 
 # JWT and session configuration
-app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")
-app.secret_key = os.environ.get("SECRET_KEY")
+app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY") or secrets.token_urlsafe(48)
+app.secret_key = os.environ.get("SECRET_KEY") or secrets.token_urlsafe(48)
 app.config['SESSION_TYPE'] = os.environ.get("SESSION_TYPE", 'filesystem')
 Session(app)
 
@@ -30,12 +39,14 @@ DB_USER = os.environ.get("DB_USER", "postgres")
 DB_PASSWORD = os.environ.get("DB_PASSWORD", "postgres")
 DB_HOST = os.environ.get("DB_HOST", "localhost")
 DB_PORT = os.environ.get("DB_PORT", "5432")
+DB_SSLMODE = os.environ.get("DB_SSLMODE", "")
 
 # Construct SQLAlchemy URI
 if DB_ENGINE == "sqlite":
     app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{DB_NAME}.db"
 else:
-    app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    ssl_query = f"?sslmode={DB_SSLMODE}" if DB_SSLMODE else ""
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}{ssl_query}"
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -121,6 +132,29 @@ PREFERRED_TIMEZONES = (
     'Asia/Tokyo',
 )
 _USER_SCHEMA_READY = False
+_DATABASE_SCHEMA_READY_URI = None
+BACKUP_FORMAT = 'vermicelli-backup'
+BACKUP_VERSION = 1
+ENCRYPTED_BACKUP_FORMAT = 'vermicelli-encrypted-backup'
+BACKUP_ENCRYPTION_ALGORITHM = 'pbkdf2-hmac-sha256+hmac-sha256-stream'
+BACKUP_KDF_ITERATIONS = 200000
+SETUP_ENV_KEYS = (
+    'SECRET_KEY',
+    'JWT_SECRET_KEY',
+    'SESSION_TYPE',
+    'USERS',
+    'DB_ENGINE',
+    'DB',
+    'DB_USER',
+    'DB_PASSWORD',
+    'DB_HOST',
+    'DB_PORT',
+    'DB_SSLMODE',
+    'POSTGRES_DB',
+    'POSTGRES_USER',
+    'POSTGRES_PASSWORD',
+)
+SETUP_PLACEHOLDER_SECRETS = {'', 'change_me', 'change_me_too', 'test'}
 
 
 def normalize_datetime_format(format_key):
@@ -203,7 +237,7 @@ def format_date_for_user(value, user=None):
 
 def ensure_user_schema():
     """Adds lightweight preference columns for existing local databases."""
-    global _USER_SCHEMA_READY
+    global _USER_SCHEMA_READY, _DATABASE_SCHEMA_READY_URI
     if _USER_SCHEMA_READY:
         return
     try:
@@ -222,8 +256,23 @@ def ensure_user_schema():
         logging.warning("Could not verify user preference schema: %s", error)
 
 
+def ensure_database_schema():
+    """Creates missing tables once for the active database URI."""
+    global _DATABASE_SCHEMA_READY_URI
+    current_uri = app.config.get('SQLALCHEMY_DATABASE_URI')
+    if _DATABASE_SCHEMA_READY_URI == current_uri:
+        return
+    try:
+        db.create_all()
+        _DATABASE_SCHEMA_READY_URI = current_uri
+    except Exception as error:
+        db.session.rollback()
+        logging.warning("Could not create database schema: %s", error)
+
+
 @app.before_request
 def ensure_runtime_schema():
+    ensure_database_schema()
     ensure_user_schema()
 
 
@@ -499,6 +548,204 @@ def login_required(f):
             return redirect(url_for('login'))
     return decorated_function
 
+
+def setup_is_available(require_empty_data=False):
+    if admin_count() > 0:
+        return False
+    if require_empty_data and database_has_any_data():
+        return False
+    return True
+
+
+def truthy_request_value(value):
+    return str(value).strip().lower() in {'1', 'true', 'yes', 'on', 'require', 'enabled'}
+
+
+def setup_database_config_from_request(payload):
+    engine = str(
+        payload.get('setup_database_engine')
+        or payload.get('db_engine')
+        or payload.get('database_engine')
+        or 'sqlite'
+    ).strip().lower()
+
+    if engine == 'sqlite':
+        return {
+            'DB_ENGINE': 'sqlite',
+            'DB': str(payload.get('sqlite_database') or DB_NAME or 'verdb').strip() or 'verdb',
+        }, None
+
+    if engine not in {'postgres', 'postgresql'}:
+        return None, 'Choose SQLite or PostgreSQL.'
+
+    port = str(payload.get('postgres_port') or DB_PORT or '5432').strip() or '5432'
+    try:
+        int(port)
+    except ValueError:
+        return None, 'PostgreSQL port must be a number.'
+
+    return {
+        'DB_ENGINE': 'postgres',
+        'DB_HOST': str(payload.get('postgres_host') or DB_HOST or 'localhost').strip() or 'localhost',
+        'DB_PORT': port,
+        'DB': str(payload.get('postgres_database') or DB_NAME or 'verdb').strip() or 'verdb',
+        'DB_USER': str(payload.get('postgres_username') or DB_USER or 'postgres').strip() or 'postgres',
+        'DB_PASSWORD': str(payload.get('postgres_password') or DB_PASSWORD or ''),
+        'DB_SSLMODE': 'require' if truthy_request_value(payload.get('postgres_ssl')) else 'disable',
+    }, None
+
+
+def database_uri_from_setup_config(config):
+    engine = config.get('DB_ENGINE', 'sqlite')
+    if engine == 'sqlite':
+        return f"sqlite:///{config.get('DB') or 'verdb'}.db"
+    query = {}
+    sslmode = config.get('DB_SSLMODE')
+    if sslmode:
+        query['sslmode'] = sslmode
+    return str(URL.create(
+        'postgresql',
+        username=config.get('DB_USER') or 'postgres',
+        password=config.get('DB_PASSWORD') or None,
+        host=config.get('DB_HOST') or 'localhost',
+        port=int(config.get('DB_PORT') or 5432),
+        database=config.get('DB') or 'verdb',
+        query=query,
+    ))
+
+
+def test_setup_database_connection(config):
+    if config.get('DB_ENGINE') == 'sqlite':
+        return True, None
+    uri = database_uri_from_setup_config(config)
+    engine = create_engine(uri, pool_pre_ping=True)
+    try:
+        with engine.connect() as connection:
+            connection.execute(text('SELECT 1'))
+        return True, None
+    except Exception as error:
+        return False, str(error)
+    finally:
+        engine.dispose()
+
+
+def generated_setup_env_values(database_config):
+    values = {
+        'SECRET_KEY': secrets.token_urlsafe(48),
+        'JWT_SECRET_KEY': secrets.token_urlsafe(48),
+        'SESSION_TYPE': 'filesystem',
+        'USERS': '',
+    }
+    values.update(database_config)
+    if values.get('DB_ENGINE') == 'postgres':
+        values.setdefault('POSTGRES_DB', values.get('DB', 'verdb'))
+        values.setdefault('POSTGRES_USER', values.get('DB_USER', 'postgres'))
+        values.setdefault('POSTGRES_PASSWORD', values.get('DB_PASSWORD', 'postgres'))
+    return values
+
+
+def env_value(value):
+    value = '' if value is None else str(value)
+    if re.fullmatch(r'[A-Za-z0-9_./:@+-]*', value):
+        return value
+    return json.dumps(value)
+
+
+def write_setup_env(values):
+    if app.config.get('TESTING') or app.config.get('DISABLE_SETUP_ENV_WRITE'):
+        return
+
+    existing_lines = ENV_PATH.read_text(encoding='utf-8').splitlines() if ENV_PATH.exists() else []
+    remaining_values = dict(values)
+    output_lines = []
+    key_pattern = re.compile(r'^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=')
+
+    for line in existing_lines:
+        match = key_pattern.match(line)
+        key = match.group(1) if match else None
+        if key in remaining_values:
+            output_lines.append(f'{key}={env_value(remaining_values.pop(key))}')
+        else:
+            output_lines.append(line)
+
+    if remaining_values:
+        if output_lines and output_lines[-1].strip():
+            output_lines.append('')
+        output_lines.append('# Generated by Vermicelli initial setup')
+        for key in SETUP_ENV_KEYS:
+            if key in remaining_values:
+                output_lines.append(f'{key}={env_value(remaining_values.pop(key))}')
+        for key, value in remaining_values.items():
+            output_lines.append(f'{key}={env_value(value)}')
+
+    ENV_PATH.write_text('\n'.join(output_lines).rstrip() + '\n', encoding='utf-8')
+
+
+def apply_setup_runtime_config(values):
+    app.secret_key = values.get('SECRET_KEY') or app.secret_key
+    app.config['JWT_SECRET_KEY'] = values.get('JWT_SECRET_KEY') or app.config.get('JWT_SECRET_KEY')
+    app.config['SESSION_TYPE'] = values.get('SESSION_TYPE') or app.config.get('SESSION_TYPE', 'filesystem')
+    users.clear()
+
+    if app.config.get('TESTING') and not app.config.get('ALLOW_SETUP_DATABASE_RECONFIGURE'):
+        return
+
+    database_config = {key: value for key, value in values.items() if key.startswith('DB_') or key == 'DB'}
+    if not database_config:
+        return
+
+    global _USER_SCHEMA_READY, _DATABASE_SCHEMA_READY_URI
+    database_uri = database_uri_from_setup_config(database_config)
+    db.session.remove()
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
+    app.config.setdefault('SQLALCHEMY_BINDS', {})
+    app.config.setdefault('SQLALCHEMY_ENGINE_OPTIONS', {})
+
+    engines = db._app_engines.setdefault(app, {})
+    for engine in engines.values():
+        engine.dispose()
+    engines.clear()
+
+    engine_options = db._engine_options.copy()
+    engine_options.update(app.config['SQLALCHEMY_ENGINE_OPTIONS'])
+    engine_options['url'] = database_uri
+    echo = app.config.setdefault('SQLALCHEMY_ECHO', False)
+    engine_options.setdefault('echo', echo)
+    engine_options.setdefault('echo_pool', echo)
+    db._make_metadata(None)
+    db._apply_driver_defaults(engine_options, app)
+    engines[None] = db._make_engine(None, engine_options, app)
+    _USER_SCHEMA_READY = False
+    _DATABASE_SCHEMA_READY_URI = None
+
+
+def complete_initial_setup_config(database_config):
+    values = generated_setup_env_values(database_config)
+    apply_setup_runtime_config(values)
+    write_setup_env(values)
+    ensure_database_schema()
+    ensure_user_schema()
+    return values
+
+
+def validate_backup_payload(payload):
+    data, error = get_backup_data(payload)
+    if error:
+        return None, error
+    error = validate_backup_data(data)
+    if error:
+        return None, error
+    return data, None
+
+
+def backup_validation_summary(data):
+    return {
+        'users': len(data.get('users', [])),
+        'projects': len(data.get('projects', [])),
+        'applications': len(data.get('applications', [])),
+        'versions': len(data.get('versions', [])),
+    }
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     """Public bootstrap registration for the first admin only."""
@@ -509,24 +756,45 @@ def register():
     if not registration_open:
         return json_error('Public admin registration is closed.', 403)
 
+    def setup_form_error(message):
+        if request.headers.get('X-Setup-Wizard') == 'true':
+            return json_error(message, 400)
+        flash(message)
+        return render_template('register.html', registration_open=True), 400
+
     username = request.form.get('username', '').strip()
     full_name = request.form.get('full_name', '').strip()
+    email = request.form.get('email', '').strip()
     password = request.form.get('password', '')
     password_confirmation = request.form.get('password_confirmation', '')
+    database_config, database_error = setup_database_config_from_request(request.form)
 
     if not username or not password:
-        flash('Username and password are required.')
-        return render_template('register.html', registration_open=True), 400
+        return setup_form_error('Username and password are required.')
     if password != password_confirmation:
-        flash('Password confirmation does not match.')
-        return render_template('register.html', registration_open=True), 400
+        return setup_form_error('Password confirmation does not match.')
+    if database_error:
+        return setup_form_error(database_error)
+    if database_config.get('DB_ENGINE') == 'postgres':
+        ok, error = test_setup_database_connection(database_config)
+        if not ok:
+            return setup_form_error(f'Could not connect to PostgreSQL: {error}')
+
+    try:
+        complete_initial_setup_config(database_config)
+    except Exception as error:
+        logging.exception("Initial setup failed")
+        return setup_form_error(f'Initial setup failed: {error}')
+
+    if database_has_any_data():
+        return setup_form_error('The selected database already contains data. Restore or setup can only run on an empty database.')
     if User.query.filter(func.lower(User.username) == username.lower()).first():
-        flash('Username already exists.')
-        return render_template('register.html', registration_open=True), 400
+        return setup_form_error('Username already exists.')
 
     first_user = User(
         username=username,
         full_name=full_name,
+        email=email,
         timezone=DEFAULT_TIMEZONE,
         platform_role=PLATFORM_ADMIN
     )
@@ -538,7 +806,9 @@ def register():
     session['user_id'] = first_user.id
     session['username'] = first_user.username
     session['platform_role'] = first_user.platform_role
-    flash('Admin registered successfully.')
+    flash('You are all set up.')
+    if request.headers.get('X-Setup-Wizard') == 'true':
+        return jsonify({'message': 'You are all set up.', 'redirect_url': url_for('index')})
     return redirect(url_for('index'))
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -707,6 +977,486 @@ def is_valid_url(url: str) -> bool:
     pattern = r'^https?://'
     return bool(re.match(pattern, url.strip()))
 
+
+def backup_datetime(value):
+    return value.isoformat() if value else None
+
+
+def backup_b64encode(value):
+    return base64.b64encode(value).decode('ascii')
+
+
+def backup_b64decode(value):
+    return base64.b64decode(str(value).encode('ascii'), validate=True)
+
+
+def canonical_backup_bytes(payload):
+    return json.dumps(payload, sort_keys=True, separators=(',', ':')).encode('utf-8')
+
+
+def derive_backup_keys(password, salt, iterations):
+    key_material = hashlib.pbkdf2_hmac(
+        'sha256',
+        str(password).encode('utf-8'),
+        salt,
+        iterations,
+        dklen=64
+    )
+    return key_material[:32], key_material[32:]
+
+
+def hmac_stream_xor(data, key, nonce):
+    output = bytearray()
+    counter = 0
+    for index in range(0, len(data), 32):
+        counter_bytes = counter.to_bytes(8, 'big')
+        block_key = hmac.new(key, nonce + counter_bytes, hashlib.sha256).digest()
+        block = data[index:index + 32]
+        output.extend(byte ^ block_key[offset] for offset, byte in enumerate(block))
+        counter += 1
+    return bytes(output)
+
+
+def encrypt_backup_payload(payload, password):
+    if not password:
+        return None, 'Backup encryption password is required.'
+
+    salt = os.urandom(16)
+    nonce = os.urandom(16)
+    encryption_key, mac_key = derive_backup_keys(password, salt, BACKUP_KDF_ITERATIONS)
+    ciphertext = hmac_stream_xor(canonical_backup_bytes(payload), encryption_key, nonce)
+    encrypted_payload = {
+        'format': ENCRYPTED_BACKUP_FORMAT,
+        'version': BACKUP_VERSION,
+        'algorithm': BACKUP_ENCRYPTION_ALGORITHM,
+        'kdf': 'pbkdf2-hmac-sha256',
+        'iterations': BACKUP_KDF_ITERATIONS,
+        'salt': backup_b64encode(salt),
+        'nonce': backup_b64encode(nonce),
+        'ciphertext': backup_b64encode(ciphertext),
+    }
+    encrypted_payload['tag'] = backup_b64encode(
+        hmac.new(mac_key, canonical_backup_bytes(encrypted_payload), hashlib.sha256).digest()
+    )
+    return encrypted_payload, None
+
+
+def decrypt_backup_payload(encrypted_payload, password):
+    if not password:
+        return None, 'Backup encryption password is required.'
+    if not isinstance(encrypted_payload, dict):
+        return None, 'Backup file must contain a JSON object.'
+    if encrypted_payload.get('format') != ENCRYPTED_BACKUP_FORMAT:
+        return None, 'Backup file must be an encrypted Vermicelli backup.'
+    if encrypted_payload.get('version') != BACKUP_VERSION:
+        return None, 'This encrypted backup version is not supported.'
+    if encrypted_payload.get('algorithm') != BACKUP_ENCRYPTION_ALGORITHM:
+        return None, 'This encrypted backup algorithm is not supported.'
+    if encrypted_payload.get('kdf') != 'pbkdf2-hmac-sha256':
+        return None, 'This encrypted backup key derivation method is not supported.'
+
+    try:
+        iterations = int(encrypted_payload.get('iterations', 0))
+        salt = backup_b64decode(encrypted_payload.get('salt', ''))
+        nonce = backup_b64decode(encrypted_payload.get('nonce', ''))
+        ciphertext = backup_b64decode(encrypted_payload.get('ciphertext', ''))
+        supplied_tag = backup_b64decode(encrypted_payload.get('tag', ''))
+    except (TypeError, ValueError):
+        return None, 'Encrypted backup file is malformed.'
+
+    if iterations <= 0 or not salt or not nonce or not ciphertext or not supplied_tag:
+        return None, 'Encrypted backup file is malformed.'
+
+    encryption_key, mac_key = derive_backup_keys(password, salt, iterations)
+    authenticated_payload = {
+        key: encrypted_payload[key]
+        for key in ('format', 'version', 'algorithm', 'kdf', 'iterations', 'salt', 'nonce', 'ciphertext')
+        if key in encrypted_payload
+    }
+    expected_tag = hmac.new(mac_key, canonical_backup_bytes(authenticated_payload), hashlib.sha256).digest()
+    if not hmac.compare_digest(expected_tag, supplied_tag):
+        return None, 'Backup password is incorrect or the backup file is corrupted.'
+
+    plaintext = hmac_stream_xor(ciphertext, encryption_key, nonce)
+    try:
+        return json.loads(plaintext.decode('utf-8')), None
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        return None, 'Backup password is incorrect or the backup file is corrupted.'
+
+
+def parse_backup_datetime(value):
+    if not value:
+        return None
+    try:
+        normalized_value = str(value)
+        if normalized_value.endswith('Z'):
+            normalized_value = normalized_value[:-1] + '+00:00'
+        parsed = datetime.fromisoformat(normalized_value)
+        if parsed.tzinfo is not None:
+            parsed = parsed.astimezone(ZoneInfo(DEFAULT_TIMEZONE)).replace(tzinfo=None)
+        return parsed
+    except ValueError:
+        return None
+
+
+def database_has_any_data():
+    model_counts = [
+        User.query.count(),
+        Project.query.count(),
+        Application.query.count(),
+        Version.query.count(),
+        ProjectMembership.query.count(),
+        ApplicationMembership.query.count(),
+    ]
+    association_count = db.session.query(project_applications).count()
+    return any(count > 0 for count in model_counts) or association_count > 0
+
+
+def serialize_backup_payload():
+    return {
+        'format': BACKUP_FORMAT,
+        'version': BACKUP_VERSION,
+        'exported_at': datetime.utcnow().isoformat() + 'Z',
+        'data': {
+            'users': [
+                {
+                    'id': user.id,
+                    'username': user.username,
+                    'full_name': user.full_name or '',
+                    'timezone': user.timezone or DEFAULT_TIMEZONE,
+                    'datetime_format': normalize_datetime_format(getattr(user, 'datetime_format', DEFAULT_DATETIME_FORMAT)),
+                    'email': user.email or '',
+                    'is_active': bool(user.is_active),
+                    'can_create_projects': bool(user.can_create_projects),
+                    'last_login_at': backup_datetime(user.last_login_at),
+                    'password_hash': user.password_hash,
+                    'platform_role': user.platform_role,
+                    'created_at': backup_datetime(user.created_at),
+                    'updated_at': backup_datetime(user.updated_at),
+                }
+                for user in User.query.order_by(User.id).all()
+            ],
+            'projects': [
+                {
+                    'id': project.id,
+                    'name': project.name,
+                    'description': project.description or '',
+                    'source_link': project.source_link or '',
+                    'status': project.status,
+                    'created_at': backup_datetime(project.created_at),
+                    'start_date': backup_datetime(project.start_date),
+                }
+                for project in Project.query.order_by(Project.id).all()
+            ],
+            'applications': [
+                {
+                    'id': app_obj.id,
+                    'name': app_obj.name,
+                    'created_at': backup_datetime(app_obj.created_at),
+                    'updated_at': backup_datetime(app_obj.updated_at),
+                    'link': app_obj.link or '',
+                    'label': app_obj.label or '',
+                }
+                for app_obj in Application.query.order_by(Application.id).all()
+            ],
+            'versions': [
+                {
+                    'id': version.id,
+                    'application_id': version.application_id,
+                    'number': version.number,
+                    'version_type': version.version_type or '',
+                    'change_date': backup_datetime(version.change_date),
+                    'notes': version.notes or '',
+                }
+                for version in Version.query.order_by(Version.id).all()
+            ],
+            'project_applications': [
+                {
+                    'project_id': row.project_id,
+                    'application_id': row.application_id,
+                }
+                for row in db.session.query(project_applications).order_by(
+                    project_applications.c.project_id,
+                    project_applications.c.application_id
+                ).all()
+            ],
+            'project_memberships': [
+                {
+                    'id': membership.id,
+                    'user_id': membership.user_id,
+                    'project_id': membership.project_id,
+                    'project_role': membership.project_role,
+                    'access_level': membership.access_level,
+                    'created_at': backup_datetime(membership.created_at),
+                    'updated_at': backup_datetime(membership.updated_at),
+                }
+                for membership in ProjectMembership.query.order_by(ProjectMembership.id).all()
+            ],
+            'application_memberships': [
+                {
+                    'id': membership.id,
+                    'user_id': membership.user_id,
+                    'application_id': membership.application_id,
+                    'access_level': membership.access_level,
+                    'created_at': backup_datetime(membership.created_at),
+                    'updated_at': backup_datetime(membership.updated_at),
+                }
+                for membership in ApplicationMembership.query.order_by(ApplicationMembership.id).all()
+            ],
+        }
+    }
+
+
+def backup_payload_from_request():
+    if 'backup' in request.files:
+        raw_payload = request.files['backup'].read()
+    elif request.is_json:
+        payload = request.get_json(silent=True)
+        return payload, None if payload is not None else 'Backup JSON is required.'
+    else:
+        raw_payload = request.get_data()
+
+    if not raw_payload:
+        return None, 'Backup file is required.'
+
+    try:
+        return json.loads(raw_payload.decode('utf-8')), None
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        return None, 'Backup file must be valid JSON.'
+
+
+def encrypted_backup_payload_from_request():
+    if request.is_json:
+        payload = request.get_json(silent=True)
+        if isinstance(payload, dict) and isinstance(payload.get('backup'), dict):
+            return payload['backup'], None
+        if isinstance(payload, dict) and payload.get('format') == ENCRYPTED_BACKUP_FORMAT:
+            return payload, None
+        return None, 'Encrypted backup JSON is required.'
+    return backup_payload_from_request()
+
+
+def backup_request_value(name):
+    if request.is_json:
+        payload = request.get_json(silent=True) or {}
+        return payload.get(name, '')
+    return request.form.get(name, '')
+
+
+def get_backup_data(payload):
+    if not isinstance(payload, dict):
+        return None, 'Backup file must contain a JSON object.'
+    if payload.get('format') != BACKUP_FORMAT:
+        return None, 'This is not a Vermicelli backup file.'
+    if payload.get('version') != BACKUP_VERSION:
+        return None, 'This backup version is not supported.'
+    data = payload.get('data')
+    if not isinstance(data, dict):
+        return None, 'Backup data is missing.'
+    expected_sections = (
+        'users',
+        'projects',
+        'applications',
+        'versions',
+        'project_applications',
+        'project_memberships',
+        'application_memberships',
+    )
+    for section in expected_sections:
+        if section not in data:
+            data[section] = []
+        if not isinstance(data[section], list):
+            return None, f'Backup section {section} must be a list.'
+    return data, None
+
+
+def backup_section_ids(rows, section_name):
+    ids = []
+    for row in rows:
+        if not isinstance(row, dict) or not isinstance(row.get('id'), int):
+            return None, f'Backup section {section_name} contains an invalid id.'
+        ids.append(row['id'])
+    if len(ids) != len(set(ids)):
+        return None, f'Backup section {section_name} contains duplicate ids.'
+    return set(ids), None
+
+
+def validate_backup_data(data):
+    user_ids, error = backup_section_ids(data['users'], 'users')
+    if error:
+        return error
+    project_ids, error = backup_section_ids(data['projects'], 'projects')
+    if error:
+        return error
+    application_ids, error = backup_section_ids(data['applications'], 'applications')
+    if error:
+        return error
+    _, error = backup_section_ids(data['versions'], 'versions')
+    if error:
+        return error
+    _, error = backup_section_ids(data['project_memberships'], 'project_memberships')
+    if error:
+        return error
+    _, error = backup_section_ids(data['application_memberships'], 'application_memberships')
+    if error:
+        return error
+
+    if not data['users']:
+        return 'Backup must contain at least one admin user.'
+    if not any(user.get('platform_role') == PLATFORM_ADMIN for user in data['users']):
+        return 'Backup must contain at least one admin user.'
+    for user in data['users']:
+        if not user.get('username') or not user.get('password_hash'):
+            return 'Backup contains an invalid user record.'
+        if user.get('platform_role') not in PLATFORM_ROLES:
+            return 'Backup contains an unsupported user role.'
+
+    for version in data['versions']:
+        if version.get('application_id') not in application_ids:
+            return 'Backup contains a version for an unknown application.'
+    for link in data['project_applications']:
+        if link.get('project_id') not in project_ids or link.get('application_id') not in application_ids:
+            return 'Backup contains an invalid project/application link.'
+    for membership in data['project_memberships']:
+        if membership.get('user_id') not in user_ids or membership.get('project_id') not in project_ids:
+            return 'Backup contains an invalid project membership.'
+    for membership in data['application_memberships']:
+        if membership.get('user_id') not in user_ids or membership.get('application_id') not in application_ids:
+            return 'Backup contains an invalid application membership.'
+
+    return None
+
+
+def clear_application_data():
+    db.session.execute(project_applications.delete())
+    ApplicationMembership.query.delete(synchronize_session=False)
+    ProjectMembership.query.delete(synchronize_session=False)
+    Version.query.delete(synchronize_session=False)
+    Application.query.delete(synchronize_session=False)
+    Project.query.delete(synchronize_session=False)
+    User.query.delete(synchronize_session=False)
+    db.session.flush()
+    db.session.expunge_all()
+
+
+def reset_primary_key_sequences():
+    if db.engine.dialect.name != 'postgresql':
+        return
+    for table_name in ('users', 'project', 'application', 'version', 'project_memberships', 'application_memberships'):
+        quoted_table_name = f'"{table_name}"'
+        db.session.execute(text(
+            f"SELECT setval(pg_get_serial_sequence('{quoted_table_name}', 'id'), "
+            f"COALESCE((SELECT MAX(id) FROM {quoted_table_name}), 1), "
+            f"(SELECT COUNT(*) FROM {quoted_table_name}) > 0)"
+        ))
+
+
+def import_backup_payload(payload):
+    data, error = get_backup_data(payload)
+    if error:
+        return False, error
+
+    error = validate_backup_data(data)
+    if error:
+        return False, error
+
+    try:
+        clear_application_data()
+
+        for row in data['users']:
+            db.session.add(User(
+                id=row['id'],
+                username=str(row.get('username', '')).strip(),
+                full_name=row.get('full_name') or '',
+                timezone=row.get('timezone') or DEFAULT_TIMEZONE,
+                datetime_format=normalize_datetime_format(row.get('datetime_format') or DEFAULT_DATETIME_FORMAT),
+                email=row.get('email') or '',
+                is_active=bool(row.get('is_active', True)),
+                can_create_projects=bool(row.get('can_create_projects', False)),
+                last_login_at=parse_backup_datetime(row.get('last_login_at')),
+                password_hash=row.get('password_hash'),
+                platform_role=row.get('platform_role') if row.get('platform_role') in PLATFORM_ROLES else PLATFORM_USER,
+                created_at=parse_backup_datetime(row.get('created_at')) or datetime.utcnow(),
+                updated_at=parse_backup_datetime(row.get('updated_at')) or datetime.utcnow(),
+            ))
+
+        for row in data['projects']:
+            db.session.add(Project(
+                id=row['id'],
+                name=str(row.get('name', '')).strip(),
+                description=row.get('description') or '',
+                source_link=row.get('source_link') or '',
+                status=row.get('status') or 'Draft',
+                created_at=parse_backup_datetime(row.get('created_at')) or datetime.utcnow(),
+                start_date=parse_backup_datetime(row.get('start_date')) or datetime.utcnow(),
+            ))
+
+        for row in data['applications']:
+            db.session.add(Application(
+                id=row['id'],
+                name=str(row.get('name', '')).strip(),
+                created_at=parse_backup_datetime(row.get('created_at')) or datetime.utcnow(),
+                updated_at=parse_backup_datetime(row.get('updated_at')) or datetime.utcnow(),
+                link=row.get('link') or '',
+                label=row.get('label') or '',
+            ))
+
+        db.session.flush()
+
+        if data['project_applications']:
+            db.session.execute(project_applications.insert(), [
+                {
+                    'project_id': row['project_id'],
+                    'application_id': row['application_id'],
+                }
+                for row in data['project_applications']
+            ])
+
+        for row in data['versions']:
+            db.session.add(Version(
+                id=row['id'],
+                application_id=row['application_id'],
+                number=row.get('number') or '0.0.0',
+                version_type=row.get('version_type') or '',
+                change_date=parse_backup_datetime(row.get('change_date')) or datetime.utcnow(),
+                notes=row.get('notes') or '',
+            ))
+
+        for row in data['project_memberships']:
+            db.session.add(ProjectMembership(
+                id=row['id'],
+                user_id=row['user_id'],
+                project_id=row['project_id'],
+                project_role=row.get('project_role') if row.get('project_role') in PROJECT_ROLES else PROJECT_USER,
+                access_level=row.get('access_level') if row.get('access_level') in PROJECT_ACCESS_LEVELS else ACCESS_VIEW_ONLY,
+                created_at=parse_backup_datetime(row.get('created_at')) or datetime.utcnow(),
+                updated_at=parse_backup_datetime(row.get('updated_at')) or datetime.utcnow(),
+            ))
+
+        for row in data['application_memberships']:
+            db.session.add(ApplicationMembership(
+                id=row['id'],
+                user_id=row['user_id'],
+                application_id=row['application_id'],
+                access_level=row.get('access_level') if row.get('access_level') in APPLICATION_ACCESS_LEVELS else ACCESS_VIEW_ONLY,
+                created_at=parse_backup_datetime(row.get('created_at')) or datetime.utcnow(),
+                updated_at=parse_backup_datetime(row.get('updated_at')) or datetime.utcnow(),
+            ))
+
+        db.session.flush()
+        reset_primary_key_sequences()
+        db.session.commit()
+        return True, None
+    except (IntegrityError, SQLAlchemyError) as error:
+        db.session.rollback()
+        logging.error("Backup import failed: %s", error)
+        return False, 'Backup could not be imported because it conflicts with the database schema.'
+    except Exception as error:
+        db.session.rollback()
+        logging.error("Backup import failed: %s", error)
+        return False, 'Backup could not be imported.'
+
+
 ### HTML page routes (render templates)
 @app.route('/')
 @login_required
@@ -739,6 +1489,16 @@ def users_page():
 def settings_page():
     user = get_current_user()
     return render_template('index.html', initial_page='settings', current_user=user, can_manage_access=can_manage_access_page(user), can_manage_users=can_manage_users_page(user))
+
+
+@app.route('/system-settings')
+@login_required
+def system_settings_page():
+    user = get_current_user()
+    if not has_platform_role(user, PLATFORM_ADMIN):
+        return json_error('You do not have permission to access system settings.', 403)
+    return render_template('index.html', initial_page='system-settings', current_user=user, can_manage_access=can_manage_access_page(user), can_manage_users=can_manage_users_page(user))
+
 
 @app.route('/content/applications')
 @login_required
@@ -1466,6 +2226,154 @@ def settings_content():
         timezone_options=get_timezone_options(),
         datetime_format_options=get_datetime_format_options()
     )
+
+
+@app.route('/content/system-settings')
+@login_required
+def system_settings_content():
+    current = get_current_user()
+    if not has_platform_role(current, PLATFORM_ADMIN):
+        return json_error('You do not have permission to access system settings.', 403)
+    return render_template('system_settings.html')
+
+
+@app.route('/api/system/verify-admin-password', methods=['POST'])
+@login_required
+def verify_system_admin_password():
+    current = get_current_user()
+    if not has_platform_role(current, PLATFORM_ADMIN):
+        return json_error('Only admins can verify system access.', 403)
+    admin_password = backup_request_value('admin_password')
+    if not admin_password or not current.check_password(admin_password):
+        return json_error('Current admin password is incorrect.', 400)
+    return jsonify({'message': 'Admin password verified.'})
+
+
+@app.route('/api/system/backup', methods=['POST'])
+@login_required
+def export_system_backup():
+    current = get_current_user()
+    if not has_platform_role(current, PLATFORM_ADMIN):
+        return json_error('Only admins can export system backups.', 403)
+
+    backup_password = backup_request_value('backup_password')
+    encrypted_payload, error = encrypt_backup_payload(serialize_backup_payload(), backup_password)
+    if error:
+        return json_error(error, 400)
+
+    filename = f"vermicelli-backup-{datetime.utcnow().strftime('%Y%m%d-%H%M%S')}.vmbak"
+    return Response(
+        json.dumps(encrypted_payload, indent=2, sort_keys=True),
+        mimetype='application/json',
+        headers={
+            'Content-Disposition': f'attachment; filename="{filename}"'
+        }
+    )
+
+
+@app.route('/api/system/backup/import', methods=['POST'])
+@login_required
+def import_system_backup():
+    current = get_current_user()
+    if not has_platform_role(current, PLATFORM_ADMIN):
+        return json_error('Only admins can import system backups.', 403)
+
+    admin_password = backup_request_value('admin_password')
+    if not admin_password or not current.check_password(admin_password):
+        return json_error('Current admin password is incorrect.', 400)
+
+    backup_password = backup_request_value('backup_password')
+    encrypted_payload, error = encrypted_backup_payload_from_request()
+    if error:
+        return json_error(error, 400)
+
+    payload, error = decrypt_backup_payload(encrypted_payload, backup_password)
+    if error:
+        return json_error(error, 400)
+
+    ok, error = import_backup_payload(payload)
+    if not ok:
+        return json_error(error, 400)
+
+    session.clear()
+    return jsonify({'message': 'Backup imported successfully. Please sign in again.'})
+
+
+@app.route('/api/setup/test-database', methods=['POST'])
+def test_initial_setup_database():
+    if not setup_is_available(require_empty_data=True):
+        return json_error('Initial setup is available only before any data exists.', 403)
+
+    payload = request.get_json(silent=True) if request.is_json else request.form
+    database_config, error = setup_database_config_from_request(payload or {})
+    if error:
+        return json_error(error, 400)
+
+    ok, error = test_setup_database_connection(database_config)
+    if not ok:
+        return json_error(f'Database connection failed: {error}', 400)
+    return jsonify({'message': 'Database connection succeeded.'})
+
+
+@app.route('/api/bootstrap/backup/verify', methods=['POST'])
+def verify_bootstrap_backup():
+    if not setup_is_available(require_empty_data=True):
+        return json_error('Backup validation is available only before any data exists.', 403)
+
+    backup_password = backup_request_value('backup_password')
+    encrypted_payload, error = encrypted_backup_payload_from_request()
+    if error:
+        return json_error(error, 400)
+
+    payload, error = decrypt_backup_payload(encrypted_payload, backup_password)
+    if error:
+        return json_error(error, 400)
+
+    data, error = validate_backup_payload(payload)
+    if error:
+        return json_error(error, 400)
+
+    return jsonify({
+        'message': 'Backup is valid.',
+        'summary': backup_validation_summary(data),
+        'format': ENCRYPTED_BACKUP_FORMAT,
+        'version': BACKUP_VERSION,
+    })
+
+
+@app.route('/api/bootstrap/backup/import', methods=['POST'])
+def import_bootstrap_backup():
+    if admin_count() > 0 or database_has_any_data():
+        return json_error('Bootstrap backup import is available only before any data exists.', 403)
+
+    if backup_request_value('restore_confirmation') != 'RESTORE':
+        return json_error('Type RESTORE to confirm the restore.', 400)
+
+    backup_password = backup_request_value('backup_password')
+    encrypted_payload, error = encrypted_backup_payload_from_request()
+    if error:
+        return json_error(error, 400)
+
+    payload, error = decrypt_backup_payload(encrypted_payload, backup_password)
+    if error:
+        return json_error(error, 400)
+
+    data, error = validate_backup_payload(payload)
+    if error:
+        return json_error(error, 400)
+
+    try:
+        complete_initial_setup_config({'DB_ENGINE': 'sqlite', 'DB': DB_NAME or 'verdb'})
+    except Exception as error:
+        logging.exception("Bootstrap backup restore setup failed")
+        return json_error(f'Backup restore setup failed: {error}', 400)
+
+    ok, error = import_backup_payload(payload)
+    if not ok:
+        return json_error(error, 400)
+
+    session.clear()
+    return jsonify({'message': 'Backup imported successfully. Sign in with an account from the backup.'})
 
 
 @app.route('/api/me', methods=['GET'])
