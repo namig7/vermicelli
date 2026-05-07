@@ -1,14 +1,85 @@
 <!-- users.html -->
-<div>
+<div class="users-page">
+    <style>
+        .users-page {
+            --users-blue: #73A5CA;
+            --users-blue-soft: #EAF3F9;
+            --users-blue-hover: #D8EAF5;
+            --users-blue-border: #BBD5E8;
+            --users-blue-text: #376A90;
+            --users-blue-strong: #24597D;
+            --users-blue-shadow: rgba(115, 165, 202, 0.28);
+        }
+
+        .users-page .btn:focus,
+        .users-page-primary:focus {
+            box-shadow: 0 0 0 2px var(--users-blue-shadow);
+        }
+
+        .users-page .btn-primary,
+        .users-page-primary,
+        .users-page .tab-link.active,
+        .users-page .tab-link:hover,
+        .users-page .pagination-page-active,
+        .users-page .pagination-page-inactive:hover {
+            background-color: var(--users-blue-soft);
+            color: var(--users-blue-text);
+        }
+
+        .users-page .btn-primary,
+        .users-page-primary {
+            box-shadow: 0 1px 2px rgba(55, 106, 144, 0.14);
+        }
+
+        .users-page .btn-primary:hover,
+        .users-page-primary:hover {
+            background-color: var(--users-blue-hover);
+            color: var(--users-blue-strong);
+        }
+
+        .users-blue-surface {
+            border-color: var(--users-blue-border) !important;
+            background-color: rgba(115, 165, 202, 0.16) !important;
+        }
+
+        .users-blue-chip {
+            border-color: var(--users-blue-border) !important;
+            background-color: var(--users-blue-soft) !important;
+            color: var(--users-blue-strong) !important;
+        }
+
+        .users-blue-text {
+            color: var(--users-blue-text) !important;
+        }
+
+        .users-blue-strong {
+            color: var(--users-blue-strong) !important;
+        }
+
+        .users-blue-icon,
+        .users-shield-icon {
+            color: var(--users-blue) !important;
+        }
+    </style>
     <header class="page-toolbar flex justify-between items-center mb-4">
         <div class="flex flex-wrap gap-2">
-            <button type="button" class="users-subpage-tab tab-link active" data-subpage="usersTable">Users</button>
-            <button type="button" class="users-subpage-tab tab-link" data-subpage="projectAccess">Access</button>
+            <button type="button" class="users-subpage-tab tab-link active" data-subpage="usersTable">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                </svg>
+                Users
+            </button>
+            <button type="button" class="users-subpage-tab tab-link" data-subpage="projectAccess">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                </svg>
+                Access
+            </button>
         </div>
         <div id="usersToolbarActions">
             <button onclick="openNewUserModal()" class="primary-action btn btn-primary group">
-                <svg class="group-hover:text-yellow-600 text-yellow-500 flex-shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
+                <svg class="flex-shrink-0 text-current h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m7-7H5" />
                 </svg>
                 New User
             </button>
@@ -36,9 +107,8 @@
                 </svg>
             </form>
             <button type="button" id="openAccessModalButton" class="primary-action btn btn-primary group">
-                <svg class="group-hover:text-yellow-600 text-yellow-500 flex-shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3.75c-2.412 1.92-5.459 3-8.625 3.056V12c0 5.084 3.45 9.655 8.386 11.112a.75.75 0 0 0 .478 0c4.936-1.457 8.386-6.028 8.386-11.112V6.806C17.459 6.75 14.412 5.67 12 3.75Z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8.25v7.5M8.25 12h7.5" />
+                <svg class="flex-shrink-0 text-current h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m7-7H5" />
                 </svg>
                 New Access
             </button>
@@ -55,7 +125,7 @@
                             <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Username</th>
                             <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Full Name</th>
                             <th class="w-36 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Role</th>
-                            <th class="hide-sm w-44 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Created</th>
+                            <th class="hide-sm w-56 py-4 px-5 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Created</th>
                             <th class="col-actions w-32 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200"></th>
                         </tr>
                     </thead>
@@ -318,18 +388,22 @@
     const USERS_PAGE_SIZE = 5;
     const MEMBERSHIPS_PAGE_SIZE = 5;
     const currentSessionUserId = {{ session.get('user_id')|tojson }};
+    const initialUsersParams = new URLSearchParams(window.location.search);
+    const initialUsersSubpage = initialUsersParams.get('tab') === 'access' ? 'projectAccess' : 'usersTable';
+    const initialDetailsUserId = Number(initialUsersParams.get('user_id') || 0);
+    let initialDetailsOpened = false;
 
     const detailsIcon = `
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5A3.375 3.375 0 0 0 10.125 2.25H5.625C5.004 2.25 4.5 2.754 4.5 3.375v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V14.25Z" />
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
         </svg>`;
     const disableIcon = `
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
         </svg>`;
     const enableIcon = `
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m4.5 12.75 6 6 9-13.5" />
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
         </svg>`;
     const editIcon = `
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
@@ -406,7 +480,7 @@
                 popup: 'bg-white rounded-lg shadow-lg',
                 title: 'text-xl font-bold text-gray-800',
                 content: 'text-gray-700',
-                confirmButton: 'btn btn-primary',
+                confirmButton: 'btn btn-primary users-page-primary',
                 cancelButton: 'btn btn-secondary',
                 actions: 'flex justify-center space-x-4'
             },
@@ -427,7 +501,7 @@
                 popup: 'bg-white rounded-lg shadow-lg',
                 title: 'text-xl font-bold text-gray-800',
                 content: 'text-gray-700',
-                confirmButton: 'btn btn-primary',
+                confirmButton: 'btn btn-primary users-page-primary',
                 actions: 'flex justify-center'
             },
             buttonsStyling: false,
@@ -439,14 +513,14 @@
         Swal.fire({
             title,
             text,
-            iconHtml: `<span class="inline-flex items-center justify-center text-blue-600" style="animation: shield-shake 0.8s ease-in-out infinite;">${sweetAlertShieldIcon}</span>`,
+            iconHtml: `<span class="users-shield-icon inline-flex items-center justify-center" style="color: #73A5CA; animation: shield-shake 0.8s ease-in-out infinite;">${sweetAlertShieldIcon}</span>`,
             confirmButtonText: 'OK',
             customClass: {
                 popup: 'bg-white rounded-lg shadow-lg',
                 title: 'text-xl font-bold text-gray-800',
                 content: 'text-gray-700',
                 icon: 'border-0 !w-[9.5rem] !h-[9.5rem]',
-                confirmButton: 'btn btn-primary',
+                confirmButton: 'btn btn-primary users-page-primary',
                 actions: 'flex justify-center'
             },
             buttonsStyling: false,
@@ -552,19 +626,19 @@
 
         const adminChips = admins.map(function(user) {
             return `
-                <span class="admin-access-summary-chip inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-sm text-blue-800">
-                    <button type="button" class="admin-access-summary-user open-access-user-details min-w-0 truncate text-left font-medium text-blue-800 transition hover:text-yellow-700" data-user-id="${user.id}">${escapeHtml(accessChipUsername(user))}</button>
-                    <span class="admin-access-summary-icon ml-2 inline-flex items-center text-blue-600" title="Platform Admin" aria-label="Platform Admin">${adminAccessIcon}</span>
+                <span class="admin-access-summary-chip users-blue-chip inline-flex items-center rounded-full border px-3 py-1 text-sm">
+                    <button type="button" class="admin-access-summary-user users-blue-strong open-access-user-details min-w-0 truncate text-left font-medium transition hover:text-yellow-700" data-user-id="${user.id}">${escapeHtml(accessChipUsername(user))}</button>
+                    <span class="admin-access-summary-icon users-blue-icon ml-2 inline-flex items-center" title="Platform Admin" aria-label="Platform Admin">${adminAccessIcon}</span>
                 </span>
             `;
         }).join('');
 
         $('#adminAccessSummary').html(`
-            <div class="admin-access-summary-card rounded-xl border border-blue-200 bg-blue-50/60 p-4">
+            <div class="admin-access-summary-card users-blue-surface rounded-xl border p-4">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                        <h3 class="admin-access-summary-title text-sm font-semibold text-blue-900">Platform Admins</h3>
-                        <p class="admin-access-summary-text mt-1 text-sm text-blue-800">Admins have access to every project and application, so they are listed once here and not repeated below.</p>
+                        <h3 class="admin-access-summary-title users-blue-strong text-sm font-semibold">Platform Admins</h3>
+                        <p class="admin-access-summary-text users-blue-text mt-1 text-sm">Admins have access to every project and application, so they are listed once here and not repeated below.</p>
                     </div>
                 </div>
                 <div class="mt-4 flex flex-wrap gap-2">
@@ -617,8 +691,8 @@
         const buttons = Array.from({ length: Math.max(0, endPage - startPage + 1) }, function(_, index) {
             const pageNumber = startPage + index;
             const activeClass = pageNumber === currentPage
-                ? 'bg-yellow-100 text-yellow-600'
-                : 'bg-white hover:bg-yellow-200 border border-gray-200 text-gray-600';
+                ? 'pagination-page-active'
+                : 'pagination-page-inactive';
             return `
                 <span
                     class="${pageButtonClass} cursor-pointer inline-flex items-center justify-center w-8 h-8 rounded-full ${activeClass}"
@@ -676,7 +750,7 @@
         const code = item.project_role_code || item.access_code || '';
         let classes = 'bg-gray-100 text-gray-700 border-gray-200';
         if (code === 'Manager' || code === 'Admin') {
-            classes = 'bg-blue-100 text-blue-700 border-blue-200';
+            classes = 'users-blue-chip';
         } else if (code === 'Operator') {
             classes = 'bg-yellow-100 text-yellow-700 border-yellow-200';
         } else if (code === 'RW') {
@@ -840,7 +914,7 @@
                 popup: 'bg-white rounded-lg shadow-lg',
                 title: 'text-xl font-bold text-gray-800',
                 content: 'text-gray-700',
-                confirmButton: 'btn btn-primary',
+                confirmButton: 'btn btn-primary users-page-primary',
                 actions: 'flex justify-center'
             },
             buttonsStyling: false,
@@ -985,7 +1059,7 @@
                     <td class="text-base text-gray-700 py-4 px-6 border-b border-gray-200">${escapeHtml(user.username)}</td>
                     <td class="text-base text-gray-600 py-4 px-6 border-b border-gray-200">${escapeHtml(user.full_name || '')}</td>
                     <td class="whitespace-nowrap text-base text-gray-600 py-4 px-6 border-b border-gray-200">${escapeHtml(user.platform_role_label || user.platform_role || '')}</td>
-                    <td class="hide-sm whitespace-nowrap text-base text-gray-600 py-4 px-6 border-b border-gray-200">${escapeHtml(user.created_at_display || '')}</td>
+                    <td class="date-time-text hide-sm whitespace-nowrap text-sm text-gray-600 py-4 px-5 border-b border-gray-200" title="${escapeHtml(user.created_at_display || '')}">${escapeHtml(user.created_at_display || '')}</td>
                     <td class="col-actions text-base text-gray-600 py-4 px-6 border-b border-gray-200">
                         <div class="table-actions">
                             <button class="details-user table-action-button text-yellow-500 hover:text-yellow-600" data-id="${user.id}" aria-label="User Details">${detailsIcon}</button>
@@ -1018,7 +1092,7 @@
 
         function removableChipHtml(entry, deleteAttrs) {
             const adminMarker = entry.isAdmin
-                ? `<span class="ml-2 inline-flex items-center text-blue-600" title="Platform Admin" aria-label="Platform Admin">${adminAccessIcon}</span>`
+                ? `<span class="users-blue-icon ml-2 inline-flex items-center" title="Platform Admin" aria-label="Platform Admin">${adminAccessIcon}</span>`
                 : '';
             const managerMarker = entry.isManager
                 ? `<span class="ml-2 inline-flex items-center text-yellow-600" title="Manager" aria-label="Manager">${managerAccessIcon}</span>`
@@ -1205,7 +1279,7 @@
                     <div class="mb-4 flex items-center justify-between gap-3">
                         <div>
                             <h3 class="text-lg font-semibold text-gray-800">${escapeHtml(project.name)}</h3>
-                            <p class="text-sm text-gray-500">Project access and application access grouped together.</p>
+                            <p class="text-sm text-gray-500">${escapeHtml(project.description || 'Project access and application access grouped together.')}</p>
                         </div>
                         <button type="button" class="edit-project-access inline-flex items-center text-yellow-600 hover:text-yellow-800" data-project-id="${project.id}" data-title="Edit Access" aria-label="Edit Access">
                             ${editIcon}
@@ -1302,7 +1376,7 @@
                 <div class="flex items-center gap-2">
                     <span class="inline-flex h-3.5 w-3.5 flex-shrink-0 rounded-full ${user.is_active ? 'bg-green-400 shadow-[0_0_0_3px_rgba(34,197,94,0.16),0_0_16px_rgba(74,222,128,0.9)]' : 'bg-gray-400 shadow-[0_0_0_3px_rgba(156,163,175,0.16),0_0_10px_rgba(107,114,128,0.4)]'}" title="${user.is_active ? 'Enabled' : 'Disabled'}"></span>
                     <span class="truncate">${escapeHtml(userDisplayName(user))}</span>
-                    ${user.platform_role === 'admin' ? `<span class="inline-flex flex-shrink-0 text-blue-600" title="Platform Admin" aria-label="Platform Admin">${adminAccessIcon}</span>` : ''}
+                    ${user.platform_role === 'admin' ? `<span class="users-blue-icon inline-flex flex-shrink-0" title="Platform Admin" aria-label="Platform Admin">${adminAccessIcon}</span>` : ''}
                 </div>
             </li>
         `).join('') || '<li class="px-3 py-2 text-sm text-gray-500">No users found.</li>');
@@ -1393,9 +1467,9 @@
                     </p>
                 </div>
                 <div class="space-y-3">
-                    <p class="text-sm text-gray-600"><strong>Created:</strong> ${escapeHtml(user.created_at_display || 'N/A')}</p>
+                    <p class="text-sm text-gray-600"><strong>Created:</strong> <span class="date-time-text">${escapeHtml(user.created_at_display || 'N/A')}</span></p>
                     <p class="text-sm text-gray-600"><strong>Status:</strong> ${escapeHtml(user.status)}</p>
-                    <p class="text-sm text-gray-600"><strong>Last login date:</strong> ${escapeHtml(user.last_login_display || 'Never')}</p>
+                    <p class="text-sm text-gray-600"><strong>Last login date:</strong> <span class="date-time-text">${escapeHtml(user.last_login_display || 'Never')}</span></p>
                     <div class="text-sm text-gray-600">
                         <strong>Role:</strong>
                         <div class="mt-2 inline-flex flex-wrap items-center gap-2 rounded-full border border-gray-200 bg-white p-1" role="group" aria-label="User role">
@@ -1490,6 +1564,10 @@
         $.getJSON('/api/users').done(function(data) {
             users = data;
             renderUsers();
+            if (initialDetailsUserId && !initialDetailsOpened) {
+                initialDetailsOpened = true;
+                openUserDetails(initialDetailsUserId);
+            }
         }).fail(showError);
 
         $.getJSON('/get_projects').done(function(data) {
@@ -1521,6 +1599,7 @@
             const responses = requests.length === 1 ? [arguments] : Array.from(arguments);
             responses.forEach(function(response, index) {
                 const payload = requests.length === 1 ? response[0] : response[0];
+                projects[index].description = payload.description || projects[index].description || '';
                 projectApplicationsById[projects[index].id] = payload.applications || [];
             });
             renderMemberships();
@@ -1603,7 +1682,7 @@
                 title: 'text-xl font-bold text-gray-800',
                 content: 'text-gray-700',
                 input: 'border border-gray-300 rounded-md px-3 py-2 focus:shadow-none focus:border-yellow-500 focus:outline-none',
-                confirmButton: 'btn btn-primary',
+                confirmButton: 'btn btn-primary users-page-primary',
                 cancelButton: 'btn btn-secondary',
                 actions: 'flex justify-center space-x-4'
             },
@@ -1936,7 +2015,7 @@
 
     syncMembershipRoleFromSelection();
     syncProjectCreationToggle();
-    switchSubpage('usersTable');
+    switchSubpage(initialUsersSubpage);
     loadAll();
 })();
 </script>

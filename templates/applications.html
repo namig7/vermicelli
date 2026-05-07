@@ -4,9 +4,19 @@
     <!-- Header for Applications -->
     <header class="page-toolbar flex justify-between items-center mb-4">
         <!-- Navigation Tabs -->
-        <nav class="flex space-x-6 text-gray-700">
-            <a href="/applications" data-page="applications" class="tab-link active">Applications</a>
-            <a href="/projects" data-page="projects" class="tab-link">Projects</a>
+        <nav class="flex flex-wrap gap-3 text-gray-700">
+            <a href="/applications" data-page="applications" class="tab-link primary-action btn btn-primary group active justify-start py-3 text-left">
+                <svg class="h-5 w-5 flex-shrink-0 text-yellow-500 group-hover:text-yellow-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-2.25-1.313M21 7.5v2.25m0-2.25-2.25 1.313M3 7.5l2.25-1.313M3 7.5l2.25 1.313M3 7.5v2.25m9 3 2.25-1.313M12 12.75l-2.25-1.313M12 12.75V15m0 6.75 2.25-1.313M12 21.75V19.5m0 2.25-2.25-1.313m0-16.875L12 2.25l2.25 1.313M21 14.25v2.25l-2.25 1.313m-13.5 0L3 16.5v-2.25" />
+                </svg>
+                Applications
+            </a>
+            <a href="/projects" data-page="projects" class="tab-link primary-action btn btn-secondary group justify-start py-3 text-left">
+                <svg class="h-5 w-5 flex-shrink-0 text-yellow-500 group-hover:text-yellow-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 9.776c.112-.017.227-.026.344-.026h15.812c.117 0 .232.009.344.026m-16.5 0a2.25 2.25 0 0 0-1.883 2.542l.857 6a2.25 2.25 0 0 0 2.227 1.932H19.05a2.25 2.25 0 0 0 2.227-1.932l.857-6a2.25 2.25 0 0 0-1.883-2.542m-16.5 0V6A2.25 2.25 0 0 1 6 3.75h3.879a1.5 1.5 0 0 1 1.06.44l2.122 2.12a1.5 1.5 0 0 0 1.06.44H18A2.25 2.25 0 0 1 20.25 9v.776" />
+                </svg>
+                Projects
+            </a>
         </nav>
         <div class="toolbar-actions flex items-center space-x-4">
             <form id="searchForm" class="toolbar-search relative">
@@ -42,7 +52,7 @@
                     class="primary-action btn btn-primary group"
                 >
                     <svg
-                        class="group-hover:text-yellow-600 text-yellow-500 flex-shrink-0"
+                        class="flex-shrink-0 text-current"
                         width="12"
                         height="20"
                         fill="currentColor"
@@ -224,6 +234,9 @@
                             name="project_ids"
                             value=""
                         />
+                        <p id="projectRequiredNote" class="mt-2 hidden text-sm text-gray-500">
+                            Create a project first, then add applications to it.
+                        </p>
                     </div>
 
                     <div class="mb-4">
@@ -366,7 +379,7 @@
                             <th class="hide-sm w-48 whitespace-nowrap py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">
                                 Latest Version
                             </th>
-                            <th class="hide-sm w-40 whitespace-nowrap py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">
+                            <th class="hide-sm w-56 whitespace-nowrap py-4 px-5 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">
                                 Release Date
                             </th>
                             <th class="col-access whitespace-nowrap py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">
@@ -392,7 +405,7 @@
                 : 'bg-gray-100 text-gray-700 border-gray-200';
             const deleteButton = app.can_edit ? `
                             <button
-                                class="delete-button table-action-button text-yellow-500 hover:text-red-600"
+                                class="delete-button table-action-button"
                                 data-id="${app.id}"
                                 aria-label="Delete Application"
                             >
@@ -467,7 +480,7 @@
                     <td class="text-base text-gray-600 py-4 px-6 border-b border-gray-200">
                         <a
                             href="#"
-                            class="app-details-link responsive-name-link text-black-500 hover:text-black-600 hover:underline"
+                            class="app-details-link responsive-name-link text-gray-800 hover:text-yellow-700 hover:underline"
                             data-id="${app.id}"
                             title="${appName}"
                         >
@@ -477,7 +490,7 @@
                     <td class="hide-sm whitespace-nowrap text-base py-4 px-6 border-b border-gray-200">
                         <span>${app.version_info || 'N/A'}</span>
                     </td>
-                    <td class="hide-sm whitespace-nowrap text-base text-gray-600 py-4 px-6 border-b border-gray-200" title="${dateTitle}">
+                    <td class="date-time-text hide-sm whitespace-nowrap text-sm text-gray-600 py-4 px-5 border-b border-gray-200" title="${dateTitle}">
                         ${dateStr}
                     </td>
                     <td class="col-access whitespace-nowrap text-base text-gray-600 py-4 px-6 border-b border-gray-200">
@@ -489,7 +502,7 @@
                         <div class="table-actions">
                             <!-- Details Button -->
                             <button
-                                class="app-details-link table-action-button text-yellow-500 hover:text-yellow-600"
+                                class="app-details-link table-action-button"
                                 data-id="${app.id}"
                                 aria-label="View Application Details"
                             >
@@ -639,8 +652,8 @@
                 <span
                     class="cursor-pointer inline-flex items-center justify-center w-8 h-8
                     ${page === currentPage
-                        ? 'bg-yellow-100 text-yellow-600'
-                        : 'bg-white hover:bg-yellow-200 border border-gray-200'}
+                        ? 'pagination-page-active'
+                        : 'pagination-page-inactive'}
                     rounded-full"
                     onclick="goToPage(${page})"
                 >
@@ -712,7 +725,12 @@
     // ================== FORM SUBMISSION ==================
     $(document).ready(function() {
         // 1) Load data
-        loadAppsData();
+        const pendingSearchQuery = sessionStorage.getItem('applicationSearchQuery') || '';
+        if (pendingSearchQuery) {
+            sessionStorage.removeItem('applicationSearchQuery');
+            $('#searchForm').find('input[name="search"]').val(pendingSearchQuery);
+        }
+        loadAppsData(pendingSearchQuery);
 
         // 2) Search form
         $('#searchForm').on('submit', function(e) {
@@ -792,6 +810,19 @@
             success: function(allProjects) {
                 const projectList = $('#projectList');
                 projectList.empty();
+                $('#projectRequiredNote').toggleClass('hidden', allProjects.length > 0);
+                $('#projectDropdownButton')
+                    .prop('disabled', allProjects.length === 0)
+                    .toggleClass('cursor-not-allowed opacity-60', allProjects.length === 0);
+
+                if (!allProjects.length) {
+                    projectList.append(`
+                        <li class="px-3 py-2 text-sm text-gray-500">
+                            Create a project first, then add applications to it.
+                        </li>
+                    `);
+                    return;
+                }
 
                 // Populate single-select items
                 allProjects.forEach(proj => {

@@ -1,103 +1,964 @@
 <!-- application_details.html -->
+{% macro access_remove_icon() -%}
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-3.5 w-3.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+    </svg>
+{%- endmacro %}
 
-<!-- Back link -->
-<div id="app-details" data-app-id="{{ app.id }}" class="container mx-auto py-6 mt-2">
-    <a href="#" onclick="window.loadPage('applications'); return false;" class="text-yellow-500 hover:text-yellow-600 font-medium">← Back</a>
-    
-    <div class="mt-5 bg-white p-6 rounded-lg shadow-md border border-gray-200 space-y-4">
-       <h1 class="flex text-2xl font-bold text-gray-800">{{ app.name }}</h1>
-        <p class="text-gray-600 mt-2"><strong>ID:</strong> {{ app.id }}</p>
-        
+{% macro admin_access_icon() -%}
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
+    </svg>
+{%- endmacro %}
 
-<!-- The Project of the Application -->
-<p class="text-gray-600">
-    <strong>Project:</strong> 
-    {% if project_name and project_id %}
-    <a href="#" onclick="openProjectDetails({{ project_id }}); return false;" class="text-yellow-500 hover:text-yellow-600 hover:underline">
-        {{ project_name }}
-    </a>
-{% else %}
-    N/A
-{% endif %}
-    </p>
-    
+{% macro manager_access_icon() -%}
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor" class="h-4 w-4">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9A2.25 2.25 0 0 1 5.25 16.5V7.86a2.25 2.25 0 0 1 .659-1.591l1.86-1.859a2.25 2.25 0 0 1 1.591-.659H16.5a2.25 2.25 0 0 1 2.25 2.25v10.5a2.25 2.25 0 0 1-2.25 2.25Z" />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 8.25h6M9 12h6M9 15.75h3" />
+    </svg>
+{%- endmacro %}
 
-<!-- The Link to the Application Repo -->
-<p class="text-gray-600">
-<strong>Link:</strong> 
-{% if app.link %}
-    <a href="{{ app.link }}" class="text-yellow-500 hover:text-yellow-600 hover:underline">
-        {{ app.link }}
-    </a>
-{% else %}
-    No link available
-{% endif %}
-</p>
+{% macro admin_access_chip(member) -%}
+    <span class="admin-access-summary-chip inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-sm text-blue-800">
+        <button type="button" class="admin-access-summary-user open-access-user-details min-w-0 truncate text-left font-medium text-blue-800 transition hover:text-yellow-700" data-user-id="{{ member.user_id }}" onclick="openApplicationAccessUser({{ member.user_id }}); return false;">{{ member.username }}</button>
+        <span class="admin-access-summary-icon ml-2 inline-flex items-center text-blue-600" title="Platform Admin" aria-label="Platform Admin">{{ admin_access_icon() }}</span>
+    </span>
+{%- endmacro %}
 
-<!-- Labels -->
-<p class="text-gray-600"><strong>Label:</strong> {{ app.label or 'No labels' }}</p>
-<p class="text-gray-600"><strong>Access level:</strong> {{ access_level_label }}</p>
+{% macro access_user_chip(member, manager=False, remove_scope='project') -%}
+    <span class="inline-flex items-center rounded-full border border-gray-200 bg-white px-3 py-1 text-sm text-gray-700">
+        <button type="button" class="open-access-user-details min-w-0 truncate text-left font-medium text-gray-700 transition hover:text-yellow-700" data-user-id="{{ member.user_id }}" onclick="openApplicationAccessUser({{ member.user_id }}); return false;">{{ member.username }}</button>
+        {% if manager %}
+            <span class="ml-2 inline-flex items-center text-yellow-600" title="Manager" aria-label="Manager">{{ manager_access_icon() }}</span>
+        {% endif %}
+        {% if remove_scope == 'application' and member.membership_id %}
+            <button type="button" class="ml-2 inline-flex h-4 w-4 items-center justify-center rounded-full text-gray-400 transition hover:bg-red-100 hover:text-red-600 delete-application-access" data-application-membership-id="{{ member.membership_id }}" onclick="deleteApplicationAccess({{ member.membership_id }}); return false;" aria-label="Delete access">{{ access_remove_icon() }}</button>
+        {% elif member.membership_id %}
+            <button type="button" class="ml-2 inline-flex h-4 w-4 items-center justify-center rounded-full text-gray-400 transition hover:bg-red-100 hover:text-red-600 delete-project-access" data-membership-id="{{ member.membership_id }}" onclick="deleteProjectAccess({{ member.membership_id }}); return false;" aria-label="Delete access">{{ access_remove_icon() }}</button>
+        {% elif remove_scope == 'application' and member.project_membership_id %}
+            <button type="button" class="ml-2 inline-flex h-4 w-4 items-center justify-center rounded-full text-gray-400 transition hover:bg-red-100 hover:text-red-600 delete-project-access" data-membership-id="{{ member.project_membership_id }}" onclick="deleteProjectAccess({{ member.project_membership_id }}); return false;" aria-label="Delete access">{{ access_remove_icon() }}</button>
+        {% endif %}
+    </span>
+{%- endmacro %}
 
-        <p class="text-gray-600"><strong>Created At:</strong> {{ app.created_at }}</p>
+<div id="app-details" data-app-id="{{ app.id }}" class="resource-page app-details-page container mx-auto py-6 mt-2">
+    {% include '_resource_page_styles.html' %}
+    <style>
+        #deleteApplicationButton {
+            background-color: #FF653F;
+            color: #ffffff;
+        }
+
+        #deleteApplicationButton:hover {
+            background-color: #e95a38;
+            color: #ffffff;
+        }
+
+        html[data-theme="dark"] #deleteApplicationButton,
+        html[data-theme="dark"] #deleteApplicationButton:hover {
+            color: #111827;
+        }
+
+        .app-details-page .details-hero {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            background: #ffffff;
+        }
+
+        .app-details-page .details-hero-layout {
+            align-items: flex-start;
+        }
+
+        .app-details-page .hero-detail-box {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            min-width: 0;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: #f9fafb;
+            padding: 0.85rem;
+        }
+
+        .app-details-page .detail-tile {
+            min-width: 0;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: #ffffff;
+            padding: 1rem;
+        }
+
+        .app-details-page .detail-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0;
+            text-transform: uppercase;
+            color: #6b7280;
+        }
+
+        .app-details-page .detail-value {
+            margin-top: 0.35rem;
+            color: #111827;
+            overflow-wrap: anywhere;
+        }
+
+        .app-details-page .access-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+            gap: 1rem;
+        }
+
+        .app-details-page .access-group {
+            min-width: 0;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 0.85rem;
+        }
+
+        .app-details-page .access-list {
+            margin-top: 0.65rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .app-details-page .access-person {
+            display: inline-flex;
+            min-width: 0;
+            align-items: center;
+            gap: 0.45rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 9999px;
+            background: #ffffff;
+            padding: 0.35rem 0.75rem;
+        }
+
+        .app-details-page .access-person-name {
+            min-width: 0;
+            color: #111827;
+            font-size: 0.875rem;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+        }
+
+        .app-details-page .access-remove-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1rem;
+            height: 1rem;
+            flex: 0 0 auto;
+            border-radius: 9999px;
+            color: #9ca3af;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .app-details-page .access-remove-button:hover {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .app-details-page .access-person-meta {
+            color: #6b7280;
+            font-size: 0.75rem;
+            overflow-wrap: anywhere;
+        }
+
+        .app-details-page .access-empty {
+            margin-top: 0.65rem;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .app-details-page .detail-heading {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            min-width: 0;
+        }
+
+        .app-details-page .detail-heading-content {
+            min-width: 0;
+            flex: 1 1 auto;
+        }
+
+        .app-details-page .platform-admin-card {
+            border: 1px solid #bfdbfe;
+            border-radius: 0.75rem;
+            background: #eff6ff;
+            padding: 1rem;
+        }
+
+        .app-details-page .platform-admin-card .detail-label {
+            color: #1e3a8a;
+        }
+
+        .app-details-page .platform-admin-card .access-person-meta {
+            color: #1e40af;
+        }
+
+        .app-details-page .platform-admin-chip {
+            display: inline-flex;
+            align-items: center;
+            max-width: 100%;
+            border-radius: 9999px;
+            border: 1px solid #bfdbfe;
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 0.35rem 0.75rem;
+            font-size: 0.875rem;
+            font-weight: 700;
+        }
+
+        .app-details-page .section-divider {
+            border-top: 1px solid #e5e7eb;
+            margin-top: 1rem;
+            padding-top: 1rem;
+        }
+
+        .app-details-page .details-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            min-height: 2rem;
+            border-radius: 9999px;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            padding: 0.35rem 0.75rem;
+            font-size: 0.8125rem;
+            font-weight: 700;
+            color: #374151;
+        }
+
+        .app-details-page .release-panel {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            background: #f9fafb;
+        }
+
+        .app-details-page .detail-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.75rem;
+            height: 1.75rem;
+            flex: 0 0 1.75rem;
+            color: #6b7280;
+            margin-top: 0.05rem;
+        }
+
+        .app-details-page .detail-icon svg {
+            width: 1.5rem;
+            height: 1.5rem;
+            stroke-width: 1.75;
+        }
+
+        .app-details-page .release-action-button {
+            min-height: 2.25rem;
+            border-radius: 0.375rem;
+            padding: 0.45rem 0.85rem;
+        }
+
+        .app-details-page .release-action-button svg {
+            width: 1.1rem;
+            height: 1.1rem;
+        }
+
+        .app-details-page .access-admin-button {
+            border: 1px solid #bfdbfe;
+            background: #eff6ff;
+            color: #1e40af;
+        }
+
+        .app-details-page .access-admin-button:hover {
+            background: #dbeafe;
+            color: #1e3a8a;
+        }
+
+        .app-details-page .inline-icon-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 9999px;
+            color: #6b7280;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .app-details-page .inline-icon-button:hover {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .app-details-page .label-chip {
+            display: inline-flex;
+            align-items: center;
+            max-width: 100%;
+            gap: 0.5rem;
+            border-radius: 9999px;
+            border: 1px solid #bfdbfe;
+            background: #eff6ff;
+            color: #1e40af;
+            padding: 0.4rem 0.55rem 0.4rem 0.8rem;
+            font-size: 0.875rem;
+            font-weight: 700;
+        }
+
+        .app-details-page .label-remove-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.35rem;
+            height: 1.35rem;
+            border-radius: 9999px;
+            color: #1d4ed8;
+        }
+
+        .app-details-page .label-remove-button:hover {
+            background: #dbeafe;
+        }
+
+        .app-details-page .repository-branches {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .app-details-page .repository-branches th,
+        .app-details-page .repository-branches td {
+            padding: 0.75rem;
+            border-top: 1px solid #e5e7eb;
+            text-align: left;
+            vertical-align: middle;
+            overflow-wrap: anywhere;
+        }
+
+        .app-details-page .repository-branches th {
+            color: #6b7280;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .app-details-page .branch-pill {
+            display: inline-flex;
+            align-items: center;
+            max-width: 100%;
+            border-radius: 9999px;
+            border: 1px solid #d1d5db;
+            background: #f9fafb;
+            color: #111827;
+            padding: 0.35rem 0.75rem;
+            font-size: 0.8125rem;
+            font-weight: 700;
+        }
+
+        .app-details-page .branch-pill:hover {
+            border-color: #f59e0b;
+            background: #fffbeb;
+            color: #92400e;
+        }
+
+        .app-details-page .repository-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            max-width: 100%;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            color: #374151;
+            padding: 0.5rem 0.65rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            line-height: 1.25rem;
+        }
+
+        .app-details-page .repository-link:hover {
+            border-color: #f59e0b;
+            background: #fffbeb;
+            color: #92400e;
+        }
+
+        .app-details-page .repository-link svg {
+            width: 1rem;
+            height: 1rem;
+            flex: 0 0 auto;
+        }
+
+        .app-details-page .repository-loading {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.85rem;
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.86);
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .app-details-page .repository-loading.hidden {
+            display: none;
+        }
+
+        .app-details-page .repository-loading-spinner {
+            width: 2.75rem;
+            height: 2.75rem;
+            flex: 0 0 auto;
+            border: 4px solid #fde68a;
+            border-top-color: #f59e0b;
+            border-radius: 9999px;
+            animation: repository-loading-spin 0.8s linear infinite;
+        }
+
+        @keyframes repository-loading-spin {
+            to { transform: rotate(360deg); }
+        }
+
+        html[data-theme="dark"] .app-details-page .details-hero,
+        html[data-theme="dark"] .app-details-page .hero-detail-box,
+        html[data-theme="dark"] .app-details-page .detail-tile,
+        html[data-theme="dark"] .app-details-page .release-panel {
+            background: #1f2937;
+            border-color: #4b5563;
+            color: #e5e7eb;
+        }
+
+        html[data-theme="dark"] .app-details-page .details-chip {
+            background: #111827;
+            border-color: #4b5563;
+            color: #e5e7eb;
+        }
+
+        html[data-theme="dark"] .app-details-page .detail-label {
+            color: #cbd5e1;
+        }
+
+        html[data-theme="dark"] .app-details-page .detail-value,
+        html[data-theme="dark"] .app-details-page .detail-value a,
+        html[data-theme="dark"] .app-details-page .release-panel p,
+        html[data-theme="dark"] .app-details-page .release-panel h2,
+        html[data-theme="dark"] .app-details-page h1 {
+            color: #f3f4f6;
+        }
+
+        html[data-theme="dark"] .app-details-page .hero-detail-box {
+            background: #111827;
+        }
+
+        html[data-theme="dark"] .app-details-page .access-group {
+            border-color: #4b5563;
+        }
+
+        html[data-theme="dark"] .app-details-page .section-divider {
+            border-color: #4b5563;
+        }
+
+        html[data-theme="dark"] .app-details-page .access-person {
+            background: #111827;
+            border-color: #4b5563;
+        }
+
+        html[data-theme="dark"] .app-details-page .access-person-name {
+            color: #f3f4f6;
+        }
+
+        html[data-theme="dark"] .app-details-page .access-remove-button {
+            color: #9ca3af;
+        }
+
+        html[data-theme="dark"] .app-details-page .access-remove-button:hover {
+            background: #7f1d1d;
+            color: #fee2e2;
+        }
+
+        html[data-theme="dark"] .app-details-page .access-person-meta,
+        html[data-theme="dark"] .app-details-page .access-empty {
+            color: #cbd5e1;
+        }
+
+        html[data-theme="dark"] .app-details-page .platform-admin-card {
+            background: #172554;
+            border-color: #2563eb;
+        }
+
+        html[data-theme="dark"] .app-details-page .platform-admin-card .detail-label,
+        html[data-theme="dark"] .app-details-page .platform-admin-card .access-person-meta {
+            color: #bfdbfe;
+        }
+
+        html[data-theme="dark"] .app-details-page .platform-admin-chip {
+            background: #1e3a8a;
+            border-color: #2563eb;
+            color: #dbeafe;
+        }
+
+        html[data-theme="dark"] .app-details-page .access-admin-button {
+            background: #1e3a8a;
+            border-color: #2563eb;
+            color: #dbeafe;
+        }
+
+        html[data-theme="dark"] .app-details-page .access-admin-button:hover {
+            background: #1d4ed8;
+            color: #eff6ff;
+        }
+
+        html[data-theme="dark"] .app-details-page .label-chip {
+            background: #172554;
+            border-color: #2563eb;
+            color: #dbeafe;
+        }
+
+        html[data-theme="dark"] .app-details-page .label-remove-button {
+            color: #bfdbfe;
+        }
+
+        html[data-theme="dark"] .app-details-page .label-remove-button:hover {
+            background: #1e3a8a;
+            color: #eff6ff;
+        }
+
+        html[data-theme="dark"] .app-details-page .inline-icon-button:hover {
+            background: #92400e;
+            color: #fffbeb;
+        }
+
+        html[data-theme="dark"] .app-details-page .inline-icon-button {
+            color: #cbd5e1;
+        }
+
+        html[data-theme="dark"] .app-details-page .repository-branches th,
+        html[data-theme="dark"] .app-details-page .repository-branches td {
+            border-color: #4b5563;
+            color: #f3f4f6;
+        }
+
+        html[data-theme="dark"] .app-details-page .repository-branches th {
+            color: #cbd5e1;
+        }
+
+        html[data-theme="dark"] .app-details-page .branch-pill {
+            background: #111827;
+            border-color: #4b5563;
+            color: #f3f4f6;
+        }
+
+        html[data-theme="dark"] .app-details-page .branch-pill:hover {
+            background: #92400e;
+            border-color: #b45309;
+            color: #fffbeb;
+        }
+
+        html[data-theme="dark"] .app-details-page .repository-link {
+            background: #111827;
+            border-color: #4b5563;
+            color: #f3f4f6;
+        }
+
+        html[data-theme="dark"] .app-details-page .repository-link:hover {
+            background: #92400e;
+            border-color: #b45309;
+            color: #fffbeb;
+        }
+
+        html[data-theme="dark"] .app-details-page .detail-icon {
+            color: #cbd5e1;
+        }
+
+        html[data-theme="dark"] .app-details-page .repository-loading {
+            background: rgba(17, 24, 39, 0.86);
+        }
+
+        html[data-theme="dark"] .app-details-page .repository-loading-spinner {
+            border-color: #78350f;
+            border-top-color: #f59e0b;
+        }
+
+        html[data-theme="dark"] .app-details-page .repository-loading p {
+            color: #fef3c7;
+        }
+    </style>
+
+    <header class="page-toolbar flex justify-between items-center mb-4">
+        <button type="button" onclick="window.loadPage('applications'); return false;" class="btn btn-secondary">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+            </svg>
+            Applications
+        </button>
         {% if can_edit_application %}
-            <div class="gap-3 mt-1 flex flex-wrap">
-                <a href="#" onclick="openEditAppModal({{ app.id }}); return false;" class="flex items-center text-gray-500 hover:text-gray-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6 mr-1">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+            <div class="toolbar-actions flex items-center">
+                <button type="button" onclick="openEditAppModal({{ app.id }}, 'all'); return false;" class="btn btn-primary">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" />
                     </svg>
                     Edit
-                </a>
-                <a href="#" onclick="deleteApplication({{ app.id }}); return false;" class="flex items-center text-gray-500 hover:text-gray-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6 mr-1">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                </button>
+                <button type="button" id="deleteApplicationButton" onclick="deleteApplication({{ app.id }}); return false;" class="btn">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166M19.228 5.79 18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                     </svg>
                     Delete
-                </a>
+                </button>
             </div>
         {% endif %}
+    </header>
 
-        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-            <h4 class="font-bold text-gray-800">Version {{ latest_version.number if latest_version else 'No versions available' }}</h4>
-            <p class="text-sm text-gray-600">Released on: {{ latest_version_display if latest_version else 'N/A' }}</p>
-            <p class="text-sm text-gray-600">No release notes available.</p>
+    <section class="details-hero p-6 md:p-8 mb-6">
+        <div class="details-hero-layout flex flex-col md:flex-row md:justify-between gap-6">
+            <div class="min-w-0 flex-1">
+                <div class="mb-4 flex items-start gap-3">
+                    <span class="detail-icon" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-2.25-1.313M21 7.5v2.25m0-2.25-2.25 1.313M3 7.5l2.25-1.313M3 7.5l2.25 1.313M3 7.5v2.25m9 3 2.25-1.313M12 12.75l-2.25-1.313M12 12.75V15m0 6.75 2.25-1.313M12 21.75V19.5m0 2.25-2.25-1.313m0-16.875L12 2.25l2.25 1.313M21 14.25v2.25l-2.25 1.313m-13.5 0L3 16.5v-2.25" />
+                        </svg>
+                    </span>
+                    <div class="flex min-w-0 flex-1 items-start gap-2">
+                        <h1 class="min-w-0 text-3xl font-bold leading-tight text-gray-900 break-words">{{ app.name }}</h1>
+                        {% if can_edit_application %}
+                            <button type="button" onclick="openEditAppModal({{ app.id }}, 'name'); return false;" class="inline-icon-button flex-shrink-0" aria-label="Edit application name" title="Edit application name">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" />
+                                </svg>
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 mb-2">
+                    <span class="details-chip">ID {{ app.id }}</span>
+                    <span class="details-chip">{{ access_level_label }}</span>
+                    <span class="details-chip">{{ version_count }} {{ 'version' if version_count == 1 else 'versions' }}</span>
+                </div>
+                <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="hero-detail-box">
+                        <span class="detail-icon" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                        </span>
+                        <div class="min-w-0">
+                            <p class="detail-label">Created</p>
+                            <p class="detail-value date-time-text">{{ created_at_display }}</p>
+                        </div>
+                    </div>
+                    <div class="hero-detail-box">
+                        <span class="detail-icon" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                        </span>
+                        <div class="min-w-0">
+                            <p class="detail-label">Updated</p>
+                            <p class="detail-value date-time-text">{{ updated_at_display }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="section-divider flex items-start justify-between gap-3">
+                    <div class="flex min-w-0 flex-1 items-start gap-3">
+                        <span class="detail-icon" aria-hidden="true">
+                            <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l8.182 8.182a2.25 2.25 0 0 0 3.182 0l4.318-4.318a2.25 2.25 0 0 0 0-3.182L11.159 3.659A2.25 2.25 0 0 0 9.568 3Z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" />
+                            </svg>
+                        </span>
+                        <div class="min-w-0 flex-1">
+                            <p class="detail-label">Labels</p>
+                            <div class="detail-value flex flex-wrap gap-2">
+                                {% if app_labels %}
+                                    {% for label in app_labels %}
+                                    <span class="label-chip">
+                                        <a href="#" onclick='filterApplicationsByLabel({{ label|tojson }}); return false;' class="truncate hover:underline" title="Show applications tagged {{ label }}">{{ label }}</a>
+                                        {% if can_edit_application %}
+                                            <button type="button" onclick='removeApplicationLabel({{ label|tojson }}); return false;' class="label-remove-button" aria-label="Remove label {{ label }}" title="Remove label">
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18 18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                        {% endif %}
+                                    </span>
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="text-gray-500">No label assigned</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% if can_edit_application %}
+                        <button type="button" onclick="openEditAppModal({{ app.id }}, 'labels'); return false;" class="inline-icon-button flex-shrink-0" aria-label="Edit labels" title="Edit labels">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" />
+                            </svg>
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="w-full md:w-80 flex-shrink-0 space-y-4">
+                <div class="release-panel p-4">
+                    <div class="detail-heading">
+                        <span class="detail-icon" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m7.875 14.25 1.214 1.942a2.25 2.25 0 0 0 1.908 1.058h2.006c.776 0 1.497-.4 1.908-1.058l1.214-1.942M2.41 9h4.636a2.25 2.25 0 0 1 1.872 1.002l.164.246a2.25 2.25 0 0 0 1.872 1.002h2.092a2.25 2.25 0 0 0 1.872-1.002l.164-.246A2.25 2.25 0 0 1 16.954 9h4.636M2.41 9a2.25 2.25 0 0 0-.16.832V12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 12V9.832c0-.287-.055-.57-.16-.832M2.41 9a2.25 2.25 0 0 1 .382-.632l3.285-3.832a2.25 2.25 0 0 1 1.708-.786h8.43c.657 0 1.281.287 1.709.786l3.284 3.832c.163.19.291.404.382.632M4.5 20.25h15A2.25 2.25 0 0 0 21.75 18v-2.625c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125V18a2.25 2.25 0 0 0 2.25 2.25Z" />
+                            </svg>
+                        </span>
+                        <div class="detail-heading-content">
+                            <p class="detail-label">Latest Release</p>
+                            <h2 class="mt-1 text-xl font-bold text-gray-900">
+                                {{ latest_version.number if latest_version else 'No versions available' }}
+                            </h2>
+                            <p class="mt-1 text-sm text-gray-600">{{ latest_version_display if latest_version else 'N/A' }}</p>
+                        </div>
+                    </div>
+                    <div class="mt-4 border-t border-gray-200 pt-3">
+                        <p class="detail-label">Release Notes</p>
+                        <p class="mt-1 text-sm text-gray-700">{{ latest_version_notes or 'No release notes available.' }}</p>
+                    </div>
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        <button type="button" id="openVersionHistory" class="btn access-admin-button release-action-button" data-app-id="{{ app.id }}">
+                            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m7.875 14.25 1.214 1.942a2.25 2.25 0 0 0 1.908 1.058h2.006c.776 0 1.497-.4 1.908-1.058l1.214-1.942M2.41 9h4.636a2.25 2.25 0 0 1 1.872 1.002l.164.246a2.25 2.25 0 0 0 1.872 1.002h2.092a2.25 2.25 0 0 0 1.872-1.002l.164-.246A2.25 2.25 0 0 1 16.954 9h4.636M2.41 9a2.25 2.25 0 0 0-.16.832V12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 12V9.832c0-.287-.055-.57-.16-.832M2.41 9a2.25 2.25 0 0 1 .382-.632l3.285-3.832a2.25 2.25 0 0 1 1.708-.786h8.43c.657 0 1.281.287 1.709.786l3.284 3.832c.163.19.291.404.382.632M4.5 20.25h15A2.25 2.25 0 0 0 21.75 18v-2.625c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125V18a2.25 2.25 0 0 0 2.25 2.25Z" />
+                            </svg>
+                            History
+                        </button>
+                        <button type="button" id="printVersionHistory" class="btn btn-secondary release-action-button" data-app-id="{{ app.id }}">
+                            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0 1 10.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0 .229 2.523a1.125 1.125 0 0 1-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0 0 21 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 0 0-1.913-.247M6.34 18H5.25A2.25 2.25 0 0 1 3 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 0 1 1.913-.247m10.5 0a48.536 48.536 0 0 0-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5Zm-3 0h.008v.008H15V10.5Z" />
+                            </svg>
+                            Print
+                        </button>
+                    </div>
+                </div>
+                {% if can_edit_application %}
+                    <section class="detail-tile">
+                        <p class="detail-label">Version Controls</p>
+                        <pre id="curl-major-{{ app.id }}" class="hidden">curl -X POST -H "Content-Type: application/json" -d "{\"version_part\":\"major\",\"releasenotes\":\"${RELEASE_NOTES:-${CI_COMMIT_MESSAGE:-${GITHUB_EVENT_HEAD_COMMIT_MESSAGE:-${GITEA_COMMIT_MESSAGE:-No release notes available.}}}}\"}" http://localhost:8000/app/{{ app.id }}/update_version</pre>
+                        <pre id="curl-minor-{{ app.id }}" class="hidden">curl -X POST -H "Content-Type: application/json" -d "{\"version_part\":\"minor\",\"releasenotes\":\"${RELEASE_NOTES:-${CI_COMMIT_MESSAGE:-${GITHUB_EVENT_HEAD_COMMIT_MESSAGE:-${GITEA_COMMIT_MESSAGE:-No release notes available.}}}}\"}" http://localhost:8000/app/{{ app.id }}/update_version</pre>
+                        <pre id="curl-patch-{{ app.id }}" class="hidden">curl -X POST -H "Content-Type: application/json" -d "{\"version_part\":\"patch\",\"releasenotes\":\"${RELEASE_NOTES:-${CI_COMMIT_MESSAGE:-${GITHUB_EVENT_HEAD_COMMIT_MESSAGE:-${GITEA_COMMIT_MESSAGE:-No release notes available.}}}}\"}" http://localhost:8000/app/{{ app.id }}/update_version</pre>
+                        <div class="mt-3 grid grid-cols-3 gap-2">
+                            <button type="button" onclick="copyToClipboard('curl-major-{{ app.id }}')" class="btn btn-secondary px-2">Major</button>
+                            <button type="button" onclick="copyToClipboard('curl-minor-{{ app.id }}')" class="btn btn-secondary px-2">Minor</button>
+                            <button type="button" onclick="copyToClipboard('curl-patch-{{ app.id }}')" class="btn btn-secondary px-2">Patch</button>
+                        </div>
+                    </section>
+                {% endif %}
+            </div>
         </div>
-        <!-- Version History -->
-        <p class="text-gray-600">
-            <a href="#" id="openVersionHistory" class="flex items-center text-gray-500 hover:text-gray-600" data-app-id="{{ app.id }}">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6 mr-1">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7.875 14.25l1.214 1.942a2.25 2.25 0 001.908 1.058h2.006c.776 0 1.497-.4 1.908-1.058l1.214-1.942M2.41 9h4.636a2.25 2.25 0 011.872 1.002l.164.246a2.25 2.25 0 001.872 1.002h2.092a2.25 2.25 0 001.872-1.002l.164-.246A2.25 2.25 0 0116.954 9h4.636M2.41 9a2.25 2.25 0 00-.16.832V12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 12V9.832c0-.287-.055-.57-.16-.832M2.41 9a2.25 2.25 0 01.382-.632l3.285-3.832a2.25 2.25 0 011.708-.786h8.43c.657 0 1.281.287 1.709.786l3.284 3.832c.163.19.291.404.382.632M4.5 20.25h15A2.25 2.25 0 0021.75 18v-2.625c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125V18a2.25 2.25 0 002.25 2.25z" />
-                </svg>
-                Version History
-            </a>
-        </p>
-        
-<!-- Version Control Block -->
+    </section>
 
-{% if can_edit_application %}
-    <pre id="curl-major-{{ app.id }}" class="hidden">curl -X POST -H "Content-Type: application/json" -d '{"version_part": "major"}' http://localhost:8000/app/{{ app.id }}/update_version</pre>
-    <pre id="curl-minor-{{ app.id }}" class="hidden">curl -X POST -H "Content-Type: application/json" -d '{"version_part": "minor"}' http://localhost:8000/app/{{ app.id }}/update_version</pre>
-    <pre id="curl-patch-{{ app.id }}" class="hidden">curl -X POST -H "Content-Type: application/json" -d '{"version_part": "patch"}' http://localhost:8000/app/{{ app.id }}/update_version</pre>
-    <div class="gap-3 mt-1 flex flex-wrap">
-            <button onclick="copyToClipboard('curl-major-{{ app.id }}')" class="flex items-center text-gray-500 hover:text-gray-600">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6 mr-1">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" />
-                </svg>
-                Major
-            </button>
-            <button onclick="copyToClipboard('curl-minor-{{ app.id }}')" class="flex items-center text-gray-500 hover:text-gray-600">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6 mr-1">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" />
-                </svg>
-                Minor
-            </button>
-            <button onclick="copyToClipboard('curl-patch-{{ app.id }}')" class="flex items-center text-gray-500 hover:text-gray-600">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6 mr-1">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" />
-                </svg>
-                Patch
-            </button>
-        </div>
-{% endif %}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <section class="lg:col-span-3 space-y-6">
+            <section class="detail-tile">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="flex min-w-0 flex-1 items-start gap-3">
+                        <span class="detail-icon" aria-hidden="true">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V6.75A2.25 2.25 0 0 1 4.5 4.5h4.628c.597 0 1.17.237 1.591.659l1.122 1.122c.422.422.994.659 1.591.659H19.5a2.25 2.25 0 0 1 2.25 2.25v3.56M2.25 12.75 4.03 18.09A2.25 2.25 0 0 0 6.164 19.5h11.672a2.25 2.25 0 0 0 2.134-1.41l1.78-5.34H2.25Z" />
+                            </svg>
+                        </span>
+                        <div class="min-w-0 flex-1">
+                            <p class="detail-label">Project</p>
+                            <p class="detail-value font-medium">
+                                {% if project_name and project_id %}
+                                    <a href="#" onclick="openProjectDetails({{ project_id }}); return false;" class="text-yellow-600 hover:text-yellow-700 hover:underline">
+                                        {{ project_name }}
+                                    </a>
+                                {% else %}
+                                    No project
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    {% if can_change_project %}
+                        <button type="button" onclick="openEditAppModal({{ app.id }}, 'project'); return false;" class="inline-icon-button flex-shrink-0" aria-label="Edit project" title="Edit project">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" />
+                            </svg>
+                        </button>
+                    {% endif %}
+                </div>
+
+                <div class="section-divider">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="detail-heading flex-1">
+                            <span class="detail-icon" aria-hidden="true">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3.75c-2.412 1.92-5.459 3-8.625 3.056V12c0 5.084 3.45 9.655 8.386 11.112a.75.75 0 0 0 .478 0c4.936-1.457 8.386-6.028 8.386-11.112V6.806C17.459 6.75 14.412 5.67 12 3.75Z" />
+                                </svg>
+                            </span>
+                            <div class="detail-heading-content">
+                                <p class="detail-label">Access</p>
+                                <p class="access-person-meta mt-1">Project access appears first, followed by application-level access for this application.</p>
+                            </div>
+                        </div>
+                        {% if can_change_project %}
+                            <button type="button" onclick="openAccessManagement(); return false;" class="inline-icon-button flex-shrink-0" aria-label="Edit access" title="Edit access">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" />
+                                </svg>
+                            </button>
+                        {% endif %}
+                    </div>
+
+                    <div class="platform-admin-card mt-4">
+                        <p class="detail-label">Platform Admins</p>
+                        <p class="access-person-meta mt-1">Admins have access to every project and application, so they are listed once here and not repeated below.</p>
+                        {% if access_summary.show_platform_admin_names and access_summary.platform_admins %}
+                            <div class="mt-4 flex flex-wrap gap-2">
+                                {% for member in access_summary.platform_admins %}
+                                    {{ admin_access_chip(member) }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="section-divider">
+                        <p class="detail-label">Project Access</p>
+                        <div class="access-grid mt-3">
+                            <div>
+                                <p class="detail-label">Managers</p>
+                                {% if access_summary.project_managers %}
+                                    <div class="access-list">
+                                        {% for member in access_summary.project_managers %}
+                                            {{ access_user_chip(member, True, 'project') }}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <p class="access-empty">No project managers assigned.</p>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <p class="detail-label">Operators</p>
+                                {% if access_summary.project_operators %}
+                                    <div class="access-list">
+                                        {% for member in access_summary.project_operators %}
+                                            {{ access_user_chip(member, False, 'project') }}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <p class="access-empty">No project operators assigned.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-divider">
+                        <p class="detail-label">Application Access</p>
+                        <div class="access-grid mt-3">
+                            <div>
+                                <p class="detail-label">Read Write</p>
+                                {% if access_summary.application_read_write %}
+                                    <div class="access-list">
+                                        {% for member in access_summary.application_read_write %}
+                                            {{ access_user_chip(member, member.is_project_manager, 'application') }}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <p class="access-empty">No users have read write access to this application.</p>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <p class="detail-label">Read Only</p>
+                                {% if access_summary.application_read_only %}
+                                    <div class="access-list">
+                                        {% for member in access_summary.application_read_only %}
+                                            {{ access_user_chip(member, member.is_project_manager, 'application') }}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <p class="access-empty">No users have read-only access to this application.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="repositoryBranchesPanel" class="detail-tile relative">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="flex min-w-0 flex-1 items-start gap-3">
+                        <span class="detail-icon" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5" />
+                            </svg>
+                        </span>
+                        <div class="min-w-0 flex-1">
+                            <p class="detail-label">Repository</p>
+                            <div class="detail-value flex flex-wrap items-center gap-2">
+                                {% if app.link %}
+                                    <a href="{{ app.link }}" target="_blank" rel="noopener noreferrer" class="repository-link" title="{{ app.link }}">
+                                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
+                                        </svg>
+                                        <span class="truncate">{{ app.link.replace('https://', '').replace('http://', '').rstrip('/') }}</span>
+                                    </a>
+                                {% else %}
+                                    <span class="text-gray-500">No link available</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% if can_edit_application %}
+                        <div class="flex flex-shrink-0 items-center gap-1">
+                            <button type="button" onclick="openEditAppModal({{ app.id }}, 'repository'); return false;" class="inline-icon-button" aria-label="Edit repository link" title="Edit repository link">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" />
+                                </svg>
+                            </button>
+                            <button type="button" id="refreshRepositoryButton" onclick="refreshRepositoryMetadata(); return false;" class="inline-icon-button" aria-label="Refresh repository data" title="Refresh repository data">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                                </svg>
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div id="repositoryLoading" class="repository-loading hidden">
+                    <div class="repository-loading-spinner" aria-hidden="true"></div>
+                    <p class="text-sm font-semibold text-yellow-800">Syncing repository data...</p>
+                </div>
+
+                <div id="repositoryBranchesTableWrap" class="mt-4 {{ 'overflow-x-auto' if repository_branches else 'hidden overflow-x-auto' }}">
+                    <table class="repository-branches">
+                        <thead>
+                            <tr>
+                                <th>Branch</th>
+                                <th>Commit SHA</th>
+                                <th>Last Commit</th>
+                                <th>Commit Note</th>
+                            </tr>
+                        </thead>
+                        <tbody id="repositoryBranchesBody">
+                            {% for branch in repository_branches %}
+                                <tr>
+                                    <td class="font-medium">
+                                        {% if branch.branch_url %}
+                                            <a href="{{ branch.branch_url }}" target="_blank" rel="noopener noreferrer" class="branch-pill" title="Open branch {{ branch.branch_name }}">
+                                                <span class="truncate">{{ branch.branch_name }}</span>
+                                            </a>
+                                        {% else %}
+                                            <span class="branch-pill">
+                                                <span class="truncate">{{ branch.branch_name }}</span>
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="font-mono text-sm" title="{{ branch.commit_sha }}">{{ branch.short_commit_sha or 'N/A' }}</td>
+                                    <td class="date-time-text">{{ branch.last_commit_display }}</td>
+                                    <td class="text-sm" title="{{ branch.full_commit_note }}">{{ branch.commit_note or 'N/A' }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <p id="repositoryBranchesEmpty" class="mt-4 {{ 'hidden' if repository_branches else '' }} text-sm text-gray-500">No repository branch data available.</p>
+            </section>
+
+        </section>
+    </div>
 </div>
 
 <!-- Modal for editing application -->
@@ -116,11 +977,11 @@
     <!-- Modal content -->
     <div class="p-6 space-y-4">
         <form id="editAppForm">
-            <div>
+            <div class="edit-field-group" data-edit-section="name">
                 <label for="appNameInput" class="block text-sm font-medium text-gray-700">Application Name</label>
                 <input type="text" id="appNameInput" name="name" class="form-input block w-full mt-1" required>
             </div>
-            <div>
+            <div class="edit-field-group" data-edit-section="project">
                 <label for="projectSelect" class="block text-sm font-medium text-gray-700">Project</label>
                 <p id="projectDisplay" class="mt-1 text-sm text-gray-600"></p>
                 <select id="projectSelect" name="project" class="form-select block w-full mt-1">
@@ -128,13 +989,14 @@
                     <option value="">No project</option>
                 </select>
             </div>
-            <div>
+            <div class="edit-field-group" data-edit-section="repository">
                 <label for="appLinkInput" class="block text-sm font-medium text-gray-700">Git Repository Link</label>
                 <input type="url" id="appLinkInput" name="link" class="form-input block w-full mt-1">
             </div>
-            <div>
+            <div class="edit-field-group" data-edit-section="labels">
                 <label for="appLabelInput" class="block text-sm font-medium text-gray-700">Label</label>
                 <input type="text" id="appLabelInput" name="label" class="form-input block w-full mt-1">
+                <p class="mt-2 text-xs text-gray-500">Tags should be comma separated.</p>
             </div>
         </form>
     </div>
@@ -169,272 +1031,64 @@
     </div>
 </div>
 
-<!--JavaScript for this page -->
-<script>
-    let currentAppId = null;
-    const canEditApplication = {{ 'true' if can_edit_application else 'false' }};
-
-    function openEditAppModal(appId) {
-        if (!canEditApplication) return;
-        currentAppId = appId;
-
-        // Loading the Data of the Application via AJAX
-        $.ajax({
-            url: `/application/${appId}`,
-            type: 'GET',
-            success: function(data) {
-                // Filling up the form with data
-                $('#appNameInput').val(data.name);
-                $('#appLinkInput').val(data.link);
-                $('#appLabelInput').val(data.label || '');
-                $('#projectDisplay').text(data.project_name || 'No project');
-                $('#projectDisplay').toggleClass('hidden', data.can_change_project);
-                $('#projectSelect').toggleClass('hidden', !data.can_change_project);
-
-                // Loading list of the projects with the dropdown list
-                if (data.can_change_project) {
-                    loadProjects(data.project_id);
-                }
-
-                // Openning the modal window
-                $('#editAppModal').removeClass('hidden').addClass('flex');
-            },
-            error: function(xhr) {
-                alert('Error loading application details');
-            }
-        });
-    }
-
-    function loadProjects(selectedProjectId) {
-        // Loading the projects via AJAX
-        $.ajax({
-            url: '/get_projects',
-            type: 'GET',
-            success: function(projects) {
-                $('#projectSelect').empty().append('<option value="">No project</option>');
-                projects.forEach(function(project) {
-                    const selected = project.id === selectedProjectId ? 'selected' : '';
-                    $('#projectSelect').append(`<option value="${project.id}" ${selected}>${project.name}</option>`);
-                });
-            },
-            error: function() {
-                alert('Error loading projects');
-            }
-        });
-    }
-
-    function closeEditAppModal() {
-        if (!canEditApplication) return;
-        $('#editAppModal').removeClass('flex').addClass('hidden');
-        $('#editAppForm')[0].reset();
-    }
-
-    function saveEditApp() {
-        if (!canEditApplication) return;
-        const appData = {
-            name: $('#appNameInput').val().trim(),
-            link: $('#appLinkInput').val().trim(),
-            label: $('#appLabelInput').val().trim(),
-        };
-        if (!$('#projectSelect').hasClass('hidden')) {
-            appData.project_id = $('#projectSelect').val();
-        }
-
-        // Processing the check
-        if (!appData.name) {
-            alert('Application name cannot be empty!');
-            return;
-        }
-
-        // Sending the new data to the BackEnd via AJAX
-        $.ajax({
-            url: `/edit_application/${currentAppId}`,
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(appData),
-            success: function() {
-                closeEditAppModal();
-                location.reload();  // Reloading page after the successful edit
-            },
-            error: function(xhr) {
-                alert('Error saving application');
-            }
-        });
-    }
-</script>
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script>
-let versionsData = [];
-let currentPage = 1;
-const versionsPerPage = 5;
-
-// Opening the modal window with the Version History
-$('#openVersionHistory').on('click', function(e) {
-    e.preventDefault();
-    const appId = $(this).data('app-id');  // Getting Application ID
-
-    // Loading the Version History via AJAX
-    $.ajax({
-        url: `/app/${appId}/versions`,
-        type: 'GET',
-        success: function(data) {
-            if (data.length > 0) {
-                versionsData = data;  // Saving all the Versions
-                displayVersions(currentPage);  // Show the first page
-                updatePaginationControls();  // Reload the pagination buttons and page numbers
-                openVersionModal();  // Open the modal window after loading the data
-            } else {
-                $('#versionContent').html('No versions available.');
-                $('#paginationControls').addClass('hidden');
-            }
-        },
-        error: function() {
-            $('#versionContent').html('Error loading version history.');
-            $('#paginationControls').addClass('hidden');
-        }
-    });
-});
-
-// Displaying the Versions based on the current page
-function displayVersions(page) {
-    let startIndex = (page - 1) * versionsPerPage;
-    let endIndex = startIndex + versionsPerPage;
-    let versionsToShow = versionsData.slice(startIndex, endIndex);
-
-    let versionList = '';
-    versionsToShow.forEach(function(version) {
-        versionList += `<div class="bg-gray-50 border border-gray-200 rounded p-4 flex items-start space-x-4">
-                            <div class="flex items-center justify-center flex-shrink-0">
-                                <img src="{{ url_for('static', filename='public/version.svg') }}" alt="Version Icon" class="version-icon w-12 h-12">
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-gray-800">Version ${version.number}</h4>
-                                <p class="text-sm text-gray-600">Released on: ${version.change_date}</p>
-                                <p class="text-sm text-gray-600">${version.notes || 'No release notes available.'}</p>
-                            </div>
-                        </div>`;
-    });
-
-    $('#versionContent').html(versionList);  // Renew the content of the modal window
-}
-
-// Renewing the pagination buttons and page numbers
-function updatePaginationControls() {
-    let totalPages = Math.ceil(versionsData.length / versionsPerPage);
-    $('#pageNumbers').html(''); // Очистка номеров страниц
-
-    // Maximum number of the page numbers to display (now it is 5)
-    const maxVisiblePages = 5;
-
-    // "Previous" Button
-    if (currentPage === 1) {
-        $('#prevPage').addClass('invisible');
-    } else {
-        $('#prevPage').removeClass('invisible');
-    }
-
-    // "Next" Button
-    if (currentPage === totalPages) {
-        $('#nextPage').addClass('invisible');
-    } else {
-        $('#nextPage').removeClass('invisible');
-    }
-
-    // Installation of the Event handlers
-    $('#prevPage').off('click').on('click', function() {
-        if (currentPage > 1) {
-            currentPage--;
-            displayVersions(currentPage);
-            updatePaginationControls();
-        }
-    });
-
-    $('#nextPage').off('click').on('click', function() {
-        if (currentPage < totalPages) {
-            currentPage++;
-            displayVersions(currentPage);
-            updatePaginationControls();
-        }
-    });
-
-    // Display of the page numbers
-    const addPageNumber = (page) => {
-        $('#pageNumbers').append(`<span class="mx-2 cursor-pointer ${page === currentPage ? 'font-bold text-yellow-500' : 'hover:text-yellow-500'}" onclick="goToPage(${page})">${page}</span>`);
-    };
-
-    // Displaying the first page
-    if (currentPage > 1) addPageNumber(1);
-
-    // Adding "..." before the current page, if needed
-    if (currentPage > maxVisiblePages) {
-        $('#pageNumbers').append('<span class="mx-2">...</span>');
-    }
-
-    // Show a few pages around the current
-    let startPage = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(totalPages - 1, currentPage + Math.floor(maxVisiblePages / 2));
-
-    for (let i = startPage; i <= endPage; i++) {
-        addPageNumber(i);
-    }
-
-    // Adding "..." after the current page, if needed
-    if (endPage < totalPages - 1) {
-        $('#pageNumbers').append('<span class="mx-2">...</span>');
-    }
-
-    // Displaying the last page
-    if (totalPages > 1 && currentPage < totalPages) addPageNumber(totalPages);
-}
-
-// Switching to the selected page
-function goToPage(page) {
-    currentPage = page;
-    displayVersions(currentPage);
-    updatePaginationControls();
-}
-
-
-// Openning the Modal Window
-function openVersionModal() {
-        $('#versionModal').removeClass('hidden').addClass('flex');
-    }
-
-// Closing the Modal Window
-function closeVersionModal() {
-        $('#versionModal').removeClass('flex').addClass('hidden');
-    }
-</script>
-
-<script>
-function copyToClipboard(elementId) {
-    var text = document.getElementById(elementId).textContent;
-    navigator.clipboard.writeText(text)
-    .then(() => {
-        var iconType = elementId.split('-')[1];
-        var button = document.querySelector('button[onclick="copyToClipboard(\'' + elementId + '\')"]');
-        var icon = button.querySelector("svg");
-        var originalSvg = icon.innerHTML;
-        icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" class="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75" /></svg>';
-        setTimeout(() => {
-            icon.innerHTML = originalSvg;
-        }, 700);
-    }, function(err) {
-        console.error('Could not copy text: ', err);
-    });
-}
-</script>
-
 <script>
     (function() {
-        // Use IIFE to prevent global scope pollution
-
-        // Get the current app ID from data attribute
         const currentAppId = $('#app-details').data('app-id');
+        const canEditApplication = {{ 'true' if can_edit_application else 'false' }};
+        const currentApplicationName = {{ app.name|tojson }};
+        const currentApplicationLink = {{ (app.link or '')|tojson }};
+        const currentApplicationLabelValue = {{ (app.label or '')|tojson }};
+        const currentApplicationLabels = {{ app_labels|tojson }};
+        const hasRepositoryLink = Boolean(currentApplicationLink);
+        let activeEditMode = 'all';
+        const currentApplicationInfo = {
+            id: currentAppId,
+            name: currentApplicationName,
+            access: {{ access_level_label|tojson }},
+            project: {{ (project_name or 'N/A')|tojson }},
+            created: {{ created_at_display|tojson }},
+            updated: {{ updated_at_display|tojson }},
+            repository: currentApplicationLink || 'N/A',
+            labels: currentApplicationLabels,
+            latestVersion: {{ (latest_version.number if latest_version else 'No versions available')|tojson }},
+            latestReleaseDate: {{ (latest_version_display if latest_version else 'N/A')|tojson }},
+            latestReleaseNotes: {{ (latest_version_notes or 'No release notes available.')|tojson }}
+        };
+        let currentRepositoryBranches = {{ repository_branches|tojson }};
 
         // Function to open the edit application modal
-        function openEditAppModal(appId) {
+        function editModeTitle(mode) {
+            return {
+                all: 'Edit Application',
+                name: 'Edit Application Name',
+                project: 'Edit Project',
+                repository: 'Edit Repository Link',
+                labels: 'Edit Labels',
+            }[mode] || 'Edit Application';
+        }
+
+        function configureEditModal(mode, data) {
+            activeEditMode = mode || 'all';
+            $('#modalTitle').text(editModeTitle(activeEditMode));
+            $('.edit-field-group').toggleClass('hidden', activeEditMode !== 'all');
+            if (activeEditMode !== 'all') {
+                $(`.edit-field-group[data-edit-section="${activeEditMode}"]`).removeClass('hidden');
+            }
+
+            const canChangeProject = Boolean(data && data.can_change_project);
+            const shouldShowProjectSelect = canChangeProject && (activeEditMode === 'all' || activeEditMode === 'project');
+            if (!canChangeProject) {
+                $('.edit-field-group[data-edit-section="project"]').addClass('hidden');
+            }
+            $('#projectDisplay').text((data && data.project_name) || 'No project');
+            $('#projectDisplay').toggleClass('hidden', shouldShowProjectSelect);
+            $('#projectSelect').toggleClass('hidden', !shouldShowProjectSelect);
+            if (shouldShowProjectSelect) {
+                loadProjects(data.project_id);
+            }
+        }
+
+        function openEditAppModal(appId, mode) {
             if (!canEditApplication) return;
             // Fetch application data via AJAX
             $.ajax({
@@ -445,14 +1099,7 @@ function copyToClipboard(elementId) {
                     $('#appNameInput').val(data.name || '');
                     $('#appLinkInput').val(data.link || '');
                     $('#appLabelInput').val(data.label || '');
-                    $('#projectDisplay').text(data.project_name || 'No project');
-                    $('#projectDisplay').toggleClass('hidden', data.can_change_project);
-                    $('#projectSelect').toggleClass('hidden', !data.can_change_project);
-            
-                    // Loading list of projects
-                    if (data.can_change_project) {
-                        loadProjects(data.project_id);
-                    }
+                    configureEditModal(mode || 'all', data);
             
                     // Opening new modal window
                     $('#editAppModal').removeClass('hidden').addClass('flex');
@@ -485,18 +1132,135 @@ function copyToClipboard(elementId) {
         function closeEditAppModal() {
             if (!canEditApplication) return;
             $('#editAppModal').removeClass('flex').addClass('hidden');
+            $('.edit-field-group').removeClass('hidden');
+            $('#modalTitle').text('Edit Application');
+            activeEditMode = 'all';
             $('#editAppForm')[0].reset();
         }
 
-        // Function to save the edited application
+        function saveApplicationData(appData, onSuccess) {
+            $.ajax({
+                url: `/edit_application/${currentAppId}`,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(appData),
+                success: onSuccess || function() {
+                    window.loadPage('application_details', currentAppId);
+                },
+                error: function(xhr) {
+                    setRepositoryLoading(false);
+                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error saving application';
+                    alert(error);
+                }
+            });
+        }
+
+        function removeApplicationLabel(labelToRemove) {
+            if (!canEditApplication) return;
+            const remainingLabels = currentApplicationLabels.filter(function(label) {
+                return label !== labelToRemove;
+            });
+            saveApplicationData({
+                name: currentApplicationName,
+                link: currentApplicationLink,
+                label: remainingLabels.join(', '),
+            });
+        }
+
+        function filterApplicationsByLabel(label) {
+            sessionStorage.setItem('applicationSearchQuery', label);
+            window.loadPage('applications');
+        }
+
+        function setRepositoryLoading(isLoading) {
+            $('#repositoryLoading').toggleClass('hidden', !isLoading);
+            $('#refreshRepositoryButton').prop('disabled', isLoading).toggleClass('opacity-50 cursor-not-allowed', isLoading);
+        }
+
+        function escapeHtml(value) {
+            return String(value || '').replace(/[&<>"']/g, function(character) {
+                return {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                }[character];
+            });
+        }
+
+        function escapeAttribute(value) {
+            return escapeHtml(value).replace(/`/g, '&#096;');
+        }
+
+        function repositoryBranchRow(branch) {
+            const branchName = escapeHtml(branch.branch_name || 'N/A');
+            const branchTitle = escapeAttribute(branch.branch_name || '');
+            const branchUrl = branch.branch_url || '';
+            const branchCell = branchUrl
+                ? `<a href="${escapeAttribute(branchUrl)}" target="_blank" rel="noopener noreferrer" class="branch-pill" title="Open branch ${branchTitle}"><span class="truncate">${branchName}</span></a>`
+                : `<span class="branch-pill"><span class="truncate">${branchName}</span></span>`;
+
+            return `
+                <tr>
+                    <td class="font-medium">${branchCell}</td>
+                    <td class="font-mono text-sm" title="${escapeAttribute(branch.commit_sha || '')}">${escapeHtml(branch.short_commit_sha || 'N/A')}</td>
+                    <td class="date-time-text">${escapeHtml(branch.last_commit_display || 'N/A')}</td>
+                    <td class="text-sm" title="${escapeAttribute(branch.full_commit_note || '')}">${escapeHtml(branch.commit_note || 'N/A')}</td>
+                </tr>
+            `;
+        }
+
+        function renderRepositoryBranches(branches) {
+            const hasBranches = Array.isArray(branches) && branches.length > 0;
+            currentRepositoryBranches = hasBranches ? branches : [];
+            $('#repositoryBranchesBody').html(hasBranches ? branches.map(repositoryBranchRow).join('') : '');
+            $('#repositoryBranchesTableWrap').toggleClass('hidden', !hasBranches);
+            $('#repositoryBranchesEmpty').toggleClass('hidden', hasBranches);
+        }
+
+        function refreshRepositoryMetadata(options) {
+            const settings = options || {};
+            if (!hasRepositoryLink) return;
+            setRepositoryLoading(true);
+            $.ajax({
+                url: `/api/application/${currentAppId}/repository/refresh`,
+                type: 'POST',
+                success: function(response) {
+                    renderRepositoryBranches(response.repository_branches || []);
+                    setRepositoryLoading(false);
+                    if (response.warning && !settings.silent) {
+                        alert(response.message || response.warning);
+                    }
+                },
+                error: function(xhr) {
+                    setRepositoryLoading(false);
+                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error refreshing repository data';
+                    if (!settings.silent) {
+                        alert(error);
+                    }
+                }
+            });
+        }
+
         function saveEditApp() {
             if (!canEditApplication) return;
             const appData = {
-                name: $('#appNameInput').val().trim(),
-                link: $('#appLinkInput').val().trim(),
-                label: $('#appLabelInput').val().trim(),
+                name: currentApplicationName,
+                link: currentApplicationLink,
+                label: currentApplicationLabelValue,
             };
-            if (!$('#projectSelect').hasClass('hidden')) {
+
+            if (activeEditMode === 'all' || activeEditMode === 'name') {
+                appData.name = $('#appNameInput').val().trim();
+            }
+            if (activeEditMode === 'all' || activeEditMode === 'repository') {
+                appData.link = $('#appLinkInput').val().trim();
+            }
+            if (activeEditMode === 'all' || activeEditMode === 'labels') {
+                appData.label = $('#appLabelInput').val().trim();
+            }
+            if ((activeEditMode === 'all' || activeEditMode === 'project') && !$('#projectSelect').hasClass('hidden')) {
                 appData.project_id = $('#projectSelect').val();
             }
 
@@ -505,18 +1269,9 @@ function copyToClipboard(elementId) {
                 return;
             }
 
-            $.ajax({
-                url: `/edit_application/${currentAppId}`,
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(appData),
-                success: function() {
-                    closeEditAppModal();
-                    window.loadPage('application_details', currentAppId); // Reload the page via AJAX
-                },
-                error: function(xhr) {
-                    alert('Error saving application');
-                }
+            saveApplicationData(appData, function() {
+                closeEditAppModal();
+                window.loadPage('application_details', currentAppId);
             });
         }
 
@@ -539,25 +1294,78 @@ function copyToClipboard(elementId) {
             });
         }
 
+        function deleteProjectAccess(membershipId) {
+            if (!membershipId || !confirm('Remove this user from the project access list?')) {
+                return;
+            }
+            $.ajax({
+                url: `/api/project_memberships/${membershipId}`,
+                type: 'DELETE',
+                success: function() {
+                    window.loadPage('application_details', currentAppId);
+                },
+                error: function(xhr) {
+                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error removing project access';
+                    alert(`Error: ${error}`);
+                }
+            });
+        }
+
+        function deleteApplicationAccess(membershipId) {
+            if (!membershipId || !confirm('Remove this user from this application access list?')) {
+                return;
+            }
+            $.ajax({
+                url: `/api/application_memberships/${membershipId}`,
+                type: 'DELETE',
+                success: function() {
+                    window.loadPage('application_details', currentAppId);
+                },
+                error: function(xhr) {
+                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error removing application access';
+                    alert(`Error: ${error}`);
+                }
+            });
+        }
+
+        function openAccessManagement() {
+            window.location.href = '/users?tab=access';
+        }
+
+        function openApplicationAccessUser(userId) {
+            if (!userId) return;
+            window.location.href = `/users?tab=access&user_id=${encodeURIComponent(userId)}`;
+        }
+
         // Variables for version history
         let versionsData = [];
         let currentPage = 1;
         const versionsPerPage = 5;
 
+        function loadVersionHistory(onSuccess, onError) {
+            $.ajax({
+                url: `/app/${currentAppId}/versions`,
+                type: 'GET',
+                success: function(data) {
+                    versionsData = Array.isArray(data) ? data : [];
+                    onSuccess(versionsData);
+                },
+                error: onError || function() {
+                    alert('Error loading version history.');
+                }
+            });
+        }
+
         // Event handler for opening version history modal
         $('#openVersionHistory').on('click', function(e) {
             e.preventDefault();
-            const appId = $(this).data('app-id');
 
-            // Fetch version history via AJAX
-            $.ajax({
-                url: `/app/${appId}/versions`,
-                type: 'GET',
-                success: function(data) {
+            loadVersionHistory(
+                function(data) {
                     if (data.length > 0) {
-                        versionsData = data;
                         currentPage = 1;
                         displayVersions(currentPage);
+                        $('#paginationControls').removeClass('hidden');
                         updatePaginationControls();
                         openVersionModal();
                     } else {
@@ -566,11 +1374,18 @@ function copyToClipboard(elementId) {
                         openVersionModal();
                     }
                 },
-                error: function() {
+                function() {
                     $('#versionContent').html('Error loading version history.');
                     $('#paginationControls').addClass('hidden');
                     openVersionModal();
                 }
+            );
+        });
+
+        $('#printVersionHistory').on('click', function(e) {
+            e.preventDefault();
+            loadVersionHistory(function(data) {
+                printVersionHistory(data);
             });
         });
 
@@ -583,15 +1398,10 @@ function copyToClipboard(elementId) {
             let versionList = '';
             versionsToShow.forEach(function(version) {
                     versionList += `
-                        <div class="bg-gray-50 border border-gray-200 rounded p-4 flex items-start space-x-4">
-                            <div class="flex items-center justify-center">
-                                <img src="{{ url_for('static', filename='public/version.svg') }}" alt="Version Icon" class="version-icon w-12 h-12">
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-gray-800">Version ${version.number}</h4>
-                                <p class="text-sm text-gray-600">Released on: ${version.change_date}</p>
-                                <p class="text-sm text-gray-600">${version.notes || 'No release notes available.'}</p>
-                            </div>
+                        <div class="bg-gray-50 border border-gray-200 rounded p-4">
+                            <h4 class="font-bold text-gray-800">Version ${version.number}</h4>
+                            <p class="date-time-text text-sm text-gray-600">Released on: ${version.change_date}</p>
+                            <p class="text-sm text-gray-600">${version.notes || 'No release notes available.'}</p>
                         </div>`;
                 });
                 
@@ -646,7 +1456,7 @@ function copyToClipboard(elementId) {
 
             for (let page = startPage; page <= endPage; page++) {
                 $('#pageNumbers').append(`
-                    <span class="mx-2 cursor-pointer ${page === currentPage ? 'font-bold text-yellow-500' : 'hover:text-yellow-500'}" onclick="goToPage(${page})">${page}</span>
+                    <span class="mx-1 cursor-pointer inline-flex h-8 w-8 items-center justify-center rounded-full ${page === currentPage ? 'pagination-page-active' : 'pagination-page-inactive'}" onclick="goToPage(${page})">${page}</span>
                 `);
             }
         }
@@ -668,13 +1478,179 @@ function copyToClipboard(elementId) {
             $('#versionModal').removeClass('flex').addClass('hidden');
         }
 
-        // Expose functions to the global scope if needed
+        function printSectionRows(rows) {
+            return rows.map(function(row) {
+                return `
+                    <tr>
+                        <th>${escapeHtml(row.label)}</th>
+                        <td>${row.html ? row.value : escapeHtml(row.value || 'N/A')}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function versionPrintRows(versions) {
+            if (!versions.length) {
+                return '<tr><td colspan="3">No versions available.</td></tr>';
+            }
+            return versions.map(function(version) {
+                return `
+                    <tr>
+                        <td>${escapeHtml(version.number || 'N/A')}</td>
+                        <td>${escapeHtml(version.change_date || 'N/A')}</td>
+                        <td>${escapeHtml(version.notes || 'No release notes available.')}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function repositoryPrintRows(branches) {
+            if (!branches.length) {
+                return '<tr><td colspan="4">No repository branch data available.</td></tr>';
+            }
+            return branches.map(function(branch) {
+                const branchLabel = branch.branch_url
+                    ? `<a href="${escapeAttribute(branch.branch_url)}">${escapeHtml(branch.branch_name || 'N/A')}</a>`
+                    : escapeHtml(branch.branch_name || 'N/A');
+                return `
+                    <tr>
+                        <td>${branchLabel}</td>
+                        <td>${escapeHtml(branch.short_commit_sha || 'N/A')}</td>
+                        <td>${escapeHtml(branch.last_commit_display || 'N/A')}</td>
+                        <td>${escapeHtml(branch.commit_note || 'N/A')}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function printVersionHistory(versions) {
+            const labels = currentApplicationInfo.labels.length
+                ? currentApplicationInfo.labels.join(', ')
+                : 'No labels assigned';
+            const repositoryHtml = currentApplicationLink
+                ? `<a href="${escapeAttribute(currentApplicationLink)}">${escapeHtml(currentApplicationLink)}</a>`
+                : 'N/A';
+            const reportHtml = `
+                <!doctype html>
+                <html>
+                <head>
+                    <meta charset="utf-8">
+                    <title>${escapeHtml(currentApplicationInfo.name)} Release History</title>
+                    <style>
+                        body { color: #111827; font-family: Arial, sans-serif; margin: 32px; }
+                        h1 { font-size: 26px; margin: 0 0 6px; }
+                        h2 { border-bottom: 1px solid #d1d5db; font-size: 18px; margin: 28px 0 10px; padding-bottom: 6px; }
+                        p { margin: 4px 0; }
+                        table { border-collapse: collapse; margin-top: 10px; width: 100%; }
+                        th, td { border: 1px solid #d1d5db; padding: 8px; text-align: left; vertical-align: top; }
+                        th { background: #f3f4f6; font-weight: 700; }
+                        .meta th { width: 32%; }
+                        .notes { white-space: pre-wrap; }
+                        a { color: #92400e; }
+                        @media print { body { margin: 18mm; } }
+                    </style>
+                </head>
+                <body>
+                    <h1>${escapeHtml(currentApplicationInfo.name)} Release History</h1>
+                    <p>Printed on ${escapeHtml(new Date().toLocaleString())}</p>
+
+                    <h2>Application</h2>
+                    <table class="meta">
+                        <tbody>
+                            ${printSectionRows([
+                                { label: 'Application ID', value: String(currentApplicationInfo.id) },
+                                { label: 'Access', value: currentApplicationInfo.access },
+                                { label: 'Project', value: currentApplicationInfo.project },
+                                { label: 'Repository', value: repositoryHtml, html: true },
+                                { label: 'Labels', value: labels },
+                                { label: 'Created', value: currentApplicationInfo.created },
+                                { label: 'Updated', value: currentApplicationInfo.updated },
+                                { label: 'Latest Release', value: currentApplicationInfo.latestVersion },
+                                { label: 'Latest Release Date', value: currentApplicationInfo.latestReleaseDate },
+                                { label: 'Latest Release Notes', value: currentApplicationInfo.latestReleaseNotes }
+                            ])}
+                        </tbody>
+                    </table>
+
+                    <h2>Releases</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Version</th>
+                                <th>Date</th>
+                                <th>Release Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>${versionPrintRows(versions)}</tbody>
+                    </table>
+
+                    <h2>Repository Branches</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Branch</th>
+                                <th>Commit SHA</th>
+                                <th>Last Commit</th>
+                                <th>Commit Note</th>
+                            </tr>
+                        </thead>
+                        <tbody>${repositoryPrintRows(currentRepositoryBranches)}</tbody>
+                    </table>
+                </body>
+                </html>
+            `;
+            const printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                alert('Allow pop-ups to print the release history.');
+                return;
+            }
+            printWindow.document.open();
+            printWindow.document.write(reportHtml);
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(function() {
+                printWindow.print();
+            }, 100);
+        }
+
+        function copyToClipboard(elementId) {
+            const source = document.getElementById(elementId);
+            if (!source) return;
+
+            navigator.clipboard.writeText(source.textContent).then(function() {
+                const button = document.querySelector(`button[onclick="copyToClipboard('${elementId}')"]`);
+                if (!button) return;
+                const originalText = button.textContent;
+                button.textContent = 'Copied';
+                setTimeout(function() {
+                    button.textContent = originalText;
+                }, 800);
+            }, function(error) {
+                console.error('Could not copy text: ', error);
+            });
+        }
+
         window.openEditAppModal = openEditAppModal;
         window.closeEditAppModal = closeEditAppModal;
         window.saveEditApp = saveEditApp;
         window.deleteApplication = deleteApplication;
+        window.deleteProjectAccess = deleteProjectAccess;
+        window.deleteApplicationAccess = deleteApplicationAccess;
+        window.openAccessManagement = openAccessManagement;
+        window.openApplicationAccessUser = openApplicationAccessUser;
         window.goToPage = goToPage;
-    })(); // End of IIFE
+        window.closeVersionModal = closeVersionModal;
+        window.copyToClipboard = copyToClipboard;
+        window.removeApplicationLabel = removeApplicationLabel;
+        window.filterApplicationsByLabel = filterApplicationsByLabel;
+        window.refreshRepositoryMetadata = refreshRepositoryMetadata;
+
+        $(function() {
+            if (!currentRepositoryBranches.length) {
+                refreshRepositoryMetadata({ silent: true });
+            }
+        });
+    })();
 
 
 </script>
@@ -697,7 +1673,7 @@ function copyToClipboard(elementId) {
             </div>
             <div>
                 <h4 class="text-sm font-semibold text-gray-600">Created At:</h4>
-                <p id="modalProjectCreatedAt" class="text-sm text-gray-700">Project creation date will appear here...</p>
+                <p id="modalProjectCreatedAt" class="date-time-text text-sm text-gray-700">Project creation date will appear here...</p>
             </div>
             <div>
                 <h4 class="text-sm font-semibold text-gray-600">Source Link:</h4>

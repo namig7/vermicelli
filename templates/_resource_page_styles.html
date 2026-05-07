@@ -37,10 +37,19 @@
     }
 
     .resource-page .tab-link {
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
         padding: 0.5rem 1rem;
         border-radius: 0.5rem;
+        font-weight: 600;
         transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .resource-page .tab-link svg {
+        width: 1.25rem;
+        height: 1.25rem;
+        flex: 0 0 auto;
     }
 
     .resource-page .tab-link.active,
@@ -155,6 +164,23 @@
         flex-shrink: 0;
     }
 
+    .pagination-page-active {
+        background-color: var(--resource-accent-soft, #fef3c7);
+        color: var(--resource-accent-text, #b45309);
+        font-weight: 600;
+    }
+
+    .pagination-page-inactive {
+        border: 1px solid var(--resource-border, #e5e7eb);
+        background-color: var(--resource-surface, #ffffff);
+        color: var(--resource-muted, #6b7280);
+    }
+
+    .pagination-page-inactive:hover {
+        background-color: var(--resource-accent-soft, #fef3c7);
+        color: var(--resource-accent-text, #b45309);
+    }
+
     .resource-page .responsive-table-wrap {
         overflow: hidden;
         border-radius: 0.75rem;
@@ -188,6 +214,13 @@
     .resource-page .responsive-table .col-access {
         width: 5.75rem;
         text-align: center;
+    }
+
+    .resource-page .date-time-text,
+    .resource-page time {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0;
     }
 
     .resource-page .responsive-table .col-access,
@@ -224,11 +257,18 @@
         height: 2.25rem;
         border-radius: 9999px;
         flex: 0 0 auto;
+        color: var(--resource-muted);
         transition: background-color 0.2s ease, color 0.2s ease;
     }
 
     .resource-page .table-action-button:hover {
         background-color: var(--resource-accent-soft);
+        color: var(--resource-accent-text);
+    }
+
+    .resource-page .table-action-button.delete-button:hover {
+        background-color: #fee2e2;
+        color: #dc2626;
     }
 
     .resource-page .table-action-button svg {
@@ -421,11 +461,33 @@
 
     html[data-theme="dark"] .resource-page .table-action-button:hover {
         background-color: #374151;
+        color: #fef3c7;
+    }
+
+    html[data-theme="dark"] .resource-page .table-action-button.delete-button:hover {
+        background-color: #7f1d1d;
+        color: #fee2e2;
     }
 
     html[data-theme="dark"] .resource-page .tab-link.active {
         background-color: var(--resource-accent);
         color: #111827;
+    }
+
+    html[data-theme="dark"] .pagination-page-active {
+        background-color: var(--resource-accent, #f59e0b);
+        color: #111827;
+    }
+
+    html[data-theme="dark"] .pagination-page-inactive {
+        background-color: #111827;
+        border-color: #4b5563;
+        color: #e5e7eb;
+    }
+
+    html[data-theme="dark"] .pagination-page-inactive:hover {
+        background-color: #374151;
+        color: #fef3c7;
     }
 
     html[data-theme="dark"] .resource-page .btn-primary,

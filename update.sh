@@ -5,6 +5,7 @@ DEFAULT_BASE_URL="http://localhost:8000"
 DEFAULT_USERNAME="admin"
 DEFAULT_PASSWORD="password"
 DEFAULT_APP_ID=1
+DEFAULT_RELEASE_NOTES="No release notes available."
 
 # Parse arguments and flags
 while [[ $# -gt 0 ]]; do
@@ -29,6 +30,10 @@ while [[ $# -gt 0 ]]; do
             BASE_URL="$2"
             shift 2
             ;;
+        --releasenotes)
+            RELEASE_NOTES="$2"
+            shift 2
+            ;;
         *)
             echo "Error: Invalid argument '$1'"
             exit 1
@@ -41,6 +46,7 @@ BASE_URL=${BASE_URL:-$DEFAULT_BASE_URL}
 USERNAME=${USERNAME:-$DEFAULT_USERNAME}
 PASSWORD=${PASSWORD:-$DEFAULT_PASSWORD}
 APP_ID=${APP_ID:-$DEFAULT_APP_ID}
+RELEASE_NOTES=${RELEASE_NOTES:-${CI_COMMIT_MESSAGE:-${GITHUB_EVENT_HEAD_COMMIT_MESSAGE:-${GITEA_COMMIT_MESSAGE:-$DEFAULT_RELEASE_NOTES}}}}
 
 # Ensure the required flag `--version` is provided
 if [ -z "$VERSION_PART" ]; then
@@ -77,9 +83,14 @@ update_version() {
     echo "Using token: $TOKEN" >&2
     
     echo "Updating $VERSION_PART version for application ID $APP_ID..."
+    PAYLOAD=$(jq -n \
+        --arg version_part "$VERSION_PART" \
+        --arg releasenotes "$RELEASE_NOTES" \
+        '{version_part: $version_part, releasenotes: $releasenotes}')
+
     RESPONSE=$(curl -s -X POST -H "Content-Type: application/json" \
         -H "Authorization: Bearer $TOKEN" \
-        -d "{\"version_part\": \"$VERSION_PART\"}" \
+        -d "$PAYLOAD" \
         "$BASE_URL$UPDATE_ENDPOINT")
     
     echo "Response: $RESPONSE" >&2
@@ -97,4 +108,3 @@ update_version() {
 # Main script execution
 JWT_TOKEN=$(get_jwt_token)
 update_version "$JWT_TOKEN"
-

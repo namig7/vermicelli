@@ -5,10 +5,13 @@ import hashlib
 import hmac
 import secrets
 from dotenv import load_dotenv
-from datetime import datetime
+from datetime import datetime, timezone
 from functools import wraps
 import logging
 import re  # for URL validation
+from urllib.error import HTTPError, URLError
+from urllib.parse import quote, unquote, urlparse
+from urllib.request import Request, urlopen
 from pathlib import Path
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError, available_timezones
 from flask import Flask, request, jsonify, render_template, redirect, url_for, session, flash, Response
@@ -86,6 +89,7 @@ PROJECT_ACCESS_LEVELS = (ACCESS_VIEW_ONLY, ACCESS_READ_WRITE)
 APPLICATION_ACCESS_LEVELS = (ACCESS_NO_ACCESS, ACCESS_VIEW_ONLY, ACCESS_READ_WRITE)
 DEFAULT_TIMEZONE = 'UTC'
 DEFAULT_DATETIME_FORMAT = 'iso_24'
+DEFAULT_RELEASE_NOTES = 'No release notes available.'
 DATETIME_FORMAT_OPTIONS = {
     'iso_24': {
         'label': '2026-04-28 14:30',
@@ -131,7 +135,14 @@ PREFERRED_TIMEZONES = (
     'Asia/Dubai',
     'Asia/Tokyo',
 )
+
+
+def utc_now():
+    return datetime.now(timezone.utc).replace(tzinfo=None)
+
+
 _USER_SCHEMA_READY = False
+_REPOSITORY_BRANCH_SCHEMA_READY = False
 _DATABASE_SCHEMA_READY_URI = None
 BACKUP_FORMAT = 'vermicelli-backup'
 BACKUP_VERSION = 1
@@ -256,6 +267,36 @@ def ensure_user_schema():
         logging.warning("Could not verify user preference schema: %s", error)
 
 
+def ensure_repository_branch_schema():
+    """Adds cached repository metadata columns for existing databases."""
+    global _REPOSITORY_BRANCH_SCHEMA_READY
+    if _REPOSITORY_BRANCH_SCHEMA_READY:
+        return
+    try:
+        inspector = inspect(db.engine)
+        if 'application_repository_branches' not in inspector.get_table_names():
+            return
+        existing_columns = {column['name'] for column in inspector.get_columns('application_repository_branches')}
+        datetime_column_type = 'TIMESTAMP' if db.engine.dialect.name == 'postgresql' else 'DATETIME'
+        column_definitions = {
+            'branch_url': 'VARCHAR(512)',
+            'commit_note': 'TEXT',
+            'last_commit_at': datetime_column_type,
+            'branch_status': "VARCHAR(50) NOT NULL DEFAULT 'active'",
+            'build_status': "VARCHAR(50) NOT NULL DEFAULT 'unknown'",
+        }
+        for column_name, column_definition in column_definitions.items():
+            if column_name not in existing_columns:
+                db.session.execute(text(
+                    f"ALTER TABLE application_repository_branches ADD COLUMN {column_name} {column_definition}"
+                ))
+        db.session.commit()
+        _REPOSITORY_BRANCH_SCHEMA_READY = True
+    except Exception as error:
+        db.session.rollback()
+        logging.warning("Could not verify repository metadata schema: %s", error)
+
+
 def ensure_database_schema():
     """Creates missing tables once for the active database URI."""
     global _DATABASE_SCHEMA_READY_URI
@@ -274,6 +315,7 @@ def ensure_database_schema():
 def ensure_runtime_schema():
     ensure_database_schema()
     ensure_user_schema()
+    ensure_repository_branch_schema()
 
 
 def json_error(message, status_code=403):
@@ -694,7 +736,7 @@ def apply_setup_runtime_config(values):
     if not database_config:
         return
 
-    global _USER_SCHEMA_READY, _DATABASE_SCHEMA_READY_URI
+    global _USER_SCHEMA_READY, _REPOSITORY_BRANCH_SCHEMA_READY, _DATABASE_SCHEMA_READY_URI
     database_uri = database_uri_from_setup_config(database_config)
     db.session.remove()
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
@@ -716,6 +758,7 @@ def apply_setup_runtime_config(values):
     db._apply_driver_defaults(engine_options, app)
     engines[None] = db._make_engine(None, engine_options, app)
     _USER_SCHEMA_READY = False
+    _REPOSITORY_BRANCH_SCHEMA_READY = False
     _DATABASE_SCHEMA_READY_URI = None
 
 
@@ -744,7 +787,45 @@ def backup_validation_summary(data):
         'projects': len(data.get('projects', [])),
         'applications': len(data.get('applications', [])),
         'versions': len(data.get('versions', [])),
+        'repository_branches': len(data.get('application_repository_branches', [])),
     }
+
+
+def application_labels(label_value):
+    return [
+        label.strip()
+        for label in re.split(r'[,;]', label_value or '')
+        if label.strip()
+    ]
+
+
+def release_notes_from_payload(payload):
+    payload = payload or {}
+    git_payload = payload.get('git') if isinstance(payload.get('git'), dict) else {}
+    for source in (payload, git_payload):
+        for key in (
+            'release_notes',
+            'releasenotes',
+            'releaseNotes',
+            'git_release_notes',
+            'notes',
+            'changelog',
+            'commit_message',
+            'CI_COMMIT_MESSAGE',
+            'GITHUB_EVENT_HEAD_COMMIT_MESSAGE',
+            'GITEA_COMMIT_MESSAGE',
+        ):
+            value = source.get(key)
+            if value:
+                return str(value).strip()
+    return DEFAULT_RELEASE_NOTES
+
+
+def commit_title(commit_note):
+    title = str(commit_note or '').splitlines()[0].strip()
+    if len(title) > 30:
+        return title[:30].rstrip() + '...'
+    return title
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -944,6 +1025,30 @@ class Application(db.Model):
 
     projects = db.relationship('Project', secondary=project_applications, back_populates='applications')
     memberships = db.relationship('ApplicationMembership', back_populates='application', cascade='all, delete-orphan')
+    repository_branches = db.relationship('ApplicationRepositoryBranch', back_populates='application', cascade='all, delete-orphan')
+
+
+class ApplicationRepositoryBranch(db.Model):
+    """Cached repository branch metadata for an application link."""
+    __tablename__ = 'application_repository_branches'
+    __table_args__ = (
+        db.UniqueConstraint('application_id', 'branch_name', name='uq_application_repository_branch'),
+    )
+
+    id = db.Column(db.Integer, primary_key=True)
+    application_id = db.Column(db.Integer, db.ForeignKey('application.id', ondelete='CASCADE'), nullable=False)
+    provider = db.Column(db.String(50), nullable=False)
+    branch_name = db.Column(db.String(255), nullable=False)
+    branch_url = db.Column(db.String(512))
+    commit_sha = db.Column(db.String(128))
+    commit_note = db.Column(db.Text)
+    last_commit_at = db.Column(db.DateTime)
+    branch_status = db.Column(db.String(50), nullable=False, default='active')
+    build_status = db.Column(db.String(50), nullable=False, default='unknown')
+    is_default = db.Column(db.Boolean, nullable=False, default=False)
+    last_checked_at = db.Column(db.DateTime, nullable=False, default=utc_now)
+
+    application = db.relationship('Application', back_populates='repository_branches')
 
 class Version(db.Model):
     """Represents a version of an application."""
@@ -976,6 +1081,235 @@ def is_valid_url(url: str) -> bool:
         return True  # if we want to allow empty
     pattern = r'^https?://'
     return bool(re.match(pattern, url.strip()))
+
+
+def normalized_repository_path(path):
+    path = unquote(path or '').strip('/')
+    if path.endswith('.git'):
+        path = path[:-4]
+    return path
+
+
+def repository_headers(provider):
+    headers = {
+        'Accept': 'application/json',
+        'User-Agent': 'Vermicelli repository metadata sync',
+    }
+    if provider == 'github' and os.environ.get('GITHUB_TOKEN'):
+        headers['Authorization'] = f"Bearer {os.environ['GITHUB_TOKEN']}"
+    elif provider == 'gitlab' and os.environ.get('GITLAB_TOKEN'):
+        headers['PRIVATE-TOKEN'] = os.environ['GITLAB_TOKEN']
+    elif provider == 'gitea' and os.environ.get('GITEA_TOKEN'):
+        headers['Authorization'] = f"token {os.environ['GITEA_TOKEN']}"
+    return headers
+
+
+def fetch_repository_json(url, provider):
+    request_obj = Request(url, headers=repository_headers(provider))
+    with urlopen(request_obj, timeout=8) as response:
+        return json.loads(response.read().decode('utf-8'))
+
+
+def parse_repository_datetime(value):
+    if not value:
+        return None
+    try:
+        normalized_value = str(value)
+        if normalized_value.endswith('Z'):
+            normalized_value = normalized_value[:-1] + '+00:00'
+        parsed_value = datetime.fromisoformat(normalized_value)
+        if parsed_value.tzinfo is not None:
+            parsed_value = parsed_value.astimezone(timezone.utc).replace(tzinfo=None)
+        return parsed_value
+    except ValueError:
+        return None
+
+
+def repository_branch_status(branch, default_branch):
+    if branch.get('default') or (branch.get('name') and branch.get('name') == default_branch):
+        return 'default'
+    if branch.get('protected'):
+        return 'protected'
+    return 'active'
+
+
+def repository_branch_url(parsed_url, provider, path, branch_name):
+    encoded_branch = quote(branch_name, safe='')
+    if provider == 'github':
+        return f'{parsed_url.scheme}://{parsed_url.netloc}/{path}/tree/{encoded_branch}'
+    if provider == 'gitlab':
+        return f'{parsed_url.scheme}://{parsed_url.netloc}/{path}/-/tree/{encoded_branch}'
+    return f'{parsed_url.scheme}://{parsed_url.netloc}/{path}/src/branch/{encoded_branch}'
+
+
+def github_repository_branches(parsed_url, path, checked_at):
+    parts = path.split('/')
+    if len(parts) < 2:
+        return []
+    owner, repo = parts[0], parts[1]
+    api_base = f'https://api.github.com/repos/{quote(owner)}/{quote(repo)}'
+    repo_data = fetch_repository_json(api_base, 'github')
+    default_branch = repo_data.get('default_branch')
+    branches = fetch_repository_json(f'{api_base}/branches?per_page=100', 'github')
+    results = []
+    for branch in branches:
+        branch_name = branch.get('name')
+        if not branch_name:
+            continue
+        commit_sha = (branch.get('commit') or {}).get('sha') or ''
+        commit_data = fetch_repository_json(f'{api_base}/commits/{quote(commit_sha, safe="")}', 'github') if commit_sha else {}
+        commit_details = commit_data.get('commit') or {}
+        committer = commit_details.get('committer') or {}
+        author = commit_details.get('author') or {}
+        results.append({
+            'provider': 'github',
+            'branch_name': branch_name,
+            'branch_url': repository_branch_url(parsed_url, 'github', path, branch_name),
+            'commit_sha': commit_sha,
+            'commit_note': commit_details.get('message') or '',
+            'last_commit_at': parse_repository_datetime(committer.get('date') or author.get('date')),
+            'branch_status': repository_branch_status(branch, default_branch),
+            'is_default': branch_name == default_branch,
+            'last_checked_at': checked_at,
+        })
+    return results
+
+
+def gitlab_repository_branches(parsed_url, path, checked_at):
+    api_base = f'{parsed_url.scheme}://{parsed_url.netloc}/api/v4'
+    project_id = quote(path, safe='')
+    branches = fetch_repository_json(f'{api_base}/projects/{project_id}/repository/branches?per_page=100', 'gitlab')
+    results = []
+    for branch in branches:
+        branch_name = branch.get('name')
+        if not branch_name:
+            continue
+        commit_data = branch.get('commit') or {}
+        results.append({
+            'provider': 'gitlab',
+            'branch_name': branch_name,
+            'branch_url': repository_branch_url(parsed_url, 'gitlab', path, branch_name),
+            'commit_sha': commit_data.get('id') or '',
+            'commit_note': commit_data.get('message') or commit_data.get('title') or '',
+            'last_commit_at': parse_repository_datetime(commit_data.get('committed_date') or commit_data.get('authored_date')),
+            'branch_status': repository_branch_status(branch, None),
+            'build_status': 'unknown',
+            'is_default': bool(branch.get('default')),
+            'last_checked_at': checked_at,
+        })
+    return results
+
+
+def gitea_repository_branches(parsed_url, path, checked_at):
+    parts = path.split('/')
+    if len(parts) < 2:
+        return []
+    owner, repo = parts[0], parts[1]
+    api_base = f'{parsed_url.scheme}://{parsed_url.netloc}/api/v1/repos/{quote(owner)}/{quote(repo)}'
+    repo_data = fetch_repository_json(api_base, 'gitea')
+    default_branch = repo_data.get('default_branch')
+    branches = fetch_repository_json(f'{api_base}/branches?limit=100', 'gitea')
+    results = []
+    for branch in branches:
+        branch_name = branch.get('name')
+        if not branch_name:
+            continue
+        commit_data = branch.get('commit') or {}
+        commit_details = commit_data.get('commit') or commit_data
+        committer = commit_details.get('committer') or {}
+        author = commit_details.get('author') or {}
+        results.append({
+            'provider': 'gitea',
+            'branch_name': branch_name,
+            'branch_url': repository_branch_url(parsed_url, 'gitea', path, branch_name),
+            'commit_sha': commit_data.get('id') or commit_data.get('sha') or '',
+            'commit_note': commit_details.get('message') or '',
+            'last_commit_at': parse_repository_datetime(
+                commit_data.get('timestamp') or commit_details.get('created') or committer.get('date') or author.get('date')
+            ),
+            'branch_status': repository_branch_status(branch, default_branch),
+            'build_status': 'unknown',
+            'is_default': branch_name == default_branch,
+            'last_checked_at': checked_at,
+        })
+    return results
+
+
+def fetch_repository_branches(repository_url):
+    parsed_url = urlparse(repository_url or '')
+    path = normalized_repository_path(parsed_url.path)
+    if not parsed_url.scheme or not parsed_url.netloc or not path:
+        return []
+
+    checked_at = utc_now()
+    host = parsed_url.netloc.lower()
+    if host == 'github.com':
+        return github_repository_branches(parsed_url, path, checked_at)
+    if 'gitlab' in host:
+        return gitlab_repository_branches(parsed_url, path, checked_at)
+    return gitea_repository_branches(parsed_url, path, checked_at)
+
+
+def sync_application_repository_branches(app_obj):
+    if not app_obj.link:
+        if app_obj.id is not None:
+            ApplicationRepositoryBranch.query.filter_by(application_id=app_obj.id).delete(synchronize_session='fetch')
+            db.session.flush()
+            db.session.expire(app_obj, ['repository_branches'])
+        else:
+            app_obj.repository_branches.clear()
+        return True, None
+
+    try:
+        branches = fetch_repository_branches(app_obj.link)
+    except (HTTPError, URLError, TimeoutError, ValueError, json.JSONDecodeError) as error:
+        logging.warning("Could not fetch repository metadata for application %s: %s", app_obj.id, error)
+        return False, str(error)
+
+    if app_obj.id is not None:
+        ApplicationRepositoryBranch.query.filter_by(application_id=app_obj.id).delete(synchronize_session='fetch')
+        db.session.flush()
+        db.session.expire(app_obj, ['repository_branches'])
+    else:
+        app_obj.repository_branches.clear()
+
+    seen_branch_names = set()
+    for branch in branches:
+        branch_name = branch['branch_name']
+        if branch_name in seen_branch_names:
+            continue
+        seen_branch_names.add(branch_name)
+        app_obj.repository_branches.append(ApplicationRepositoryBranch(
+            provider=branch['provider'],
+            branch_name=branch_name,
+            branch_url=branch.get('branch_url') or '',
+            commit_sha=branch['commit_sha'],
+            commit_note=branch.get('commit_note') or '',
+            last_commit_at=branch.get('last_commit_at'),
+            branch_status=branch['branch_status'],
+            build_status=branch.get('build_status') or 'unknown',
+            is_default=branch['is_default'],
+            last_checked_at=branch['last_checked_at'],
+        ))
+    return True, None
+
+
+def serialize_repository_branch(branch, user=None):
+    return {
+        'provider': branch.provider,
+        'branch_name': branch.branch_name,
+        'branch_url': branch.branch_url or '',
+        'commit_sha': branch.commit_sha or '',
+        'short_commit_sha': (branch.commit_sha or '')[:12],
+        'commit_note': commit_title(branch.commit_note),
+        'full_commit_note': branch.commit_note or '',
+        'last_commit_at': branch.last_commit_at.isoformat() if branch.last_commit_at else None,
+        'last_commit_display': format_datetime_for_user(branch.last_commit_at, user) if branch.last_commit_at else 'N/A',
+        'branch_status': branch.branch_status or 'active',
+        'is_default': bool(branch.is_default),
+        'last_checked_at': branch.last_checked_at.isoformat() if branch.last_checked_at else None,
+        'last_checked_display': format_datetime_for_user(branch.last_checked_at, user) if branch.last_checked_at else 'N/A',
+    }
 
 
 def backup_datetime(value):
@@ -1105,6 +1439,7 @@ def database_has_any_data():
         Project.query.count(),
         Application.query.count(),
         Version.query.count(),
+        ApplicationRepositoryBranch.query.count(),
         ProjectMembership.query.count(),
         ApplicationMembership.query.count(),
     ]
@@ -1169,6 +1504,23 @@ def serialize_backup_payload():
                     'notes': version.notes or '',
                 }
                 for version in Version.query.order_by(Version.id).all()
+            ],
+            'application_repository_branches': [
+                {
+                    'id': branch.id,
+                    'application_id': branch.application_id,
+                    'provider': branch.provider,
+                    'branch_name': branch.branch_name,
+                    'branch_url': branch.branch_url or '',
+                    'commit_sha': branch.commit_sha or '',
+                    'commit_note': branch.commit_note or '',
+                    'last_commit_at': backup_datetime(branch.last_commit_at),
+                    'branch_status': branch.branch_status or 'active',
+                    'build_status': branch.build_status or 'unknown',
+                    'is_default': bool(branch.is_default),
+                    'last_checked_at': backup_datetime(branch.last_checked_at),
+                }
+                for branch in ApplicationRepositoryBranch.query.order_by(ApplicationRepositoryBranch.id).all()
             ],
             'project_applications': [
                 {
@@ -1258,6 +1610,7 @@ def get_backup_data(payload):
         'projects',
         'applications',
         'versions',
+        'application_repository_branches',
         'project_applications',
         'project_memberships',
         'application_memberships',
@@ -1294,6 +1647,9 @@ def validate_backup_data(data):
     _, error = backup_section_ids(data['versions'], 'versions')
     if error:
         return error
+    _, error = backup_section_ids(data['application_repository_branches'], 'application_repository_branches')
+    if error:
+        return error
     _, error = backup_section_ids(data['project_memberships'], 'project_memberships')
     if error:
         return error
@@ -1314,6 +1670,9 @@ def validate_backup_data(data):
     for version in data['versions']:
         if version.get('application_id') not in application_ids:
             return 'Backup contains a version for an unknown application.'
+    for branch in data['application_repository_branches']:
+        if branch.get('application_id') not in application_ids:
+            return 'Backup contains repository metadata for an unknown application.'
     for link in data['project_applications']:
         if link.get('project_id') not in project_ids or link.get('application_id') not in application_ids:
             return 'Backup contains an invalid project/application link.'
@@ -1331,6 +1690,7 @@ def clear_application_data():
     db.session.execute(project_applications.delete())
     ApplicationMembership.query.delete(synchronize_session=False)
     ProjectMembership.query.delete(synchronize_session=False)
+    ApplicationRepositoryBranch.query.delete(synchronize_session=False)
     Version.query.delete(synchronize_session=False)
     Application.query.delete(synchronize_session=False)
     Project.query.delete(synchronize_session=False)
@@ -1342,7 +1702,7 @@ def clear_application_data():
 def reset_primary_key_sequences():
     if db.engine.dialect.name != 'postgresql':
         return
-    for table_name in ('users', 'project', 'application', 'version', 'project_memberships', 'application_memberships'):
+    for table_name in ('users', 'project', 'application', 'version', 'application_repository_branches', 'project_memberships', 'application_memberships'):
         quoted_table_name = f'"{table_name}"'
         db.session.execute(text(
             f"SELECT setval(pg_get_serial_sequence('{quoted_table_name}', 'id'), "
@@ -1420,6 +1780,22 @@ def import_backup_payload(payload):
                 version_type=row.get('version_type') or '',
                 change_date=parse_backup_datetime(row.get('change_date')) or datetime.utcnow(),
                 notes=row.get('notes') or '',
+            ))
+
+        for row in data['application_repository_branches']:
+            db.session.add(ApplicationRepositoryBranch(
+                id=row['id'],
+                application_id=row['application_id'],
+                provider=row.get('provider') or 'unknown',
+                branch_name=row.get('branch_name') or '',
+                branch_url=row.get('branch_url') or '',
+                commit_sha=row.get('commit_sha') or '',
+                commit_note=row.get('commit_note') or '',
+                last_commit_at=parse_backup_datetime(row.get('last_commit_at')),
+                branch_status=row.get('branch_status') or 'active',
+                build_status=row.get('build_status') or 'unknown',
+                is_default=bool(row.get('is_default', False)),
+                last_checked_at=parse_backup_datetime(row.get('last_checked_at')) or datetime.utcnow(),
             ))
 
         for row in data['project_memberships']:
@@ -1519,6 +1895,7 @@ def application_details_content(app_id):
         return json_error('You do not have access to this application.', 403)
     latest_version = Version.query.filter_by(application_id=app_id).order_by(Version.change_date.desc()).first()
     latest_version_display = format_datetime_for_user(latest_version.change_date, current) if latest_version else None
+    version_count = Version.query.filter_by(application_id=app_id).count()
     project_name = app_obj.projects[0].name if app_obj.projects else None
     project_id = app_obj.projects[0].id if app_obj.projects else None
     app_access_level = application_access_level_for_user(current, app_obj)
@@ -1528,9 +1905,20 @@ def application_details_content(app_id):
         app=app_obj,
         latest_version=latest_version,
         latest_version_display=latest_version_display,
+        latest_version_notes=latest_version.notes if latest_version and latest_version.notes else '',
+        version_count=version_count,
+        app_labels=application_labels(app_obj.label),
+        repository_branches=[
+            serialize_repository_branch(branch, current)
+            for branch in sorted(app_obj.repository_branches, key=lambda item: (not item.is_default, item.branch_name.lower()))
+        ],
         project_name=project_name,
         project_id=project_id,
+        created_at_display=format_datetime_for_user(app_obj.created_at, current) if app_obj.created_at else 'N/A',
+        updated_at_display=format_datetime_for_user(app_obj.updated_at, current) if app_obj.updated_at else 'N/A',
         can_edit_application=can_write_application(current, app_obj),
+        can_change_project=has_platform_role(current, PLATFORM_ADMIN),
+        access_summary=serialize_application_access_summary(app_obj, current),
         access_level_label=access_label(app_access_level)
     )
 
@@ -1545,6 +1933,7 @@ def application_details_page(app_id):
     project_id = app_obj.projects[0].id if app_obj.projects else None
     latest_version = Version.query.filter_by(application_id=app_obj.id).order_by(Version.change_date.desc()).first()
     latest_version_display = format_datetime_for_user(latest_version.change_date, current) if latest_version else None
+    version_count = Version.query.filter_by(application_id=app_obj.id).count()
     app_access_level = application_access_level_for_user(current, app_obj)
     return render_template(
         'application_details.html',
@@ -1553,7 +1942,18 @@ def application_details_page(app_id):
         project_id=project_id,
         latest_version=latest_version,
         latest_version_display=latest_version_display,
+        latest_version_notes=latest_version.notes if latest_version and latest_version.notes else '',
+        version_count=version_count,
+        app_labels=application_labels(app_obj.label),
+        repository_branches=[
+            serialize_repository_branch(branch, current)
+            for branch in sorted(app_obj.repository_branches, key=lambda item: (not item.is_default, item.branch_name.lower()))
+        ],
+        created_at_display=format_datetime_for_user(app_obj.created_at, current) if app_obj.created_at else 'N/A',
+        updated_at_display=format_datetime_for_user(app_obj.updated_at, current) if app_obj.updated_at else 'N/A',
         can_edit_application=can_write_application(current, app_obj),
+        can_change_project=has_platform_role(current, PLATFORM_ADMIN),
+        access_summary=serialize_application_access_summary(app_obj, current),
         access_level_label=access_label(app_access_level)
     )
 
@@ -1578,6 +1978,10 @@ def get_application(app_id):
         'name': app_obj.name,
         'link': app_obj.link,
         'label': app_obj.label,
+        'repository_branches': [
+            serialize_repository_branch(branch, current)
+            for branch in sorted(app_obj.repository_branches, key=lambda item: (not item.is_default, item.branch_name.lower()))
+        ],
         'project_id': project.id if project else None,
         'project_name': project.name if project else 'No project',
         'access_level': app_access_level,
@@ -1587,6 +1991,40 @@ def get_application(app_id):
         'can_change_project': has_platform_role(current, PLATFORM_ADMIN)
     }
     return jsonify(app_data)
+
+
+@app.route('/api/application/<int:app_id>/repository/refresh', methods=['POST'])
+@login_required
+def refresh_application_repository(app_id):
+    app_obj = Application.query.get_or_404(app_id)
+    current = get_current_user()
+    if not can_view_application(current, app_obj):
+        return json_error('You do not have permission to refresh repository data.', 403)
+    if not app_obj.link:
+        return json_error('Repository URL is required before branch data can be refreshed.', 400)
+
+    ok, error = sync_application_repository_branches(app_obj)
+    if not ok:
+        db.session.rollback()
+        cached_branches = [
+            serialize_repository_branch(branch, current)
+            for branch in sorted(app_obj.repository_branches, key=lambda item: (not item.is_default, item.branch_name.lower()))
+        ]
+        if 'rate limit' in str(error).lower():
+            return jsonify({
+                'message': 'Repository refresh skipped because the provider rate limit was reached. Showing cached data.',
+                'warning': f'Could not refresh repository data: {error}',
+                'repository_branches': cached_branches
+            }), 200
+        return json_error(f'Could not refresh repository data: {error}', 400)
+    db.session.commit()
+    return jsonify({
+        'message': 'Repository data refreshed.',
+        'repository_branches': [
+            serialize_repository_branch(branch, current)
+            for branch in sorted(app_obj.repository_branches, key=lambda item: (not item.is_default, item.branch_name.lower()))
+        ]
+    })
 
 @app.route('/get_applications_data', methods=['GET'])
 @login_required
@@ -1695,7 +2133,6 @@ def edit_application(app_id):
             app_obj.projects = [project] if project else []
         elif has_platform_role(current, PLATFORM_ADMIN):
             app_obj.projects = []
-
     if not app_obj.name:
         return jsonify({'error': 'Application name cannot be empty'}), 400
 
@@ -1800,18 +2237,19 @@ def get_projects():
             return jsonify([])
         query = query.filter(Project.id.in_(project_ids))
     projects = query.order_by(Project.name).all()
-    projects_data = [{'id': p.id, 'name': p.name} for p in projects]
+    projects_data = [{'id': p.id, 'name': p.name, 'description': p.description or ''} for p in projects]
     return jsonify(projects_data)
 
 @app.route('/app/<int:application_id>/update_version', methods=['POST'])
 @jwt_required()
 def update_version(application_id):
     try:
+        payload = request.get_json(silent=True) or {}
         jwt_user = load_user_for_jwt_identity(get_jwt_identity())
         app_obj = Application.query.get_or_404(application_id)
         if not can_write_application(jwt_user, app_obj):
             return jsonify({'error': 'You do not have permission to update this application.'}), 403
-        version_part = request.json.get('version_part')
+        version_part = payload.get('version_part')
         if version_part not in ['major', 'minor', 'patch']:
             return jsonify({'error': 'Invalid version part'}), 400
 
@@ -1831,11 +2269,16 @@ def update_version(application_id):
             patch += 1
 
         new_version_number = f"{major}.{minor}.{patch}"
-        new_version = Version(application_id=application_id, number=new_version_number)
+        release_notes = release_notes_from_payload(payload)
+        new_version = Version(
+            application_id=application_id,
+            number=new_version_number,
+            notes=release_notes
+        )
         db.session.add(new_version)
         db.session.commit()
 
-        return jsonify({'new_version': new_version_number})
+        return jsonify({'new_version': new_version_number, 'notes': release_notes})
     except Exception as e:
         logging.error(f"Error updating version for application {application_id}: {str(e)}")
         return jsonify({'error': 'Server error while updating version'}), 500
@@ -1880,6 +2323,7 @@ def get_projects_data():
         projects_data.append({
             'id': project.id,
             'name': project.name,
+            'description': project.description or '',
             'start_date': format_date_for_user(project.start_date, user),
             'status': project.status,
             'access_level': project_access_level,
@@ -1983,6 +2427,7 @@ def get_project_details(project_id):
         'project_role_label': project_role_display_label(current, project_id),
         'project_role_code': project_role_display_code(current, project_id),
         'can_edit': can_manage_project_resource(current, project_id),
+        'access_summary': serialize_project_access_summary(project, current),
         'applications': [
             {
                 'id': app.id,
@@ -2215,6 +2660,146 @@ def serialize_application_membership(membership):
         'access_level': membership.access_level,
         'access_code': access_code(membership.access_level),
         'access_label': access_label(membership.access_level)
+    }
+
+
+def serialize_project_access_summary(project, viewer=None):
+    memberships = ProjectMembership.query.join(User).filter(
+        ProjectMembership.project_id == project.id
+    ).order_by(User.username).all()
+    can_manage_access = can_manage_project_membership(viewer, project.id)
+    summary = {
+        'platform_admins': [],
+        'managers': [],
+        'operators': [],
+    }
+
+    if has_platform_role(viewer, PLATFORM_ADMIN):
+        summary['platform_admins'] = [
+            {
+                'user_id': user.id,
+                'username': user.username,
+                'full_name': user.full_name or '',
+                'platform_role_label': PLATFORM_ROLE_LABELS.get(user.platform_role, user.platform_role),
+            }
+            for user in User.query.filter_by(is_active=True, platform_role=PLATFORM_ADMIN).order_by(User.username).all()
+        ]
+
+    for membership in memberships:
+        user_data = {
+            'membership_id': membership.id,
+            'user_id': membership.user_id,
+            'username': membership.user.username,
+            'full_name': membership.user.full_name or '',
+            'project_role': membership.project_role,
+            'project_role_label': project_role_label(membership.project_role),
+            'project_role_code': project_role_code(membership.project_role),
+            'access_level': membership.access_level,
+            'access_label': access_label(membership.access_level),
+            'can_remove': can_manage_access and membership.user.platform_role != PLATFORM_ADMIN,
+        }
+        if membership.project_role == PROJECT_ADMIN:
+            summary['managers'].append(user_data)
+        elif membership.project_role == PROJECT_USER:
+            summary['operators'].append(user_data)
+
+    return summary
+
+
+def serialize_application_access_summary(app_obj, viewer=None):
+    project = app_obj.projects[0] if app_obj.projects else None
+    project_memberships = []
+    can_manage_project_access = can_manage_project_membership(viewer, project.id) if project else False
+    if project:
+        project_memberships = ProjectMembership.query.join(User).filter(
+            ProjectMembership.project_id == project.id
+        ).order_by(User.username).all()
+
+    project_managers = []
+    project_operators = []
+    for membership in project_memberships:
+        user_data = {
+            'membership_id': membership.id,
+            'user_id': membership.user_id,
+            'username': membership.user.username,
+            'full_name': membership.user.full_name or '',
+            'project_role': membership.project_role,
+            'project_role_label': project_role_label(membership.project_role),
+            'access_level': membership.access_level,
+            'access_label': access_label(membership.access_level),
+            'can_remove': can_manage_project_access and membership.user.platform_role != PLATFORM_ADMIN,
+        }
+        if membership.project_role == PROJECT_ADMIN:
+            project_managers.append(user_data)
+        elif membership.project_role == PROJECT_USER:
+            project_operators.append(user_data)
+
+    include_platform_admins = has_platform_role(viewer, PLATFORM_ADMIN)
+    platform_admins = []
+    if include_platform_admins:
+        platform_admins = [
+            {
+                'user_id': user.id,
+                'username': user.username,
+                'full_name': user.full_name or '',
+                'platform_role': user.platform_role,
+                'platform_role_label': PLATFORM_ROLE_LABELS.get(user.platform_role, user.platform_role),
+            }
+            for user in User.query.filter_by(is_active=True, platform_role=PLATFORM_ADMIN).order_by(User.username).all()
+        ]
+
+    effective_read_write = []
+    effective_read_only = []
+    application_memberships_by_user = {
+        membership.user_id: membership
+        for membership in ApplicationMembership.query.filter_by(application_id=app_obj.id).all()
+    }
+    for user in User.query.filter_by(is_active=True).order_by(User.username).all():
+        if user.platform_role == PLATFORM_ADMIN:
+            continue
+        effective_access = application_access_level_for_user(user, app_obj)
+        if effective_access not in (ACCESS_READ_WRITE, ACCESS_VIEW_ONLY):
+            continue
+        project_membership = get_project_membership(user, project.id) if project else None
+        application_membership = application_memberships_by_user.get(user.id)
+        user_data = {
+            'membership_id': application_membership.id if application_membership else None,
+            'project_membership_id': project_membership.id if project_membership else None,
+            'user_id': user.id,
+            'username': user.username,
+            'full_name': user.full_name or '',
+            'platform_role': user.platform_role,
+            'platform_role_label': PLATFORM_ROLE_LABELS.get(user.platform_role, user.platform_role),
+            'project_role': project_membership.project_role if project_membership else None,
+            'project_role_label': project_role_label(project_membership.project_role) if project_membership else 'No Project Membership',
+            'access_level': effective_access,
+            'access_label': access_label(effective_access),
+            'is_project_manager': bool(project_membership and project_membership.project_role == PROJECT_ADMIN),
+            'can_remove': bool(
+                (
+                    application_membership
+                    and can_manage_application_membership(viewer, app_obj, user, project.id if project else None)
+                )
+                or (
+                    project_membership
+                    and project_membership.project_role == PROJECT_ADMIN
+                    and can_manage_project_access
+                )
+            ),
+        }
+        if effective_access == ACCESS_READ_WRITE:
+            effective_read_write.append(user_data)
+        else:
+            effective_read_only.append(user_data)
+
+    return {
+        'project_name': project.name if project else 'No project',
+        'platform_admins': platform_admins,
+        'show_platform_admin_names': include_platform_admins,
+        'project_managers': project_managers,
+        'project_operators': project_operators,
+        'application_read_write': effective_read_write,
+        'application_read_only': effective_read_only,
     }
 
 

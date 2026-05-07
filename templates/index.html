@@ -77,6 +77,29 @@
             overflow-wrap: anywhere;
         }
 
+        .date-time-text,
+        time {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0;
+        }
+
+        .project-inline-icon-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 9999px;
+            color: #6b7280;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .project-inline-icon-button:hover {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
         .page-toolbar {
             align-items: center;
             gap: 1rem;
@@ -294,16 +317,41 @@
         }
 
         .tab-link {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
             padding: 0.5rem 1rem;
             border-radius: 0.5rem;
+            font-weight: 600;
             transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .tab-link svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            flex: 0 0 auto;
         }
         .tab-link.active {
             background-color: #fef3c7;
             color: #b45309;
         }
         .tab-link:hover {
+            background-color: #fef3c7;
+            color: #b45309;
+        }
+
+        .pagination-page-active {
+            background-color: #fef3c7;
+            color: #b45309;
+            font-weight: 600;
+        }
+
+        .pagination-page-inactive {
+            border: 1px solid #e5e7eb;
+            background-color: #ffffff;
+            color: #6b7280;
+        }
+
+        .pagination-page-inactive:hover {
             background-color: #fef3c7;
             color: #b45309;
         }
@@ -815,6 +863,31 @@
         html[data-theme="dark"] .tab-link.active {
             background-color: #f59e0b;
             color: #111827;
+        }
+
+        html[data-theme="dark"] .pagination-page-active {
+            background-color: #f59e0b;
+            color: #111827;
+        }
+
+        html[data-theme="dark"] .pagination-page-inactive {
+            background-color: #111827;
+            border-color: #4b5563;
+            color: #e5e7eb;
+        }
+
+        html[data-theme="dark"] .pagination-page-inactive:hover {
+            background-color: #374151;
+            color: #fef3c7;
+        }
+
+        html[data-theme="dark"] .project-inline-icon-button {
+            color: #cbd5e1;
+        }
+
+        html[data-theme="dark"] .project-inline-icon-button:hover {
+            background: #92400e;
+            color: #fffbeb;
         }
 
         html[data-theme="dark"] .btn-primary {
