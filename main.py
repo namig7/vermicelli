@@ -1133,6 +1133,27 @@ def repository_branch_status(branch, default_branch):
     return 'active'
 
 
+def repository_build_status_label(build_status):
+    labels = {
+        'success': 'Passing',
+        'failure': 'Failing',
+        'error': 'Error',
+        'pending': 'Pending',
+        'unknown': 'Unknown',
+    }
+    return labels.get(build_status or 'unknown', str(build_status).replace('_', ' ').title())
+
+
+def github_commit_build_status(api_base, commit_sha):
+    if not commit_sha:
+        return 'unknown'
+    try:
+        status_data = fetch_repository_json(f'{api_base}/commits/{quote(commit_sha, safe="")}/status', 'github')
+        return status_data.get('state') or 'unknown'
+    except (HTTPError, URLError, TimeoutError, ValueError, json.JSONDecodeError):
+        return 'unknown'
+
+
 def repository_branch_url(parsed_url, provider, path, branch_name):
     encoded_branch = quote(branch_name, safe='')
     if provider == 'github':
@@ -1169,6 +1190,7 @@ def github_repository_branches(parsed_url, path, checked_at):
             'commit_note': commit_details.get('message') or '',
             'last_commit_at': parse_repository_datetime(committer.get('date') or author.get('date')),
             'branch_status': repository_branch_status(branch, default_branch),
+            'build_status': github_commit_build_status(api_base, commit_sha),
             'is_default': branch_name == default_branch,
             'last_checked_at': checked_at,
         })
@@ -1306,6 +1328,8 @@ def serialize_repository_branch(branch, user=None):
         'last_commit_at': branch.last_commit_at.isoformat() if branch.last_commit_at else None,
         'last_commit_display': format_datetime_for_user(branch.last_commit_at, user) if branch.last_commit_at else 'N/A',
         'branch_status': branch.branch_status or 'active',
+        'build_status': branch.build_status or 'unknown',
+        'build_status_label': repository_build_status_label(branch.build_status),
         'is_default': bool(branch.is_default),
         'last_checked_at': branch.last_checked_at.isoformat() if branch.last_checked_at else None,
         'last_checked_display': format_datetime_for_user(branch.last_checked_at, user) if branch.last_checked_at else 'N/A',
@@ -2427,7 +2451,6 @@ def get_project_details(project_id):
         'project_role_label': project_role_display_label(current, project_id),
         'project_role_code': project_role_display_code(current, project_id),
         'can_edit': can_manage_project_resource(current, project_id),
-        'access_summary': serialize_project_access_summary(project, current),
         'applications': [
             {
                 'id': app.id,
@@ -2663,53 +2686,9 @@ def serialize_application_membership(membership):
     }
 
 
-def serialize_project_access_summary(project, viewer=None):
-    memberships = ProjectMembership.query.join(User).filter(
-        ProjectMembership.project_id == project.id
-    ).order_by(User.username).all()
-    can_manage_access = can_manage_project_membership(viewer, project.id)
-    summary = {
-        'platform_admins': [],
-        'managers': [],
-        'operators': [],
-    }
-
-    if has_platform_role(viewer, PLATFORM_ADMIN):
-        summary['platform_admins'] = [
-            {
-                'user_id': user.id,
-                'username': user.username,
-                'full_name': user.full_name or '',
-                'platform_role_label': PLATFORM_ROLE_LABELS.get(user.platform_role, user.platform_role),
-            }
-            for user in User.query.filter_by(is_active=True, platform_role=PLATFORM_ADMIN).order_by(User.username).all()
-        ]
-
-    for membership in memberships:
-        user_data = {
-            'membership_id': membership.id,
-            'user_id': membership.user_id,
-            'username': membership.user.username,
-            'full_name': membership.user.full_name or '',
-            'project_role': membership.project_role,
-            'project_role_label': project_role_label(membership.project_role),
-            'project_role_code': project_role_code(membership.project_role),
-            'access_level': membership.access_level,
-            'access_label': access_label(membership.access_level),
-            'can_remove': can_manage_access and membership.user.platform_role != PLATFORM_ADMIN,
-        }
-        if membership.project_role == PROJECT_ADMIN:
-            summary['managers'].append(user_data)
-        elif membership.project_role == PROJECT_USER:
-            summary['operators'].append(user_data)
-
-    return summary
-
-
 def serialize_application_access_summary(app_obj, viewer=None):
     project = app_obj.projects[0] if app_obj.projects else None
     project_memberships = []
-    can_manage_project_access = can_manage_project_membership(viewer, project.id) if project else False
     if project:
         project_memberships = ProjectMembership.query.join(User).filter(
             ProjectMembership.project_id == project.id
@@ -2719,7 +2698,6 @@ def serialize_application_access_summary(app_obj, viewer=None):
     project_operators = []
     for membership in project_memberships:
         user_data = {
-            'membership_id': membership.id,
             'user_id': membership.user_id,
             'username': membership.user.username,
             'full_name': membership.user.full_name or '',
@@ -2727,7 +2705,6 @@ def serialize_application_access_summary(app_obj, viewer=None):
             'project_role_label': project_role_label(membership.project_role),
             'access_level': membership.access_level,
             'access_label': access_label(membership.access_level),
-            'can_remove': can_manage_project_access and membership.user.platform_role != PLATFORM_ADMIN,
         }
         if membership.project_role == PROJECT_ADMIN:
             project_managers.append(user_data)
@@ -2750,10 +2727,6 @@ def serialize_application_access_summary(app_obj, viewer=None):
 
     effective_read_write = []
     effective_read_only = []
-    application_memberships_by_user = {
-        membership.user_id: membership
-        for membership in ApplicationMembership.query.filter_by(application_id=app_obj.id).all()
-    }
     for user in User.query.filter_by(is_active=True).order_by(User.username).all():
         if user.platform_role == PLATFORM_ADMIN:
             continue
@@ -2761,10 +2734,7 @@ def serialize_application_access_summary(app_obj, viewer=None):
         if effective_access not in (ACCESS_READ_WRITE, ACCESS_VIEW_ONLY):
             continue
         project_membership = get_project_membership(user, project.id) if project else None
-        application_membership = application_memberships_by_user.get(user.id)
         user_data = {
-            'membership_id': application_membership.id if application_membership else None,
-            'project_membership_id': project_membership.id if project_membership else None,
             'user_id': user.id,
             'username': user.username,
             'full_name': user.full_name or '',
@@ -2775,17 +2745,6 @@ def serialize_application_access_summary(app_obj, viewer=None):
             'access_level': effective_access,
             'access_label': access_label(effective_access),
             'is_project_manager': bool(project_membership and project_membership.project_role == PROJECT_ADMIN),
-            'can_remove': bool(
-                (
-                    application_membership
-                    and can_manage_application_membership(viewer, app_obj, user, project.id if project else None)
-                )
-                or (
-                    project_membership
-                    and project_membership.project_role == PROJECT_ADMIN
-                    and can_manage_project_access
-                )
-            ),
         }
         if effective_access == ACCESS_READ_WRITE:
             effective_read_write.append(user_data)
