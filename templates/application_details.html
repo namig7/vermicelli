@@ -19,15 +19,17 @@
 {%- endmacro %}
 
 {% macro admin_access_chip(member) -%}
-    <span class="admin-access-summary-chip inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-sm text-blue-800">
-        <button type="button" class="admin-access-summary-user open-access-user-details min-w-0 truncate text-left font-medium text-blue-800 transition hover:text-yellow-700" data-user-id="{{ member.user_id }}" onclick="openApplicationAccessUser({{ member.user_id }}); return false;">{{ member.username }}</button>
+    {% set is_current_user = member.user_id == session.get('user_id') %}
+    <span class="admin-access-summary-chip inline-flex items-center rounded-full border px-3 py-1 text-sm {{ 'current-admin-access-chip border-blue-300 bg-blue-100 text-blue-900' if is_current_user else 'border-blue-200 bg-blue-50 text-blue-800' }}">
+        <button type="button" class="admin-access-summary-user open-access-user-details min-w-0 truncate text-left font-medium transition hover:text-blue-700 {{ 'text-blue-900' if is_current_user else 'text-blue-800' }}" data-user-id="{{ member.user_id }}" onclick="openApplicationAccessUser({{ member.user_id }}); return false;">{{ member.username }}</button>
         <span class="admin-access-summary-icon ml-2 inline-flex items-center text-blue-600" title="Platform Admin" aria-label="Platform Admin">{{ admin_access_icon() }}</span>
     </span>
 {%- endmacro %}
 
 {% macro access_user_chip(member, manager=False, remove_scope='project') -%}
-    <span class="inline-flex items-center rounded-full border border-gray-200 bg-white px-3 py-1 text-sm text-gray-700">
-        <button type="button" class="open-access-user-details min-w-0 truncate text-left font-medium text-gray-700 transition hover:text-yellow-700" data-user-id="{{ member.user_id }}" onclick="openApplicationAccessUser({{ member.user_id }}); return false;">{{ member.username }}</button>
+    {% set is_current_user = member.user_id == session.get('user_id') %}
+    <span class="inline-flex items-center rounded-full border px-3 py-1 text-sm {{ 'current-user-access-chip border-yellow-300 bg-yellow-100 text-yellow-900' if is_current_user else 'border-gray-200 bg-white text-gray-700' }}">
+        <button type="button" class="open-access-user-details min-w-0 truncate text-left font-medium transition hover:text-yellow-700 {{ 'text-yellow-900' if is_current_user else 'text-gray-700' }}" data-user-id="{{ member.user_id }}" onclick="openApplicationAccessUser({{ member.user_id }}); return false;">{{ member.username }}</button>
         {% if manager %}
             <span class="ml-2 inline-flex items-center text-yellow-600" title="Manager" aria-label="Manager">{{ manager_access_icon() }}</span>
         {% endif %}
@@ -41,7 +43,7 @@
     </span>
 {%- endmacro %}
 
-<div id="app-details" data-app-id="{{ app.id }}" class="resource-page app-details-page container mx-auto py-6 mt-2">
+<div id="app-details" data-app-id="{{ app.id }}" class="resource-page app-details-page">
     {% include '_resource_page_styles.html' %}
     <style>
         #deleteApplicationButton {
@@ -69,6 +71,84 @@
             align-items: flex-start;
         }
 
+        .app-details-page .app-details-view {
+            margin-top: 1.5rem;
+        }
+
+        .app-details-page .app-title-strip {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            background: #ffffff;
+            padding: 1rem 1.25rem;
+            margin-top: 50px !important;
+        }
+
+        .app-details-page .page-toolbar {
+            margin-bottom: 1.5rem !important;
+        }
+
+        .app-details-page .app-title-strip h1 {
+            font-size: 1.25rem;
+            line-height: 1.75rem;
+        }
+
+        .app-details-page .details-hero.app-details-view {
+            margin-bottom: 1.5rem;
+        }
+
+        .app-details-page .app-details-view.hidden {
+            display: none !important;
+        }
+
+        .app-details-page .app-details-tab.active {
+            background-color: #fef3c7;
+            color: #b45309;
+            border-color: #fde68a;
+        }
+
+        .app-details-page .app-details-tab svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            flex: 0 0 auto;
+        }
+
+        .app-details-page .app-details-tab .size-6 {
+            width: 1.25rem;
+            height: 1.25rem;
+            flex: 0 0 1.25rem;
+        }
+
+        .app-details-page .metadata-date {
+            font-size: 0.75rem;
+            line-height: 1rem;
+        }
+
+        .app-details-page h1 {
+            font-size: 1.25rem;
+            line-height: 1.75rem;
+        }
+
+        .app-details-page h2 {
+            font-size: 1.125rem;
+            line-height: 1.5rem;
+        }
+
+        .app-details-page .overview-heading {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            min-width: 0;
+        }
+
+        .app-details-page .overview-heading-content {
+            min-width: 0;
+            flex: 1 1 auto;
+        }
+
         .app-details-page .hero-detail-box {
             display: flex;
             align-items: flex-start;
@@ -88,6 +168,10 @@
             padding: 1rem;
         }
 
+        .app-details-page #repositoryBranchesPanel {
+            padding: 1.5rem;
+        }
+
         .app-details-page .detail-label {
             font-size: 0.75rem;
             font-weight: 700;
@@ -99,6 +183,7 @@
         .app-details-page .detail-value {
             margin-top: 0.35rem;
             color: #111827;
+            font-size: 0.875rem;
             overflow-wrap: anywhere;
         }
 
@@ -182,18 +267,18 @@
         }
 
         .app-details-page .platform-admin-card {
-            border: 1px solid #bfdbfe;
+            border: 1px solid #fb8f77;
             border-radius: 0.75rem;
-            background: #eff6ff;
+            background: #fff1ed;
             padding: 1rem;
         }
 
         .app-details-page .platform-admin-card .detail-label {
-            color: #1e3a8a;
+            color: #9f341f;
         }
 
         .app-details-page .platform-admin-card .access-person-meta {
-            color: #1e40af;
+            color: #9f341f;
         }
 
         .app-details-page .platform-admin-chip {
@@ -201,12 +286,23 @@
             align-items: center;
             max-width: 100%;
             border-radius: 9999px;
-            border: 1px solid #bfdbfe;
-            background: #dbeafe;
-            color: #1e40af;
+            border: 1px solid #fb8f77;
+            background: #ffb4a2;
+            color: #111827;
             padding: 0.35rem 0.75rem;
             font-size: 0.875rem;
             font-weight: 700;
+        }
+
+        .app-details-page .platform-admin-card .admin-access-summary-chip {
+            border-color: #fb8f77;
+            background: #ffb4a2;
+            color: #9f341f;
+        }
+
+        .app-details-page .platform-admin-card .admin-access-summary-user,
+        .app-details-page .platform-admin-card .admin-access-summary-icon {
+            color: #9f341f;
         }
 
         .app-details-page .section-divider {
@@ -230,9 +326,13 @@
         }
 
         .app-details-page .release-panel {
-            border: 1px solid #e5e7eb;
-            border-radius: 0.75rem;
-            background: #f9fafb;
+            border: 0;
+            background: transparent;
+            padding: 0 !important;
+        }
+
+        .app-details-page .release-notes-content {
+            margin-left: 2.5rem;
         }
 
         .app-details-page .detail-icon {
@@ -278,11 +378,19 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 2rem;
-            height: 2rem;
+            width: 1.75rem;
+            height: 1.75rem;
             border-radius: 9999px;
             color: #6b7280;
             transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .app-details-page .inline-icon-button .size-6,
+        .app-details-page .table-action-button .size-6,
+        .app-details-page .btn .size-6 {
+            width: 1rem;
+            height: 1rem;
+            flex: 0 0 1rem;
         }
 
         .app-details-page .inline-icon-button:hover {
@@ -296,13 +404,24 @@
             max-width: 100%;
             gap: 0.5rem;
             border-radius: 9999px;
-            border: 1px solid #bfdbfe;
-            background: #eff6ff;
-            color: #1e40af;
+            border: 1px solid transparent;
+            background: #ffb4a2;
+            color: #111827;
             padding: 0.4rem 0.55rem 0.4rem 0.8rem;
             font-size: 0.875rem;
-            font-weight: 700;
+            font-weight: 400;
         }
+
+        .app-details-page .label-chip a {
+            color: #111827;
+            font-weight: 400;
+        }
+
+        .app-details-page .label-color-0 { background: #ffb4a2; border-color: #fb8f77; }
+        .app-details-page .label-color-1 { background: #fde68a; border-color: #facc15; }
+        .app-details-page .label-color-2 { background: #fdba74; border-color: #fb923c; }
+        .app-details-page .label-color-3 { background: #fca5a5; border-color: #f87171; }
+        .app-details-page .label-color-4 { background: #f9a8d4; border-color: #f472b6; }
 
         .app-details-page .label-remove-button {
             display: inline-flex;
@@ -311,11 +430,16 @@
             width: 1.35rem;
             height: 1.35rem;
             border-radius: 9999px;
-            color: #1d4ed8;
+            color: rgba(17, 24, 39, 0.72);
         }
 
         .app-details-page .label-remove-button:hover {
-            background: #dbeafe;
+            background: rgba(17, 24, 39, 0.1);
+            color: #111827;
+        }
+
+        .app-details-page .current-admin-access-chip .admin-access-summary-icon {
+            color: #9f341f;
         }
 
         .app-details-page .repository-branches {
@@ -324,8 +448,41 @@
             table-layout: fixed;
         }
 
+        .app-details-page .deployment-checks {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .app-details-page .deployment-checks .col-status {
+            width: 3rem;
+            text-align: center;
+        }
+
+        .app-details-page .deployment-checks .col-actions {
+            width: 10.5rem;
+        }
+
+        .app-details-page .deployment-checks .col-url {
+            width: 28%;
+        }
+
+        .app-details-page .deployment-checks .col-type {
+            width: 8.5rem;
+        }
+
+        .app-details-page .deployment-checks .col-version {
+            width: 7rem;
+        }
+
+        .app-details-page .deployment-checks .col-last-check {
+            width: 10rem;
+        }
+
         .app-details-page .repository-branches th,
-        .app-details-page .repository-branches td {
+        .app-details-page .repository-branches td,
+        .app-details-page .deployment-checks th,
+        .app-details-page .deployment-checks td {
             padding: 0.75rem;
             border-top: 1px solid #e5e7eb;
             text-align: left;
@@ -333,7 +490,8 @@
             overflow-wrap: anywhere;
         }
 
-        .app-details-page .repository-branches th {
+        .app-details-page .repository-branches th,
+        .app-details-page .deployment-checks th {
             color: #6b7280;
             font-size: 0.75rem;
             font-weight: 700;
@@ -386,6 +544,250 @@
             flex: 0 0 auto;
         }
 
+        .app-details-page .labels-card,
+        .app-details-page .repository-card {
+            display: flex;
+            align-items: stretch;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-top: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            background: #f9fafb;
+            padding: 0.75rem;
+        }
+
+        .app-details-page .labels-card-content {
+            min-width: 0;
+            flex: 1 1 auto;
+        }
+
+        .app-details-page .repository-card-link {
+            display: flex;
+            min-width: 0;
+            flex: 1 1 auto;
+            align-items: center;
+            gap: 0.75rem;
+            border-radius: 0.5rem;
+            padding: 0.45rem 0.5rem;
+            color: #111827;
+        }
+
+        .app-details-page .repository-card-link:hover {
+            background: #fffbeb;
+            color: #92400e;
+        }
+
+        .app-details-page .repository-card-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.25rem;
+            height: 2.25rem;
+            flex: 0 0 2.25rem;
+            border-radius: 0.5rem;
+            background: transparent;
+            color: #6b7280;
+        }
+
+        .app-details-page .repository-card-icon svg {
+            width: 1.2rem;
+            height: 1.2rem;
+        }
+
+        .app-details-page .labels-card-actions,
+        .app-details-page .repository-card-actions {
+            display: flex;
+            flex: 0 0 auto;
+            align-items: center;
+            gap: 0.25rem;
+            border-left: 1px solid #e5e7eb;
+            padding-left: 0.75rem;
+        }
+
+        .app-details-page .deployment-status-dot {
+            display: inline-flex;
+            width: 0.625rem;
+            height: 0.625rem;
+            border-radius: 9999px;
+            background-color: #9ca3af;
+            box-shadow: 0 0 0 2px rgba(156, 163, 175, 0.18), 0 0 7px rgba(107, 114, 128, 0.32);
+        }
+
+        .app-details-page .deployment-status-dot.is-healthy,
+        .app-details-page .deployment-status-dot.is-reachable {
+            background-color: #f59e0b;
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.18), 0 0 10px rgba(245, 158, 11, 0.38);
+        }
+
+        .app-details-page .deployment-url {
+            width: 100%;
+        }
+
+        .app-details-page .deployment-url span {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .app-details-page .deployment-actions {
+            grid-template-columns: repeat(4, 2.25rem);
+        }
+
+        .app-details-page .deployment-type-badge {
+            display: inline-flex;
+            align-items: center;
+            max-width: 100%;
+            border-radius: 9999px;
+            border: 1px solid #d1d5db;
+            background: #f9fafb;
+            color: #374151;
+            padding: 0.3rem 0.7rem;
+            font-size: 0.75rem;
+            font-weight: 800;
+            line-height: 1rem;
+            text-transform: uppercase;
+        }
+
+        .app-details-page .deployment-type-production {
+            border-color: #bbf7d0;
+            background: #f0fdf4;
+            color: #166534;
+        }
+
+        .app-details-page .deployment-type-development {
+            border-color: #bfdbfe;
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .app-details-page .deployment-type-staging,
+        .app-details-page .deployment-type-preview {
+            border-color: #fde68a;
+            background: #fffbeb;
+            color: #92400e;
+        }
+
+        .app-details-page .deployment-type-testing,
+        .app-details-page .deployment-type-qa {
+            border-color: #ddd6fe;
+            background: #f5f3ff;
+            color: #6d28d9;
+        }
+
+        @media (max-width: 760px) {
+            .app-details-page .details-hero {
+                padding: 1rem !important;
+            }
+
+            .app-details-page .app-title-strip,
+            .app-details-page .labels-card,
+            .app-details-page .repository-card {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .app-details-page .labels-card-actions,
+            .app-details-page .repository-card-actions {
+                border-left: 0;
+                border-top: 1px solid #e5e7eb;
+                justify-content: flex-start;
+                padding-left: 0;
+                padding-top: 0.75rem;
+            }
+
+            .app-details-page .detail-tile {
+                padding: 0.85rem;
+            }
+
+            .app-details-page #repositoryBranchesPanel {
+                padding: 1rem;
+            }
+
+            .app-details-page #deploymentsTableWrap {
+                overflow-x: visible;
+            }
+
+            .app-details-page .deployment-checks,
+            .app-details-page .deployment-checks thead,
+            .app-details-page .deployment-checks tbody,
+            .app-details-page .deployment-checks tr,
+            .app-details-page .deployment-checks th,
+            .app-details-page .deployment-checks td {
+                display: block;
+                width: 100%;
+            }
+
+            .app-details-page .deployment-checks thead {
+                display: none;
+            }
+
+            .app-details-page .deployment-checks tr {
+                border: 1px solid #e5e7eb;
+                border-radius: 0.5rem;
+                background: #ffffff;
+                padding: 0.6rem 0.75rem;
+            }
+
+            .app-details-page .deployment-checks tr + tr {
+                margin-top: 0.75rem;
+            }
+
+            .app-details-page .deployment-checks td {
+                display: grid;
+                grid-template-columns: 6.5rem minmax(0, 1fr);
+                align-items: center;
+                gap: 0.75rem;
+                border-top: 0;
+                padding: 0.45rem 0;
+                font-size: 0.875rem;
+            }
+
+            .app-details-page .deployment-checks td::before {
+                content: attr(data-label);
+                color: #6b7280;
+                font-size: 0.75rem;
+                font-weight: 700;
+                text-transform: uppercase;
+            }
+
+            .app-details-page .deployment-checks .col-status {
+                text-align: left;
+            }
+
+            .app-details-page .deployment-checks .col-status::before {
+                content: "Status";
+            }
+
+            .app-details-page .deployment-checks .col-actions {
+                display: flex;
+                justify-content: flex-start;
+            }
+
+            .app-details-page .deployment-checks .col-actions::before {
+                display: none;
+            }
+
+            .app-details-page .deployment-actions {
+                grid-template-columns: repeat(4, 2.25rem);
+                justify-content: flex-start;
+            }
+        }
+
+        .app-details-page .deployment-response {
+            max-height: 9rem;
+            overflow: auto;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+            background: #111827;
+            color: #f9fafb;
+            padding: 0.65rem;
+            font-size: 0.75rem;
+            line-height: 1.35;
+            white-space: pre-wrap;
+        }
+
         .app-details-page .repository-loading {
             position: absolute;
             inset: 0;
@@ -420,9 +822,9 @@
         }
 
         html[data-theme="dark"] .app-details-page .details-hero,
+        html[data-theme="dark"] .app-details-page .app-title-strip,
         html[data-theme="dark"] .app-details-page .hero-detail-box,
-        html[data-theme="dark"] .app-details-page .detail-tile,
-        html[data-theme="dark"] .app-details-page .release-panel {
+        html[data-theme="dark"] .app-details-page .detail-tile {
             background: #1f2937;
             border-color: #4b5563;
             color: #e5e7eb;
@@ -482,19 +884,54 @@
         }
 
         html[data-theme="dark"] .app-details-page .platform-admin-card {
-            background: #172554;
-            border-color: #2563eb;
+            background: #431407;
+            border-color: #e76f51;
         }
 
         html[data-theme="dark"] .app-details-page .platform-admin-card .detail-label,
         html[data-theme="dark"] .app-details-page .platform-admin-card .access-person-meta {
-            color: #bfdbfe;
+            color: #fed7cc;
         }
 
         html[data-theme="dark"] .app-details-page .platform-admin-chip {
-            background: #1e3a8a;
-            border-color: #2563eb;
-            color: #dbeafe;
+            background: #e76f51;
+            border-color: #f28b73;
+            color: #ffffff;
+        }
+
+        html[data-theme="dark"] .app-details-page .platform-admin-card .admin-access-summary-chip {
+            background: #e76f51;
+            border-color: #f28b73;
+            color: #fed7cc;
+        }
+
+        html[data-theme="dark"] .app-details-page .platform-admin-card .admin-access-summary-user,
+        html[data-theme="dark"] .app-details-page .platform-admin-card .admin-access-summary-icon {
+            color: #fed7cc;
+        }
+
+        html[data-theme="dark"] .app-details-page .current-user-access-chip {
+            background: #78350f;
+            border-color: #f59e0b;
+            color: #fef3c7;
+        }
+
+        html[data-theme="dark"] .app-details-page .current-user-access-chip button {
+            color: #fef3c7;
+        }
+
+        html[data-theme="dark"] .app-details-page .current-admin-access-chip {
+            background: #e76f51;
+            border-color: #f28b73;
+            color: #ffffff;
+        }
+
+        html[data-theme="dark"] .app-details-page .current-admin-access-chip button {
+            color: #ffffff;
+        }
+
+        html[data-theme="dark"] .app-details-page .current-admin-access-chip .admin-access-summary-icon {
+            color: #ffffff;
         }
 
         html[data-theme="dark"] .app-details-page .access-admin-button {
@@ -508,19 +945,13 @@
             color: #eff6ff;
         }
 
-        html[data-theme="dark"] .app-details-page .label-chip {
-            background: #172554;
-            border-color: #2563eb;
-            color: #dbeafe;
-        }
-
         html[data-theme="dark"] .app-details-page .label-remove-button {
-            color: #bfdbfe;
+            color: rgba(255, 255, 255, 0.85);
         }
 
         html[data-theme="dark"] .app-details-page .label-remove-button:hover {
-            background: #1e3a8a;
-            color: #eff6ff;
+            background: rgba(255, 255, 255, 0.18);
+            color: #ffffff;
         }
 
         html[data-theme="dark"] .app-details-page .inline-icon-button:hover {
@@ -533,12 +964,15 @@
         }
 
         html[data-theme="dark"] .app-details-page .repository-branches th,
-        html[data-theme="dark"] .app-details-page .repository-branches td {
+        html[data-theme="dark"] .app-details-page .repository-branches td,
+        html[data-theme="dark"] .app-details-page .deployment-checks th,
+        html[data-theme="dark"] .app-details-page .deployment-checks td {
             border-color: #4b5563;
             color: #f3f4f6;
         }
 
-        html[data-theme="dark"] .app-details-page .repository-branches th {
+        html[data-theme="dark"] .app-details-page .repository-branches th,
+        html[data-theme="dark"] .app-details-page .deployment-checks th {
             color: #cbd5e1;
         }
 
@@ -566,6 +1000,102 @@
             color: #fffbeb;
         }
 
+        html[data-theme="dark"] .app-details-page .labels-card,
+        html[data-theme="dark"] .app-details-page .repository-card {
+            background: #111827;
+            border-color: #4b5563;
+        }
+
+        html[data-theme="dark"] .app-details-page .label-chip,
+        html[data-theme="dark"] .app-details-page .label-chip a {
+            color: #ffffff;
+        }
+
+        html[data-theme="dark"] .app-details-page .label-color-0 { background: #e76f51; border-color: #f28b73; }
+        html[data-theme="dark"] .app-details-page .label-color-1 { background: #a16207; border-color: #ca8a04; }
+        html[data-theme="dark"] .app-details-page .label-color-2 { background: #ea580c; border-color: #f97316; }
+        html[data-theme="dark"] .app-details-page .label-color-3 { background: #dc2626; border-color: #ef4444; }
+        html[data-theme="dark"] .app-details-page .label-color-4 { background: #db2777; border-color: #ec4899; }
+
+        html[data-theme="dark"] .app-details-page .repository-card-link {
+            color: #f3f4f6;
+        }
+
+        html[data-theme="dark"] .app-details-page .repository-card-link:hover {
+            background: #451a03;
+            color: #fde68a;
+        }
+
+        html[data-theme="dark"] .app-details-page .repository-card-icon {
+            background: transparent;
+            color: #cbd5e1;
+        }
+
+        html[data-theme="dark"] .app-details-page .labels-card-actions,
+        html[data-theme="dark"] .app-details-page .repository-card-actions {
+            border-color: #4b5563;
+        }
+
+        html[data-theme="dark"] .app-details-page .deployment-response {
+            border-color: #4b5563;
+            background: #020617;
+            color: #e5e7eb;
+        }
+
+        html[data-theme="dark"] .app-details-page .deployment-status-dot {
+            background-color: #6b7280;
+            box-shadow: 0 0 0 2px rgba(107, 114, 128, 0.2), 0 0 7px rgba(107, 114, 128, 0.32);
+        }
+
+        html[data-theme="dark"] .app-details-page .deployment-status-dot.is-healthy,
+        html[data-theme="dark"] .app-details-page .deployment-status-dot.is-reachable {
+            background-color: #f59e0b;
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.18), 0 0 10px rgba(245, 158, 11, 0.38);
+        }
+
+        html[data-theme="dark"] .app-details-page .deployment-type-badge {
+            border-color: #4b5563;
+            background: #111827;
+            color: #e5e7eb;
+        }
+
+        html[data-theme="dark"] .app-details-page .deployment-type-production {
+            border-color: #16a34a;
+            background: #052e16;
+            color: #bbf7d0;
+        }
+
+        html[data-theme="dark"] .app-details-page .deployment-type-development {
+            border-color: #2563eb;
+            background: #172554;
+            color: #bfdbfe;
+        }
+
+        html[data-theme="dark"] .app-details-page .deployment-type-staging,
+        html[data-theme="dark"] .app-details-page .deployment-type-preview {
+            border-color: #b45309;
+            background: #451a03;
+            color: #fde68a;
+        }
+
+        html[data-theme="dark"] .app-details-page .deployment-type-testing,
+        html[data-theme="dark"] .app-details-page .deployment-type-qa {
+            border-color: #7c3aed;
+            background: #2e1065;
+            color: #ddd6fe;
+        }
+
+        @media (max-width: 760px) {
+            html[data-theme="dark"] .app-details-page .deployment-checks tr {
+                background: #111827;
+                border-color: #4b5563;
+            }
+
+            html[data-theme="dark"] .app-details-page .deployment-checks td::before {
+                color: #cbd5e1;
+            }
+        }
+
         html[data-theme="dark"] .app-details-page .detail-icon {
             color: #cbd5e1;
         }
@@ -582,20 +1112,78 @@
         html[data-theme="dark"] .app-details-page .repository-loading p {
             color: #fef3c7;
         }
+
+        .app-details-swal {
+            border-radius: 0.75rem !important;
+            background: #ffffff !important;
+            color: #374151 !important;
+            box-shadow: 0 20px 45px rgba(17, 24, 39, 0.18) !important;
+        }
+
+        .app-details-swal-title {
+            color: #111827 !important;
+            font-family: "Outfit", sans-serif !important;
+            font-size: 1.25rem !important;
+            font-weight: 800 !important;
+            letter-spacing: 0 !important;
+        }
+
+        .app-details-swal-content {
+            color: #4b5563 !important;
+            font-family: "Outfit", sans-serif !important;
+        }
+
+        html[data-theme="dark"] .app-details-swal {
+            background: #1f2937 !important;
+            color: #e5e7eb !important;
+            border: 1px solid #4b5563 !important;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45) !important;
+        }
+
+        html[data-theme="dark"] .app-details-swal-title,
+        html[data-theme="dark"] .app-details-swal-content {
+            color: #f3f4f6 !important;
+        }
     </style>
 
-    <header class="page-toolbar flex justify-between items-center mb-4">
-        <button type="button" onclick="window.loadPage('applications'); return false;" class="btn btn-secondary">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
-            </svg>
-            Applications
-        </button>
-        {% if can_edit_application %}
-            <div class="toolbar-actions flex items-center">
+    <header class="page-toolbar flex flex-col md:flex-row md:justify-between md:items-center mb-4">
+        <div class="toolbar-actions flex flex-wrap items-center">
+            <button type="button" onclick="window.loadPage('applications'); return false;" class="btn btn-secondary">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                </svg>
+                Applications
+            </button>
+            <button type="button" class="tab-link primary-action btn btn-primary app-details-tab active group justify-start py-3 text-left" data-app-details-tab="overview" onclick="showApplicationDetailsView('overview'); return false;">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 flex-shrink-0 text-yellow-500 group-hover:text-yellow-600" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 8.25V18a2.25 2.25 0 0 0 2.25 2.25h13.5A2.25 2.25 0 0 0 21 18V8.25m-18 0V6a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 6v2.25m-18 0h18M5.25 6h.008v.008H5.25V6ZM7.5 6h.008v.008H7.5V6Zm2.25 0h.008v.008H9.75V6Z" />
+                </svg>
+                Overview
+            </button>
+            <button type="button" class="tab-link primary-action btn btn-secondary app-details-tab group justify-start py-3 text-left" data-app-details-tab="versions" onclick="showApplicationDetailsView('versions'); return false;">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 flex-shrink-0 text-yellow-500 group-hover:text-yellow-600" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m7.875 14.25 1.214 1.942a2.25 2.25 0 0 0 1.908 1.058h2.006c.776 0 1.497-.4 1.908-1.058l1.214-1.942M2.41 9h4.636a2.25 2.25 0 0 1 1.872 1.002l.164.246a2.25 2.25 0 0 0 1.872 1.002h2.092a2.25 2.25 0 0 0 1.872-1.002l.164-.246A2.25 2.25 0 0 1 16.954 9h4.636M2.41 9a2.25 2.25 0 0 0-.16.832V12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 12V9.832c0-.287-.055-.57-.16-.832M2.41 9a2.25 2.25 0 0 1 .382-.632l3.285-3.832a2.25 2.25 0 0 1 1.708-.786h8.43c.657 0 1.281.287 1.709.786l3.284 3.832c.163.19.291.404.382.632M4.5 20.25h15A2.25 2.25 0 0 0 21.75 18v-2.625c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125V18a2.25 2.25 0 0 0 2.25 2.25Z" />
+                </svg>
+                Versions
+            </button>
+            <button type="button" class="tab-link primary-action btn btn-secondary app-details-tab group justify-start py-3 text-left" data-app-details-tab="access" onclick="showApplicationDetailsView('access'); return false;">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 flex-shrink-0 text-yellow-500 group-hover:text-yellow-600" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                </svg>
+                Access
+            </button>
+            <button type="button" class="tab-link primary-action btn btn-secondary app-details-tab group justify-start py-3 text-left" data-app-details-tab="deployments" onclick="showApplicationDetailsView('deployments'); return false;">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 flex-shrink-0 text-yellow-500 group-hover:text-yellow-600" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 0 1-3-3m3 3a3 3 0 1 0 0 6h13.5a3 3 0 1 0 0-6m-16.5-3a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3m-19.5 0a4.5 4.5 0 0 1 .9-2.7L5.737 5.1a3.375 3.375 0 0 1 2.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 0 1 .9 2.7m0 0a3 3 0 0 1-3 3m0 3h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Zm-3 6h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Z" />
+                </svg>
+                Deployments
+            </button>
+        </div>
+        <div class="toolbar-actions flex items-center app-details-actions" data-app-actions-view="overview">
+            {% if can_edit_application %}
                 <button type="button" onclick="openEditAppModal({{ app.id }}); return false;" class="btn btn-primary">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
                     </svg>
                     Edit
                 </button>
@@ -605,36 +1193,114 @@
                     </svg>
                     Delete
                 </button>
-            </div>
-        {% endif %}
+            {% endif %}
+        </div>
+        <div class="toolbar-actions flex items-center app-details-actions hidden" data-app-actions-view="versions">
+            <button type="button" id="openVersionHistory" class="tab-link primary-action btn btn-secondary group justify-start py-3 text-left" data-app-id="{{ app.id }}">
+                <svg class="size-6 flex-shrink-0 text-yellow-500 group-hover:text-yellow-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+                History
+            </button>
+        </div>
+        <div class="toolbar-actions flex items-center app-details-actions hidden" data-app-actions-view="access">
+            {% if can_change_project %}
+                <button type="button" onclick="openAccessManagement(); return false;" class="btn btn-primary">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    New Access
+                </button>
+            {% else %}
+                <button type="button" onclick="showPermissionNotice('You do not have permission to manage access.'); return false;" class="btn btn-secondary opacity-60 cursor-not-allowed" aria-disabled="true">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    New Access
+                </button>
+            {% endif %}
+        </div>
+        <div class="toolbar-actions flex items-center app-details-actions hidden" data-app-actions-view="deployments">
+            {% if can_edit_application %}
+                <button type="button" onclick="openDeploymentModal(); return false;" class="btn btn-primary">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    New Deployment
+                </button>
+            {% endif %}
+        </div>
     </header>
 
-    <section class="details-hero p-6 md:p-8 mb-6">
+    <section class="app-title-strip" style="margin-top: 50px;">
+        <div class="flex min-w-0 items-center gap-2">
+            <span class="detail-icon" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-2.25-1.313M21 7.5v2.25m0-2.25-2.25 1.313M3 7.5l2.25-1.313M3 7.5l2.25 1.313M3 7.5v2.25m9 3 2.25-1.313M12 12.75l-2.25-1.313M12 12.75V15m0 6.75 2.25-1.313M12 21.75V19.5m0 2.25-2.25-1.313m0-16.875L12 2.25l2.25 1.313M21 14.25v2.25l-2.25 1.313m-13.5 0L3 16.5v-2.25" />
+                </svg>
+            </span>
+            <h1 class="min-w-0 font-bold text-gray-900 break-words">{{ app.name }}</h1>
+            {% if can_edit_application %}
+                <button type="button" onclick="openEditAppModal({{ app.id }}, 'name'); return false;" class="inline-icon-button flex-shrink-0" aria-label="Edit application name" title="Edit application name">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                    </svg>
+                </button>
+            {% endif %}
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+            <span class="details-chip">ID {{ app.id }}</span>
+            <span class="details-chip">{{ access_level_label }}</span>
+            <span class="details-chip">Latest {{ latest_version.number if latest_version else 'No version' }}</span>
+        </div>
+    </section>
+
+    <section class="detail-tile app-details-view" data-app-details-view="overview">
         <div class="details-hero-layout flex flex-col md:flex-row md:justify-between gap-6">
             <div class="min-w-0 flex-1">
-                <div class="mb-4 flex items-start gap-3">
+                <div class="overview-heading mb-4">
                     <span class="detail-icon" aria-hidden="true">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-2.25-1.313M21 7.5v2.25m0-2.25-2.25 1.313M3 7.5l2.25-1.313M3 7.5l2.25 1.313M3 7.5v2.25m9 3 2.25-1.313M12 12.75l-2.25-1.313M12 12.75V15m0 6.75 2.25-1.313M12 21.75V19.5m0 2.25-2.25-1.313m0-16.875L12 2.25l2.25 1.313M21 14.25v2.25l-2.25 1.313m-13.5 0L3 16.5v-2.25" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 8.25V18a2.25 2.25 0 0 0 2.25 2.25h13.5A2.25 2.25 0 0 0 21 18V8.25m-18 0V6a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 6v2.25m-18 0h18M5.25 6h.008v.008H5.25V6ZM7.5 6h.008v.008H7.5V6Zm2.25 0h.008v.008H9.75V6Z" />
                         </svg>
                     </span>
-                    <div class="flex min-w-0 flex-1 items-start gap-2">
-                        <h1 class="min-w-0 text-3xl font-bold leading-tight text-gray-900 break-words">{{ app.name }}</h1>
-                        {% if can_edit_application %}
-                            <button type="button" onclick="openEditAppModal({{ app.id }}, 'name'); return false;" class="inline-icon-button flex-shrink-0" aria-label="Edit application name" title="Edit application name">
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" />
-                                </svg>
-                            </button>
-                        {% endif %}
+                    <div class="overview-heading-content">
+                        <p class="detail-label">Overview</p>
+                        <p class="access-person-meta mt-1">Core application details and release metadata.</p>
                     </div>
                 </div>
                 <div class="flex flex-wrap items-center gap-2 mb-2">
                     <span class="details-chip">ID {{ app.id }}</span>
                     <span class="details-chip">{{ access_level_label }}</span>
-                    <span class="details-chip">{{ version_count }} {{ 'version' if version_count == 1 else 'versions' }}</span>
+                    <span class="details-chip">Latest {{ latest_version.number if latest_version else 'No version' }}</span>
                 </div>
-                <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div class="hero-detail-box">
+                        <span class="detail-icon" aria-hidden="true">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V6.75A2.25 2.25 0 0 1 4.5 4.5h4.628c.597 0 1.17.237 1.591.659l1.122 1.122c.422.422.994.659 1.591.659H19.5a2.25 2.25 0 0 1 2.25 2.25v3.56M2.25 12.75 4.03 18.09A2.25 2.25 0 0 0 6.164 19.5h11.672a2.25 2.25 0 0 0 2.134-1.41l1.78-5.34H2.25Z" />
+                            </svg>
+                        </span>
+                        <div class="min-w-0 flex-1">
+                            <p class="detail-label">Project</p>
+                            <p class="detail-value font-medium">
+                                {% if project_name and project_id %}
+                                    <a href="#" onclick="openProjectDetails({{ project_id }}); return false;" class="text-yellow-600 hover:text-yellow-700 hover:underline">
+                                        {{ project_name }}
+                                    </a>
+                                {% else %}
+                                    No project
+                                {% endif %}
+                            </p>
+                        </div>
+                        {% if can_change_project %}
+                            <button type="button" onclick="openEditAppModal({{ app.id }}, 'project'); return false;" class="inline-icon-button flex-shrink-0" aria-label="Edit project" title="Edit project">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                                </svg>
+                            </button>
+                        {% endif %}
+                    </div>
                     <div class="hero-detail-box">
                         <span class="detail-icon" aria-hidden="true">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -657,31 +1323,48 @@
                             <p class="detail-value date-time-text">{{ updated_at_display }}</p>
                         </div>
                     </div>
-                    <div class="hero-detail-box">
-                        <span class="detail-icon" aria-hidden="true">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-8.25-4.5h10.5A2.25 2.25 0 0 1 19.5 7.5v9a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 16.5v-9a2.25 2.25 0 0 1 2.25-2.25Z" />
-                            </svg>
-                        </span>
-                        <div class="min-w-0">
-                            <p class="detail-value"><strong>Access level:</strong> {{ access_level_label }}</p>
+                </div>
+                <div class="section-divider">
+                    <div class="release-panel">
+                        <div class="detail-heading">
+                            <span class="detail-icon" aria-hidden="true">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m7.875 14.25 1.214 1.942a2.25 2.25 0 0 0 1.908 1.058h2.006c.776 0 1.497-.4 1.908-1.058l1.214-1.942M2.41 9h4.636a2.25 2.25 0 0 1 1.872 1.002l.164.246a2.25 2.25 0 0 0 1.872 1.002h2.092a2.25 2.25 0 0 0 1.872-1.002l.164-.246A2.25 2.25 0 0 1 16.954 9h4.636M2.41 9a2.25 2.25 0 0 0-.16.832V12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 12V9.832c0-.287-.055-.57-.16-.832M2.41 9a2.25 2.25 0 0 1 .382-.632l3.285-3.832a2.25 2.25 0 0 1 1.708-.786h8.43c.657 0 1.281.287 1.709.786l3.284 3.832c.163.19.291.404.382.632M4.5 20.25h15A2.25 2.25 0 0 0 21.75 18v-2.625c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125V18a2.25 2.25 0 0 0 2.25 2.25Z" />
+                                </svg>
+                            </span>
+                            <div class="detail-heading-content">
+                                <p class="detail-label">Latest Release</p>
+                                <h2 class="mt-1 font-bold text-gray-900">
+                                    {{ latest_version.number if latest_version else 'No versions available' }}
+                                </h2>
+                                <p class="mt-1 text-sm text-gray-600">{{ latest_version_display if latest_version else 'N/A' }}</p>
+                            </div>
+                        </div>
+                        <div class="release-notes-content mt-3">
+                            <p class="detail-label">Release Notes</p>
+                            <p class="mt-1 text-sm text-gray-700">{{ latest_version_notes or 'No release notes available.' }}</p>
                         </div>
                     </div>
                 </div>
-                <div class="section-divider flex items-start justify-between gap-3">
-                    <div class="flex min-w-0 flex-1 items-start gap-3">
+                <div class="section-divider">
+                    <div class="overview-heading">
                         <span class="detail-icon" aria-hidden="true">
                             <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l8.182 8.182a2.25 2.25 0 0 0 3.182 0l4.318-4.318a2.25 2.25 0 0 0 0-3.182L11.159 3.659A2.25 2.25 0 0 0 9.568 3Z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" />
                             </svg>
                         </span>
-                        <div class="min-w-0 flex-1">
+                        <div class="overview-heading-content">
                             <p class="detail-label">Labels</p>
-                            <div class="detail-value flex flex-wrap gap-2">
+                            <p class="access-person-meta mt-1">Labels help group and filter applications.</p>
+                        </div>
+                    </div>
+                    <div class="labels-card">
+                        <div class="labels-card-content">
+                            <div class="flex flex-wrap gap-2">
                                 {% if app_labels %}
                                     {% for label in app_labels %}
-                                    <span class="label-chip">
+                                    <span class="label-chip label-color-{{ loop.index0 % 5 }}">
                                         <a href="#" onclick='filterApplicationsByLabel({{ label|tojson }}); return false;' class="truncate hover:underline" title="Show applications tagged {{ label }}">{{ label }}</a>
                                         {% if can_edit_application %}
                                             <button type="button" onclick='removeApplicationLabel({{ label|tojson }}); return false;' class="label-remove-button" aria-label="Remove label {{ label }}" title="Remove label">
@@ -697,106 +1380,76 @@
                                 {% endif %}
                             </div>
                         </div>
-                    </div>
-                    {% if can_edit_application %}
-                        <button type="button" onclick="openEditAppModal({{ app.id }}, 'labels'); return false;" class="inline-icon-button flex-shrink-0" aria-label="Edit labels" title="Edit labels">
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" />
-                            </svg>
-                        </button>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="w-full md:w-80 flex-shrink-0 space-y-4">
-                <div class="release-panel p-4">
-                    <div class="detail-heading">
-                        <span class="detail-icon" aria-hidden="true">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="m7.875 14.25 1.214 1.942a2.25 2.25 0 0 0 1.908 1.058h2.006c.776 0 1.497-.4 1.908-1.058l1.214-1.942M2.41 9h4.636a2.25 2.25 0 0 1 1.872 1.002l.164.246a2.25 2.25 0 0 0 1.872 1.002h2.092a2.25 2.25 0 0 0 1.872-1.002l.164-.246A2.25 2.25 0 0 1 16.954 9h4.636M2.41 9a2.25 2.25 0 0 0-.16.832V12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 12V9.832c0-.287-.055-.57-.16-.832M2.41 9a2.25 2.25 0 0 1 .382-.632l3.285-3.832a2.25 2.25 0 0 1 1.708-.786h8.43c.657 0 1.281.287 1.709.786l3.284 3.832c.163.19.291.404.382.632M4.5 20.25h15A2.25 2.25 0 0 0 21.75 18v-2.625c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125V18a2.25 2.25 0 0 0 2.25 2.25Z" />
-                            </svg>
-                        </span>
-                        <div class="detail-heading-content">
-                            <p class="detail-label">Latest Release</p>
-                            <h2 class="mt-1 text-xl font-bold text-gray-900">
-                                {{ latest_version.number if latest_version else 'No versions available' }}
-                            </h2>
-                            <p class="mt-1 text-sm text-gray-600">{{ latest_version_display if latest_version else 'N/A' }}</p>
-                        </div>
-                    </div>
-                    <div class="mt-4 border-t border-gray-200 pt-3">
-                        <p class="detail-label">Release Notes</p>
-                        <p class="mt-1 text-sm text-gray-700">{{ latest_version_notes or 'No release notes available.' }}</p>
-                    </div>
-                    <div class="mt-4 flex flex-wrap gap-2">
-                        <button type="button" id="openVersionHistory" class="btn access-admin-button release-action-button" data-app-id="{{ app.id }}">
-                            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="m7.875 14.25 1.214 1.942a2.25 2.25 0 0 0 1.908 1.058h2.006c.776 0 1.497-.4 1.908-1.058l1.214-1.942M2.41 9h4.636a2.25 2.25 0 0 1 1.872 1.002l.164.246a2.25 2.25 0 0 0 1.872 1.002h2.092a2.25 2.25 0 0 0 1.872-1.002l.164-.246A2.25 2.25 0 0 1 16.954 9h4.636M2.41 9a2.25 2.25 0 0 0-.16.832V12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 12V9.832c0-.287-.055-.57-.16-.832M2.41 9a2.25 2.25 0 0 1 .382-.632l3.285-3.832a2.25 2.25 0 0 1 1.708-.786h8.43c.657 0 1.281.287 1.709.786l3.284 3.832c.163.19.291.404.382.632M4.5 20.25h15A2.25 2.25 0 0 0 21.75 18v-2.625c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125V18a2.25 2.25 0 0 0 2.25 2.25Z" />
-                            </svg>
-                            History
-                        </button>
-                        <button type="button" id="printVersionHistory" class="btn btn-secondary release-action-button" data-app-id="{{ app.id }}">
-                            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0 1 10.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0 .229 2.523a1.125 1.125 0 0 1-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0 0 21 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 0 0-1.913-.247M6.34 18H5.25A2.25 2.25 0 0 1 3 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 0 1 1.913-.247m10.5 0a48.536 48.536 0 0 0-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5Zm-3 0h.008v.008H15V10.5Z" />
-                            </svg>
-                            Print
-                        </button>
+                        {% if can_edit_application %}
+                            <div class="labels-card-actions">
+                                <button type="button" onclick="openEditAppModal({{ app.id }}, 'labels'); return false;" class="inline-icon-button" aria-label="Edit labels" title="Edit labels">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                                    </svg>
+                                </button>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
-                {% if can_edit_application %}
-                    <section class="detail-tile">
-                        <p class="detail-label">Version Controls</p>
-                        <pre id="curl-major-{{ app.id }}" class="hidden">curl -X POST -H "Content-Type: application/json" -d "{\"version_part\":\"major\",\"releasenotes\":\"${RELEASE_NOTES:-${CI_COMMIT_MESSAGE:-${GITHUB_EVENT_HEAD_COMMIT_MESSAGE:-${GITEA_COMMIT_MESSAGE:-No release notes available.}}}}\"}" http://localhost:8000/app/{{ app.id }}/update_version</pre>
-                        <pre id="curl-minor-{{ app.id }}" class="hidden">curl -X POST -H "Content-Type: application/json" -d "{\"version_part\":\"minor\",\"releasenotes\":\"${RELEASE_NOTES:-${CI_COMMIT_MESSAGE:-${GITHUB_EVENT_HEAD_COMMIT_MESSAGE:-${GITEA_COMMIT_MESSAGE:-No release notes available.}}}}\"}" http://localhost:8000/app/{{ app.id }}/update_version</pre>
-                        <pre id="curl-patch-{{ app.id }}" class="hidden">curl -X POST -H "Content-Type: application/json" -d "{\"version_part\":\"patch\",\"releasenotes\":\"${RELEASE_NOTES:-${CI_COMMIT_MESSAGE:-${GITHUB_EVENT_HEAD_COMMIT_MESSAGE:-${GITEA_COMMIT_MESSAGE:-No release notes available.}}}}\"}" http://localhost:8000/app/{{ app.id }}/update_version</pre>
-                        <div class="mt-3 grid grid-cols-3 gap-2">
-                            <button type="button" onclick="copyToClipboard('curl-major-{{ app.id }}')" class="btn btn-secondary px-2">Major</button>
-                            <button type="button" onclick="copyToClipboard('curl-minor-{{ app.id }}')" class="btn btn-secondary px-2">Minor</button>
-                            <button type="button" onclick="copyToClipboard('curl-patch-{{ app.id }}')" class="btn btn-secondary px-2">Patch</button>
-                        </div>
-                    </section>
-                {% endif %}
             </div>
         </div>
     </section>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <section class="lg:col-span-3 space-y-6">
-            <section class="detail-tile">
-                <div class="flex items-start justify-between gap-3">
-                    <div class="flex min-w-0 flex-1 items-start gap-3">
-                        <span class="detail-icon" aria-hidden="true">
-                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V6.75A2.25 2.25 0 0 1 4.5 4.5h4.628c.597 0 1.17.237 1.591.659l1.122 1.122c.422.422.994.659 1.591.659H19.5a2.25 2.25 0 0 1 2.25 2.25v3.56M2.25 12.75 4.03 18.09A2.25 2.25 0 0 0 6.164 19.5h11.672a2.25 2.25 0 0 0 2.134-1.41l1.78-5.34H2.25Z" />
-                            </svg>
-                        </span>
-                        <div class="min-w-0 flex-1">
-                            <p class="detail-label">Project</p>
-                            <p class="detail-value font-medium">
-                                {% if project_name and project_id %}
-                                    <a href="#" onclick="openProjectDetails({{ project_id }}); return false;" class="text-yellow-600 hover:text-yellow-700 hover:underline">
-                                        {{ project_name }}
-                                    </a>
-                                {% else %}
-                                    No project
-                                {% endif %}
-                            </p>
-                        </div>
-                    </div>
-                    {% if can_change_project %}
-                        <button type="button" onclick="openEditAppModal({{ app.id }}, 'project'); return false;" class="inline-icon-button flex-shrink-0" aria-label="Edit project" title="Edit project">
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" />
-                            </svg>
-                        </button>
-                    {% endif %}
-                </div>
-
-                <div class="section-divider">
-                    <div class="flex items-start justify-between gap-3">
+            <section id="versionDetailsSection" class="detail-tile app-details-view hidden" data-app-details-view="versions">
+                <div class="flex flex-col gap-5">
+                    <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                         <div class="detail-heading flex-1">
                             <span class="detail-icon" aria-hidden="true">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3.75c-2.412 1.92-5.459 3-8.625 3.056V12c0 5.084 3.45 9.655 8.386 11.112a.75.75 0 0 0 .478 0c4.936-1.457 8.386-6.028 8.386-11.112V6.806C17.459 6.75 14.412 5.67 12 3.75Z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m7.875 14.25 1.214 1.942a2.25 2.25 0 0 0 1.908 1.058h2.006c.776 0 1.497-.4 1.908-1.058l1.214-1.942M2.41 9h4.636a2.25 2.25 0 0 1 1.872 1.002l.164.246a2.25 2.25 0 0 0 1.872 1.002h2.092a2.25 2.25 0 0 0 1.872-1.002l.164-.246A2.25 2.25 0 0 1 16.954 9h4.636M2.41 9a2.25 2.25 0 0 0-.16.832V12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 12V9.832c0-.287-.055-.57-.16-.832M2.41 9a2.25 2.25 0 0 1 .382-.632l3.285-3.832a2.25 2.25 0 0 1 1.708-.786h8.43c.657 0 1.281.287 1.709.786l3.284 3.832c.163.19.291.404.382.632M4.5 20.25h15A2.25 2.25 0 0 0 21.75 18v-2.625c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125V18a2.25 2.25 0 0 0 2.25 2.25Z" />
+                                </svg>
+                            </span>
+                            <div class="detail-heading-content">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <p class="detail-label">Version</p>
+                                    <span class="details-chip">{{ version_count }} {{ 'release' if version_count == 1 else 'releases' }}</span>
+                                </div>
+                                <h2 class="mt-1 font-bold text-gray-900">
+                                    {{ latest_version.number if latest_version else 'No versions available' }}
+                                </h2>
+                                <p class="mt-1 text-sm text-gray-600">{{ latest_version_display if latest_version else 'N/A' }}</p>
+                                <p class="mt-3 text-sm text-gray-700">{{ latest_version_notes or 'No release notes available.' }}</p>
+                            </div>
+                        </div>
+                        <div class="toolbar-actions flex flex-wrap items-center">
+                            <button type="button" id="printVersionHistory" class="btn btn-secondary release-action-button" data-app-id="{{ app.id }}">
+                                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0 1 10.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0 .229 2.523a1.125 1.125 0 0 1-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0 0 21 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 0 0-1.913-.247M6.34 18H5.25A2.25 2.25 0 0 1 3 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 0 1 1.913-.247m10.5 0a48.536 48.536 0 0 0-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5Zm-3 0h.008v.008H15V10.5Z" />
+                                </svg>
+                                Print
+                            </button>
+                        </div>
+                    </div>
+                    {% if can_edit_application %}
+                        <div class="section-divider">
+                            <p class="detail-label">Version Controls</p>
+                            <pre id="curl-major-{{ app.id }}" class="hidden">curl -X POST -H "Content-Type: application/json" -d "{\"version_part\":\"major\",\"releasenotes\":\"${RELEASE_NOTES:-${CI_COMMIT_MESSAGE:-${GITHUB_EVENT_HEAD_COMMIT_MESSAGE:-${GITEA_COMMIT_MESSAGE:-No release notes available.}}}}\"}" http://localhost:8000/app/{{ app.id }}/update_version</pre>
+                            <pre id="curl-minor-{{ app.id }}" class="hidden">curl -X POST -H "Content-Type: application/json" -d "{\"version_part\":\"minor\",\"releasenotes\":\"${RELEASE_NOTES:-${CI_COMMIT_MESSAGE:-${GITHUB_EVENT_HEAD_COMMIT_MESSAGE:-${GITEA_COMMIT_MESSAGE:-No release notes available.}}}}\"}" http://localhost:8000/app/{{ app.id }}/update_version</pre>
+                            <pre id="curl-patch-{{ app.id }}" class="hidden">curl -X POST -H "Content-Type: application/json" -d "{\"version_part\":\"patch\",\"releasenotes\":\"${RELEASE_NOTES:-${CI_COMMIT_MESSAGE:-${GITHUB_EVENT_HEAD_COMMIT_MESSAGE:-${GITEA_COMMIT_MESSAGE:-No release notes available.}}}}\"}" http://localhost:8000/app/{{ app.id }}/update_version</pre>
+                            <div class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
+                                <button type="button" onclick="copyToClipboard('curl-major-{{ app.id }}')" class="btn btn-secondary px-2">Major</button>
+                                <button type="button" onclick="copyToClipboard('curl-minor-{{ app.id }}')" class="btn btn-secondary px-2">Minor</button>
+                                <button type="button" onclick="copyToClipboard('curl-patch-{{ app.id }}')" class="btn btn-secondary px-2">Patch</button>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </section>
+
+            <section id="accessDetailsSection" class="detail-tile app-details-view hidden" data-app-details-view="access">
+                <div>
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="detail-heading flex-1">
+                            <span class="detail-icon" aria-hidden="true">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
                                 </svg>
                             </span>
                             <div class="detail-heading-content">
@@ -806,8 +1459,8 @@
                         </div>
                         {% if can_change_project %}
                             <button type="button" onclick="openAccessManagement(); return false;" class="inline-icon-button flex-shrink-0" aria-label="Edit access" title="Edit access">
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" />
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
                                 </svg>
                             </button>
                         {% endif %}
@@ -887,7 +1540,7 @@
                 </div>
             </section>
 
-            <section id="repositoryBranchesPanel" class="detail-tile relative">
+            <section id="repositoryBranchesPanel" class="detail-tile app-details-view relative" data-app-details-view="overview">
                 <div class="flex items-start justify-between gap-3">
                     <div class="flex min-w-0 flex-1 items-start gap-3">
                         <span class="detail-icon" aria-hidden="true">
@@ -897,32 +1550,63 @@
                         </span>
                         <div class="min-w-0 flex-1">
                             <p class="detail-label">Repository</p>
-                            <div class="detail-value flex flex-wrap items-center gap-2">
-                                {% if app.link %}
-                                    <a href="{{ app.link }}" target="_blank" rel="noopener noreferrer" class="repository-link" title="{{ app.link }}">
-                                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
-                                        </svg>
-                                        <span class="truncate">{{ app.link.replace('https://', '').replace('http://', '').rstrip('/') }}</span>
-                                    </a>
-                                {% else %}
-                                    <span class="text-gray-500">No link available</span>
-                                {% endif %}
-                            </div>
+                            <p class="access-person-meta mt-1">Branch metadata is synced from the configured repository URL.</p>
                         </div>
                     </div>
+                </div>
+
+                <div class="repository-card">
+                    {% if app.link %}
+                        <a href="{{ app.link }}" target="_blank" rel="noopener noreferrer" class="repository-card-link" title="{{ app.link }}">
+                            <span class="repository-card-icon" aria-hidden="true">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
+                                </svg>
+                            </span>
+                            <span class="min-w-0">
+                                <span class="block text-sm font-bold truncate">{{ app.link.replace('https://', '').replace('http://', '').rstrip('/') }}</span>
+                                <span class="block text-xs text-gray-500 truncate">Open repository</span>
+                            </span>
+                        </a>
+                    {% else %}
+                        <div class="repository-card-link">
+                            <span class="repository-card-icon" aria-hidden="true">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 4.5v15m7.5-7.5h-15" />
+                                </svg>
+                            </span>
+                            <span class="min-w-0">
+                                <span class="block text-sm font-bold text-gray-700">No repository link</span>
+                                <span class="block text-xs text-gray-500">Add a repository URL to sync branch data.</span>
+                            </span>
+                        </div>
+                    {% endif %}
                     {% if can_edit_application %}
-                        <div class="flex flex-shrink-0 items-center gap-1">
-                            <button type="button" onclick="openEditAppModal({{ app.id }}, 'repository'); return false;" class="inline-icon-button" aria-label="Edit repository link" title="Edit repository link">
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" />
-                                </svg>
-                            </button>
-                            <button type="button" id="refreshRepositoryButton" onclick="refreshRepositoryMetadata(); return false;" class="inline-icon-button" aria-label="Refresh repository data" title="Refresh repository data">
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-                                </svg>
-                            </button>
+                        <div class="repository-card-actions">
+                            {% if app.link %}
+                                <button type="button" onclick="openEditAppModal({{ app.id }}, 'repository'); return false;" class="inline-icon-button" aria-label="Edit repository link" title="Edit repository link">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                                    </svg>
+                                </button>
+                                <button type="button" id="refreshRepositoryButton" onclick="refreshRepositoryMetadata(); return false;" class="inline-icon-button" aria-label="Refresh repository data" title="Refresh repository data">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                                    </svg>
+                                </button>
+                                <button type="button" onclick="removeRepositoryLink(); return false;" class="inline-icon-button" aria-label="Remove repository link" title="Remove repository link">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166M19.228 5.79 18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                    </svg>
+                                </button>
+                            {% else %}
+                                <button type="button" onclick="openEditAppModal({{ app.id }}, 'repository'); return false;" class="btn btn-primary" aria-label="Add repository link" title="Add repository link">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.5v15m7.5-7.5h-15" />
+                                    </svg>
+                                    Add Repository
+                                </button>
+                            {% endif %}
                         </div>
                     {% endif %}
                 </div>
@@ -932,7 +1616,7 @@
                     <p class="text-sm font-semibold text-yellow-800">Syncing repository data...</p>
                 </div>
 
-                <div id="repositoryBranchesTableWrap" class="mt-4 {{ 'overflow-x-auto' if repository_branches else 'hidden overflow-x-auto' }}">
+                <div id="repositoryBranchesTableWrap" class="mt-4 {{ 'overflow-x-auto' if app.link and repository_branches else 'hidden overflow-x-auto' }}">
                     <table class="repository-branches">
                         <thead>
                             <tr>
@@ -957,14 +1641,50 @@
                                         {% endif %}
                                     </td>
                                     <td class="font-mono text-sm" title="{{ branch.commit_sha }}">{{ branch.short_commit_sha or 'N/A' }}</td>
-                                    <td class="date-time-text">{{ branch.last_commit_display }}</td>
+                                    <td class="date-time-text metadata-date">{{ branch.last_commit_display }}</td>
                                     <td class="text-sm" title="{{ branch.full_commit_note }}">{{ branch.commit_note or 'N/A' }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
-                <p id="repositoryBranchesEmpty" class="mt-4 {{ 'hidden' if repository_branches else '' }} text-sm text-gray-500">No repository branch data available.</p>
+                <p id="repositoryBranchesEmpty" class="mt-4 {{ 'hidden' if app.link and repository_branches else '' }} text-sm text-gray-500">{{ 'No repository branch data available.' if app.link else 'Add a repository link to sync branch data.' }}</p>
+            </section>
+
+            <section id="deploymentChecksPanel" class="detail-tile app-details-view hidden" data-app-details-view="deployments">
+                <div class="flex flex-col gap-4">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="detail-heading flex-1">
+                            <span class="detail-icon" aria-hidden="true">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 0 1-3-3m3 3a3 3 0 1 0 0 6h13.5a3 3 0 1 0 0-6m-16.5-3a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3m-19.5 0a4.5 4.5 0 0 1 .9-2.7L5.737 5.1a3.375 3.375 0 0 1 2.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 0 1 .9 2.7m0 0a3 3 0 0 1-3 3m0 3h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Zm-3 6h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Z" />
+                                </svg>
+                            </span>
+                            <div class="detail-heading-content">
+                                <p class="detail-label">Deployments</p>
+                                <p class="access-person-meta mt-1">Configure deployment URLs and check their root, version, and health endpoints.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="deploymentsTableWrap" class="{{ 'overflow-x-auto' if deployments else 'hidden overflow-x-auto' }}">
+                        <table class="deployment-checks">
+                            <thead>
+                                <tr>
+                                    <th class="col-status"></th>
+                                    <th>Name</th>
+                                    <th class="col-type">Type</th>
+                                    <th class="col-url">URL</th>
+                                    <th class="col-version">Version</th>
+                                    <th class="col-last-check">Last Check</th>
+                                    <th class="col-actions">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="deploymentsBody"></tbody>
+                        </table>
+                    </div>
+                    <p id="deploymentsEmpty" class="{{ 'hidden' if deployments else '' }} text-sm text-gray-500">No deployments configured.</p>
+                </div>
             </section>
 
         </section>
@@ -1019,6 +1739,55 @@
 </div>
 {% endif %}
 
+<!-- Modal for deployment configuration -->
+{% if can_edit_application %}
+<div id="deploymentModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center">
+<div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-hidden">
+    <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
+        <h3 id="deploymentModalTitle" class="text-lg font-bold text-gray-800">New Deployment</h3>
+        <button onclick="closeDeploymentModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none" aria-label="Close deployment modal">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+    <form id="deploymentForm">
+        <div class="p-6 space-y-4">
+            <input type="hidden" id="deploymentIdInput">
+            <div>
+                <label for="deploymentNameInput" class="block text-sm font-medium text-gray-700">Application Name</label>
+                <input type="text" id="deploymentNameInput" class="form-input block w-full mt-1" placeholder="{{ app.name }}" required>
+            </div>
+            <div>
+                <label for="deploymentUrlInput" class="block text-sm font-medium text-gray-700">Deployment URL</label>
+                <input type="url" id="deploymentUrlInput" class="form-input block w-full mt-1" placeholder="http://localhost:8081" required>
+                <p class="mt-2 text-xs text-gray-500">Vermicelli checks the URL, /version, and /health. Deployment type is detected from /version.</p>
+            </div>
+        </div>
+        <div class="p-4 border-t border-gray-200 bg-gray-100 text-right rounded-b-lg space-x-2">
+            <button type="submit" id="saveDeploymentButton" class="btn btn-primary">Add</button>
+            <button type="button" onclick="closeDeploymentModal()" class="btn btn-secondary">Cancel</button>
+        </div>
+    </form>
+</div>
+</div>
+{% endif %}
+
+<!-- Modal for deployment check result -->
+<div id="deploymentResultModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center">
+<div class="bg-white rounded-lg shadow-lg w-full max-w-3xl mx-auto overflow-hidden">
+    <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
+        <h3 id="deploymentResultTitle" class="text-lg font-bold text-gray-800">Deployment Result</h3>
+        <button onclick="closeDeploymentResultModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none" aria-label="Close deployment result">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+    <div id="deploymentResultContent" class="p-6 space-y-4 text-gray-700"></div>
+</div>
+</div>
+
 <!-- Version History Modal -->
 <div id="versionModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center">
     <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-hidden">
@@ -1051,6 +1820,22 @@
         const currentApplicationLabels = {{ app_labels|tojson }};
         const hasRepositoryLink = Boolean(currentApplicationLink);
         let activeEditMode = 'all';
+        const deploymentCheckIcon = `
+            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+            </svg>`;
+        const deploymentResultIcon = `
+            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m6.75 7.5 3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0 0 21 18V6a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 6v12a2.25 2.25 0 0 0 2.25 2.25Z" />
+            </svg>`;
+        const deploymentEditIcon = `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+            </svg>`;
+        const deploymentDeleteIcon = `
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166M19.228 5.79 18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+            </svg>`;
         const currentApplicationInfo = {
             id: currentAppId,
             name: currentApplicationName,
@@ -1065,6 +1850,59 @@
             latestReleaseNotes: {{ (latest_version_notes or 'No release notes available.')|tojson }}
         };
         let currentRepositoryBranches = {{ repository_branches|tojson }};
+        let currentDeployments = {{ deployments|tojson }};
+
+        function showAppAlert(options) {
+            const settings = typeof options === 'string' ? { text: options } : (options || {});
+            const title = settings.title || (settings.icon === 'error' ? 'Error' : 'Notice');
+            const text = settings.text || '';
+            if (typeof Swal !== 'undefined') {
+                return Swal.fire({
+                    title,
+                    text,
+                    icon: settings.icon || 'info',
+                    confirmButtonText: settings.confirmButtonText || 'OK',
+                    customClass: {
+                        popup: 'app-details-swal',
+                        title: 'app-details-swal-title',
+                        htmlContainer: 'app-details-swal-content',
+                        confirmButton: 'btn btn-primary'
+                    },
+                    buttonsStyling: false,
+                    scrollbarPadding: false
+                });
+            }
+            alert(text ? `${title}\n\n${text}` : title);
+            return Promise.resolve();
+        }
+
+        function confirmAppAction(options) {
+            const settings = options || {};
+            const title = settings.title || 'Are you sure?';
+            if (typeof Swal !== 'undefined') {
+                return Swal.fire({
+                    title,
+                    text: settings.text || '',
+                    icon: settings.icon || 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: settings.confirmButtonText || 'Confirm',
+                    cancelButtonText: settings.cancelButtonText || 'Cancel',
+                    customClass: {
+                        popup: 'app-details-swal',
+                        title: 'app-details-swal-title',
+                        htmlContainer: 'app-details-swal-content',
+                        confirmButton: settings.danger ? 'btn btn-danger' : 'btn btn-primary',
+                        cancelButton: 'btn btn-secondary',
+                        actions: 'flex justify-center space-x-4'
+                    },
+                    buttonsStyling: false,
+                    scrollbarPadding: false
+                }).then(function(result) {
+                    return Boolean(result.isConfirmed);
+                });
+            }
+            return Promise.resolve(confirm(settings.text ? `${title}\n\n${settings.text}` : title));
+        }
 
         // Function to open the edit application modal
         function editModeTitle(mode) {
@@ -1115,7 +1953,7 @@
                     $('#editAppModal').removeClass('hidden').addClass('flex');
                 },
                 error: function(xhr) {
-                    alert('Error loading application details');
+                    showAppAlert({ title: 'Error', text: 'Error loading application details', icon: 'error' });
                 }
             });            
         }
@@ -1133,7 +1971,7 @@
                     });
                 },
                 error: function() {
-                    alert('Error loading projects');
+                    showAppAlert({ title: 'Error', text: 'Error loading projects', icon: 'error' });
                 }
             });
         }
@@ -1160,7 +1998,7 @@
                 error: function(xhr) {
                     setRepositoryLoading(false);
                     const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error saving application';
-                    alert(error);
+                    showAppAlert({ title: 'Error', text: error, icon: 'error' });
                 }
             });
         }
@@ -1215,7 +2053,7 @@
                 <tr>
                     <td class="font-medium">${branchCell}</td>
                     <td class="font-mono text-sm" title="${escapeAttribute(branch.commit_sha || '')}">${escapeHtml(branch.short_commit_sha || 'N/A')}</td>
-                    <td class="date-time-text">${escapeHtml(branch.last_commit_display || 'N/A')}</td>
+                    <td class="date-time-text metadata-date">${escapeHtml(branch.last_commit_display || 'N/A')}</td>
                     <td class="text-sm" title="${escapeAttribute(branch.full_commit_note || '')}">${escapeHtml(branch.commit_note || 'N/A')}</td>
                 </tr>
             `;
@@ -1229,6 +2067,241 @@
             $('#repositoryBranchesEmpty').toggleClass('hidden', hasBranches);
         }
 
+        function showApplicationDetailsView(viewName) {
+            const activeView = viewName || 'overview';
+            $('[data-app-details-view]').toggleClass('hidden', true);
+            $(`[data-app-details-view="${activeView}"]`).toggleClass('hidden', false);
+            $('.app-details-actions').toggleClass('hidden', true);
+            $(`.app-details-actions[data-app-actions-view="${activeView}"]`).toggleClass('hidden', false);
+            $('.app-details-tab')
+                .removeClass('active btn-primary')
+                .addClass('btn-secondary');
+            $(`.app-details-tab[data-app-details-tab="${activeView}"]`)
+                .removeClass('btn-secondary')
+                .addClass('active btn-primary');
+        }
+
+        function responseSummary(response) {
+            if (!response) return 'N/A';
+            if (response.json && typeof response.json === 'object') {
+                return escapeHtml(JSON.stringify(response.json, null, 2));
+            }
+            return escapeHtml(response.raw || 'N/A');
+        }
+
+        function versionSummary(deployment) {
+            const payload = deployment.version_response && deployment.version_response.json;
+            if (payload && typeof payload === 'object' && !Array.isArray(payload)) {
+                return escapeHtml(payload.version || 'N/A');
+            }
+            return escapeHtml(deployment.version_status_code ? `HTTP ${deployment.version_status_code}` : 'Not checked');
+        }
+
+        function deploymentTypeBadge(deployment) {
+            const typeValue = deployment.deployment_type || 'other';
+            return `<span class="deployment-type-badge deployment-type-${escapeAttribute(typeValue)}">${escapeHtml(deployment.deployment_type_label || typeValue)}</span>`;
+        }
+
+        function deploymentRow(deployment) {
+            const statusState = deployment.health_status || 'unknown';
+            const dotClass = statusState === 'healthy' || statusState === 'reachable' ? `is-${statusState}` : 'is-disabled';
+            const writeActions = canEditApplication ? `
+                <button type="button" class="table-action-button" onclick="editDeployment(${deployment.id}); return false;" aria-label="Edit deployment" title="Edit deployment">${deploymentEditIcon}</button>
+                <button type="button" class="table-action-button delete-button" onclick="deleteDeployment(${deployment.id}); return false;" aria-label="Delete deployment" title="Delete deployment">${deploymentDeleteIcon}</button>
+            ` : '';
+            return `
+                <tr>
+                    <td class="col-status" data-label="Status"><span class="deployment-status-dot ${dotClass}" title="${escapeAttribute(deployment.health_status_label)}"></span></td>
+                    <td class="font-medium" data-label="Name">${escapeHtml(deployment.name)}</td>
+                    <td data-label="Type">${deploymentTypeBadge(deployment)}</td>
+                    <td data-label="URL">
+                        <a href="${escapeAttribute(deployment.base_url)}" target="_blank" rel="noopener noreferrer" class="repository-link deployment-url" title="${escapeAttribute(deployment.base_url)}">
+                            <span class="truncate">${escapeHtml(deployment.base_url)}</span>
+                        </a>
+                    </td>
+                    <td data-label="Version">${versionSummary(deployment)}</td>
+                    <td class="date-time-text metadata-date" data-label="Last Check">${escapeHtml(deployment.last_checked_display || 'Never checked')}</td>
+                    <td class="col-actions" data-label="Actions">
+                        <div class="table-actions ${canEditApplication ? 'deployment-actions' : ''}">
+                            <button type="button" class="table-action-button" onclick="checkDeployment(${deployment.id}); return false;" aria-label="Check deployment" title="Check deployment">${deploymentCheckIcon}</button>
+                            <button type="button" class="table-action-button" onclick="openDeploymentResult(${deployment.id}); return false;" aria-label="View deployment result" title="View deployment result">${deploymentResultIcon}</button>
+                            ${writeActions}
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+
+        function renderDeployments(deployments) {
+            const hasDeployments = Array.isArray(deployments) && deployments.length > 0;
+            currentDeployments = hasDeployments ? deployments : [];
+            $('#deploymentsBody').html(hasDeployments ? currentDeployments.map(deploymentRow).join('') : '');
+            $('#deploymentsTableWrap').toggleClass('hidden', !hasDeployments);
+            $('#deploymentsEmpty').toggleClass('hidden', hasDeployments);
+        }
+
+        function resetDeploymentForm() {
+            $('#deploymentIdInput').val('');
+            $('#deploymentNameInput').val('');
+            $('#deploymentUrlInput').val('');
+            $('#saveDeploymentButton').text('Add');
+            $('#deploymentModalTitle').text('New Deployment');
+        }
+
+        function openDeploymentModal(deploymentId) {
+            resetDeploymentForm();
+            if (deploymentId) {
+                const deployment = currentDeployments.find(function(item) {
+                    return item.id === deploymentId;
+                });
+                if (!deployment) return;
+                $('#deploymentIdInput').val(deployment.id);
+                $('#deploymentNameInput').val(deployment.name);
+                $('#deploymentUrlInput').val(deployment.base_url);
+                $('#saveDeploymentButton').text('Save');
+                $('#deploymentModalTitle').text('Edit Deployment');
+            }
+            $('#deploymentModal').removeClass('hidden').addClass('flex');
+        }
+
+        function closeDeploymentModal() {
+            $('#deploymentModal').removeClass('flex').addClass('hidden');
+            resetDeploymentForm();
+        }
+
+        function deploymentPayload() {
+            return {
+                name: $('#deploymentNameInput').val().trim(),
+                base_url: $('#deploymentUrlInput').val().trim(),
+            };
+        }
+
+        function upsertDeployment(event) {
+            event.preventDefault();
+            if (!canEditApplication) return;
+            const deploymentId = $('#deploymentIdInput').val();
+            const method = deploymentId ? 'PUT' : 'POST';
+            const url = deploymentId
+                ? `/api/application_deployments/${deploymentId}`
+                : `/api/application/${currentAppId}/deployments`;
+            $.ajax({
+                url,
+                type: method,
+                contentType: 'application/json',
+                data: JSON.stringify(deploymentPayload()),
+                success: function(response) {
+                    const deployment = response.deployment;
+                    if (deploymentId) {
+                        currentDeployments = currentDeployments.map(function(item) {
+                            return item.id === deployment.id ? deployment : item;
+                        });
+                    } else {
+                        currentDeployments.push(deployment);
+                    }
+                    renderDeployments(currentDeployments);
+                    closeDeploymentModal();
+                },
+                error: function(xhr) {
+                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error saving deployment';
+                    showAppAlert({ title: 'Error', text: error, icon: 'error' });
+                }
+            });
+        }
+
+        function editDeployment(deploymentId) {
+            openDeploymentModal(deploymentId);
+        }
+
+        function deploymentEndpointBlock(label, url, statusCode, response) {
+            const status = statusCode ? `HTTP ${statusCode}` : 'No response';
+            return `
+                <section class="detail-tile">
+                    <p class="detail-label">${escapeHtml(label)}</p>
+                    <p class="mt-1 text-sm text-gray-600">${escapeHtml(url || 'N/A')}</p>
+                    <p class="mt-2 text-sm font-semibold">${escapeHtml(status)}</p>
+                    <pre class="deployment-response mt-2">${responseSummary(response)}</pre>
+                </section>
+            `;
+        }
+
+        function openDeploymentResult(deploymentId) {
+            const deployment = currentDeployments.find(function(item) {
+                return item.id === deploymentId;
+            });
+            if (!deployment) return;
+            $('#deploymentResultTitle').text(`${deployment.name} Result`);
+            $('#deploymentResultContent').html(`
+                <div class="grid grid-cols-1 gap-3 md:grid-cols-3">
+                    <div>
+                        <p class="detail-label">Type</p>
+                        <p class="detail-value">${escapeHtml(deployment.deployment_type_label)}</p>
+                    </div>
+                    <div>
+                        <p class="detail-label">Version</p>
+                        <p class="detail-value">${versionSummary(deployment)}</p>
+                    </div>
+                    <div>
+                        <p class="detail-label">Last Check</p>
+                        <p class="detail-value date-time-text">${escapeHtml(deployment.last_checked_display || 'Never checked')}</p>
+                    </div>
+                </div>
+                ${deploymentEndpointBlock('Base Request', deployment.base_check_url, deployment.base_status_code, deployment.base_response)}
+                ${deploymentEndpointBlock('Version Request', deployment.version_check_url, deployment.version_status_code, deployment.version_response)}
+                ${deploymentEndpointBlock('Health Request', deployment.health_check_url, deployment.health_status_code, deployment.health_response)}
+            `);
+            $('#deploymentResultModal').removeClass('hidden').addClass('flex');
+        }
+
+        function closeDeploymentResultModal() {
+            $('#deploymentResultModal').removeClass('flex').addClass('hidden');
+        }
+
+        function checkDeployment(deploymentId) {
+            $.ajax({
+                url: `/api/application_deployments/${deploymentId}/check`,
+                type: 'POST',
+                success: function(response) {
+                    const deployment = response.deployment;
+                    currentDeployments = currentDeployments.map(function(item) {
+                        return item.id === deployment.id ? deployment : item;
+                    });
+                    renderDeployments(currentDeployments);
+                },
+                error: function(xhr) {
+                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error checking deployment';
+                    showAppAlert({ title: 'Error', text: error, icon: 'error' });
+                }
+            });
+        }
+
+        function deleteDeployment(deploymentId) {
+            confirmAppAction({
+                title: 'Delete deployment check?',
+                text: 'This deployment check will be removed from the application.',
+                confirmButtonText: 'Delete',
+                danger: true
+            }).then(function(confirmed) {
+                if (!confirmed) return;
+                $.ajax({
+                    url: `/api/application_deployments/${deploymentId}`,
+                    type: 'DELETE',
+                    success: function() {
+                        currentDeployments = currentDeployments.filter(function(item) {
+                            return item.id !== deploymentId;
+                        });
+                        renderDeployments(currentDeployments);
+                        if ($('#deploymentIdInput').val() === String(deploymentId)) {
+                            resetDeploymentForm();
+                        }
+                    },
+                    error: function(xhr) {
+                        const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error deleting deployment';
+                        showAppAlert({ title: 'Error', text: error, icon: 'error' });
+                    }
+                });
+            });
+        }
+
         function refreshRepositoryMetadata(options) {
             const settings = options || {};
             if (!hasRepositoryLink) return;
@@ -1240,16 +2313,62 @@
                     renderRepositoryBranches(response.repository_branches || []);
                     setRepositoryLoading(false);
                     if (response.warning && !settings.silent) {
-                        alert(response.message || response.warning);
+                        showAppAlert({ title: 'Repository warning', text: response.message || response.warning, icon: 'warning' });
                     }
                 },
                 error: function(xhr) {
                     setRepositoryLoading(false);
                     const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error refreshing repository data';
                     if (!settings.silent) {
-                        alert(error);
+                        showAppAlert({ title: 'Error', text: error, icon: 'error' });
                     }
                 }
+            });
+        }
+
+        function reloadApplicationDetails() {
+            window.loadPage('application_details', currentAppId);
+        }
+
+        function refreshRepositoryThenReload(linkValue) {
+            if (!linkValue) {
+                reloadApplicationDetails();
+                return;
+            }
+            setRepositoryLoading(true);
+            $.ajax({
+                url: `/api/application/${currentAppId}/repository/refresh`,
+                type: 'POST',
+                complete: reloadApplicationDetails
+            });
+        }
+
+        function showPermissionNotice(message) {
+            showAppAlert({ title: 'Permission required', text: message || 'You do not have permission to perform this action.', icon: 'warning' });
+        }
+
+        function removeRepositoryLink() {
+            if (!canEditApplication) return;
+            if (!currentApplicationLink) {
+                showAppAlert({ title: 'No repository link', text: 'No repository link to remove.', icon: 'info' });
+                return;
+            }
+            const removeLink = function() {
+                saveApplicationData({
+                    name: currentApplicationName,
+                    link: '',
+                    label: currentApplicationLabelValue,
+                }, function() {
+                    reloadApplicationDetails();
+                });
+            };
+            confirmAppAction({
+                title: 'Remove repository link?',
+                text: 'Repository branch data will be hidden until a link is added again.',
+                confirmButtonText: 'Remove',
+                danger: true
+            }).then(function(confirmed) {
+                if (confirmed) removeLink();
             });
         }
 
@@ -1275,66 +2394,89 @@
             }
 
             if (!appData.name) {
-                alert('Application name cannot be empty!');
+                showAppAlert({ title: 'Application name required', text: 'Application name cannot be empty!', icon: 'warning' });
                 return;
             }
 
+            const savedEditMode = activeEditMode;
             saveApplicationData(appData, function() {
                 closeEditAppModal();
-                window.loadPage('application_details', currentAppId);
+                if (savedEditMode === 'all' || savedEditMode === 'repository') {
+                    refreshRepositoryThenReload(appData.link);
+                    return;
+                }
+                reloadApplicationDetails();
             });
         }
 
         // Function to delete the application
         function deleteApplication(appId) {
-            if (!confirm('Are you sure you want to delete this application?')) {
-                return;
-            }
-            $.ajax({
-                url: `/delete_application/${appId}`,
-                type: 'DELETE',
-                success: function(response) {
-                    alert(response.message);
-                    window.loadPage('applications'); // Redirect to applications page
-                },
-                error: function(xhr) {
-                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error deleting application';
-                    alert(`Error: ${error}`);
-                }
+            confirmAppAction({
+                title: 'Delete application?',
+                text: 'This action cannot be undone.',
+                confirmButtonText: 'Delete',
+                danger: true
+            }).then(function(confirmed) {
+                if (!confirmed) return;
+                $.ajax({
+                    url: `/delete_application/${appId}`,
+                    type: 'DELETE',
+                    success: function(response) {
+                        showAppAlert({ title: 'Deleted', text: response.message, icon: 'success' }).then(function() {
+                            window.loadPage('applications');
+                        });
+                    },
+                    error: function(xhr) {
+                        const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error deleting application';
+                        showAppAlert({ title: 'Error', text: error, icon: 'error' });
+                    }
+                });
             });
         }
 
         function deleteProjectAccess(membershipId) {
-            if (!membershipId || !confirm('Remove this user from the project access list?')) {
-                return;
-            }
-            $.ajax({
-                url: `/api/project_memberships/${membershipId}`,
-                type: 'DELETE',
-                success: function() {
-                    window.loadPage('application_details', currentAppId);
-                },
-                error: function(xhr) {
-                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error removing project access';
-                    alert(`Error: ${error}`);
-                }
+            if (!membershipId) return;
+            confirmAppAction({
+                title: 'Remove project access?',
+                text: 'This user will be removed from the project access list.',
+                confirmButtonText: 'Remove',
+                danger: true
+            }).then(function(confirmed) {
+                if (!confirmed) return;
+                $.ajax({
+                    url: `/api/project_memberships/${membershipId}`,
+                    type: 'DELETE',
+                    success: function() {
+                        window.loadPage('application_details', currentAppId);
+                    },
+                    error: function(xhr) {
+                        const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error removing project access';
+                        showAppAlert({ title: 'Error', text: error, icon: 'error' });
+                    }
+                });
             });
         }
 
         function deleteApplicationAccess(membershipId) {
-            if (!membershipId || !confirm('Remove this user from this application access list?')) {
-                return;
-            }
-            $.ajax({
-                url: `/api/application_memberships/${membershipId}`,
-                type: 'DELETE',
-                success: function() {
-                    window.loadPage('application_details', currentAppId);
-                },
-                error: function(xhr) {
-                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error removing application access';
-                    alert(`Error: ${error}`);
-                }
+            if (!membershipId) return;
+            confirmAppAction({
+                title: 'Remove application access?',
+                text: 'This user will be removed from this application access list.',
+                confirmButtonText: 'Remove',
+                danger: true
+            }).then(function(confirmed) {
+                if (!confirmed) return;
+                $.ajax({
+                    url: `/api/application_memberships/${membershipId}`,
+                    type: 'DELETE',
+                    success: function() {
+                        window.loadPage('application_details', currentAppId);
+                    },
+                    error: function(xhr) {
+                        const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error removing application access';
+                        showAppAlert({ title: 'Error', text: error, icon: 'error' });
+                    }
+                });
             });
         }
 
@@ -1361,7 +2503,7 @@
                     onSuccess(versionsData);
                 },
                 error: onError || function() {
-                    alert('Error loading version history.');
+                    showAppAlert({ title: 'Error', text: 'Error loading version history.', icon: 'error' });
                 }
             });
         }
@@ -1533,6 +2675,24 @@
             }).join('');
         }
 
+        function deploymentPrintRows(deployments) {
+            if (!deployments.length) {
+                return '<tr><td colspan="6">No deployments configured.</td></tr>';
+            }
+            return deployments.map(function(deployment) {
+                return `
+                    <tr>
+                        <td>${escapeHtml(deployment.name || 'N/A')}</td>
+                        <td>${escapeHtml(deployment.deployment_type_label || 'N/A')}</td>
+                        <td><a href="${escapeAttribute(deployment.base_url || '')}">${escapeHtml(deployment.base_url || 'N/A')}</a></td>
+                        <td>${escapeHtml(deployment.health_status_label || 'Unknown')}</td>
+                        <td>${escapeHtml(deployment.version_status_code ? `HTTP ${deployment.version_status_code}` : 'Not checked')}</td>
+                        <td>${escapeHtml(deployment.health_status_code ? `HTTP ${deployment.health_status_code}` : 'Not checked')}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
         function printVersionHistory(versions) {
             const labels = currentApplicationInfo.labels.length
                 ? currentApplicationInfo.labels.join(', ')
@@ -1546,8 +2706,12 @@
                 <head>
                     <meta charset="utf-8">
                     <title>${escapeHtml(currentApplicationInfo.name)} Release History</title>
+                    <link rel="preconnect" href="https://fonts.googleapis.com">
+                    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+                    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
                     <style>
-                        body { color: #111827; font-family: Arial, sans-serif; margin: 32px; }
+                        body { color: #111827; font-family: "Outfit", sans-serif; margin: 32px; }
+                        button, input, optgroup, select, textarea { font-family: "Outfit", sans-serif; }
                         h1 { font-size: 26px; margin: 0 0 6px; }
                         h2 { border-bottom: 1px solid #d1d5db; font-size: 18px; margin: 28px 0 10px; padding-bottom: 6px; }
                         p { margin: 4px 0; }
@@ -1606,12 +2770,27 @@
                         </thead>
                         <tbody>${repositoryPrintRows(currentRepositoryBranches)}</tbody>
                     </table>
+
+                    <h2>Deployments</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>URL</th>
+                                <th>Status</th>
+                                <th>Version Check</th>
+                                <th>Health Check</th>
+                            </tr>
+                        </thead>
+                        <tbody>${deploymentPrintRows(currentDeployments)}</tbody>
+                    </table>
                 </body>
                 </html>
             `;
             const printWindow = window.open('', '_blank');
             if (!printWindow) {
-                alert('Allow pop-ups to print the release history.');
+                showAppAlert({ title: 'Pop-up blocked', text: 'Allow pop-ups to print the release history.', icon: 'warning' });
                 return;
             }
             printWindow.document.open();
@@ -1646,6 +2825,10 @@
         window.deleteApplication = deleteApplication;
         window.deleteProjectAccess = deleteProjectAccess;
         window.deleteApplicationAccess = deleteApplicationAccess;
+        window.showAppAlert = showAppAlert;
+        window.confirmAppAction = confirmAppAction;
+        window.showPermissionNotice = showPermissionNotice;
+        window.removeRepositoryLink = removeRepositoryLink;
         window.openAccessManagement = openAccessManagement;
         window.openApplicationAccessUser = openApplicationAccessUser;
         window.goToPage = goToPage;
@@ -1654,8 +2837,19 @@
         window.removeApplicationLabel = removeApplicationLabel;
         window.filterApplicationsByLabel = filterApplicationsByLabel;
         window.refreshRepositoryMetadata = refreshRepositoryMetadata;
+        window.showApplicationDetailsView = showApplicationDetailsView;
+        window.resetDeploymentForm = resetDeploymentForm;
+        window.openDeploymentModal = openDeploymentModal;
+        window.closeDeploymentModal = closeDeploymentModal;
+        window.editDeployment = editDeployment;
+        window.checkDeployment = checkDeployment;
+        window.deleteDeployment = deleteDeployment;
+        window.openDeploymentResult = openDeploymentResult;
+        window.closeDeploymentResultModal = closeDeploymentResultModal;
 
         $(function() {
+            renderDeployments(currentDeployments);
+            $('#deploymentForm').on('submit', upsertDeployment);
             if (!currentRepositoryBranches.length) {
                 refreshRepositoryMetadata({ silent: true });
             }
@@ -1757,7 +2951,11 @@
                 $('#projectModal').removeClass('hidden');
             },
             error: function(xhr) {
-                alert('Error fetching project details.');
+                if (window.showAppAlert) {
+                    window.showAppAlert({ title: 'Error', text: 'Error fetching project details.', icon: 'error' });
+                } else {
+                    alert('Error fetching project details.');
+                }
             }
         });
     }

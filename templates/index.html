@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <title>Vermicelli Dashboard</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='public/favicon.ico') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
     <!-- Include Tailwind CSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
@@ -36,6 +39,7 @@
         /* Ensure the body takes full height and uses Flexbox */
         body, html {
             height: 100%;
+            font-family: "Outfit", sans-serif;
         }
 
         body {
@@ -78,18 +82,46 @@
         }
 
         .date-time-text,
-        time {
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+        time,
+        code,
+        pre,
+        .font-mono {
+            font-family: "Outfit", sans-serif !important;
             font-variant-numeric: tabular-nums;
             letter-spacing: 0;
+        }
+
+        button,
+        input,
+        optgroup,
+        select,
+        textarea {
+            font-family: "Outfit", sans-serif;
+        }
+
+        .size-6 {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+
+        .btn .size-6,
+        .project-inline-icon-button .size-6,
+        .inline-icon-button .size-6,
+        .table-action-button .size-6,
+        .edit-detail-field .size-6,
+        .edit-project-access .size-6,
+        .edit-application-access .size-6 {
+            width: 1rem;
+            height: 1rem;
+            flex: 0 0 1rem;
         }
 
         .project-inline-icon-button {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 2rem;
-            height: 2rem;
+            width: 1.75rem;
+            height: 1.75rem;
             border-radius: 9999px;
             color: #6b7280;
             transition: background-color 0.2s ease, color 0.2s ease;

@@ -87,6 +87,15 @@ ACCESS_VIEW_ONLY = 'view_only'
 ACCESS_READ_WRITE = 'read_write'
 PROJECT_ACCESS_LEVELS = (ACCESS_VIEW_ONLY, ACCESS_READ_WRITE)
 APPLICATION_ACCESS_LEVELS = (ACCESS_NO_ACCESS, ACCESS_VIEW_ONLY, ACCESS_READ_WRITE)
+DEPLOYMENT_TYPES = (
+    'production',
+    'development',
+    'staging',
+    'testing',
+    'qa',
+    'preview',
+    'other',
+)
 DEFAULT_TIMEZONE = 'UTC'
 DEFAULT_DATETIME_FORMAT = 'iso_24'
 DEFAULT_RELEASE_NOTES = 'No release notes available.'
@@ -1026,6 +1035,7 @@ class Application(db.Model):
     projects = db.relationship('Project', secondary=project_applications, back_populates='applications')
     memberships = db.relationship('ApplicationMembership', back_populates='application', cascade='all, delete-orphan')
     repository_branches = db.relationship('ApplicationRepositoryBranch', back_populates='application', cascade='all, delete-orphan')
+    deployments = db.relationship('ApplicationDeployment', back_populates='application', cascade='all, delete-orphan')
 
 
 class ApplicationRepositoryBranch(db.Model):
@@ -1049,6 +1059,28 @@ class ApplicationRepositoryBranch(db.Model):
     last_checked_at = db.Column(db.DateTime, nullable=False, default=utc_now)
 
     application = db.relationship('Application', back_populates='repository_branches')
+
+class ApplicationDeployment(db.Model):
+    """Configured deployment endpoint checks for an application."""
+    __tablename__ = 'application_deployments'
+
+    id = db.Column(db.Integer, primary_key=True)
+    application_id = db.Column(db.Integer, db.ForeignKey('application.id', ondelete='CASCADE'), nullable=False)
+    name = db.Column(db.String(120), nullable=False)
+    deployment_type = db.Column(db.String(50), nullable=False, default='production')
+    base_url = db.Column(db.String(512), nullable=False)
+    base_status_code = db.Column(db.Integer)
+    base_response = db.Column(db.Text)
+    version_status_code = db.Column(db.Integer)
+    version_response = db.Column(db.Text)
+    health_status_code = db.Column(db.Integer)
+    health_response = db.Column(db.Text)
+    health_status = db.Column(db.String(50), nullable=False, default='unknown')
+    last_checked_at = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    application = db.relationship('Application', back_populates='deployments')
 
 class Version(db.Model):
     """Represents a version of an application."""
@@ -1336,6 +1368,156 @@ def serialize_repository_branch(branch, user=None):
     }
 
 
+def deployment_type_label(deployment_type):
+    labels = {
+        'production': 'Production',
+        'development': 'Development',
+        'staging': 'Staging',
+        'testing': 'Testing',
+        'qa': 'QA',
+        'preview': 'Preview',
+        'other': 'Other',
+    }
+    return labels.get(deployment_type, labels['other'])
+
+
+def normalize_deployment_type(deployment_type):
+    return deployment_type if deployment_type in DEPLOYMENT_TYPES else 'other'
+
+
+def normalize_deployment_url(url):
+    return (url or '').strip().rstrip('/')
+
+
+def deployment_check_url(base_url, path=''):
+    base = normalize_deployment_url(base_url)
+    if not path:
+        return base
+    return f'{base}/{path.lstrip("/")}'
+
+
+def truncate_deployment_response(value, limit=6000):
+    value = value or ''
+    if len(value) <= limit:
+        return value
+    return value[:limit] + '\n... response truncated ...'
+
+
+def parse_deployment_json(value):
+    try:
+        return json.loads(value) if value else None
+    except json.JSONDecodeError:
+        return None
+
+
+def deployment_health_status(status_code, response_text):
+    parsed = parse_deployment_json(response_text)
+    if isinstance(parsed, dict):
+        status_value = str(parsed.get('status') or parsed.get('health') or '').lower()
+        if status_value in ('ok', 'healthy', 'up', 'pass', 'passing'):
+            return 'healthy'
+        if status_value:
+            return 'unhealthy'
+    if status_code and 200 <= status_code < 300:
+        return 'reachable'
+    return 'unhealthy'
+
+
+def deployment_type_from_version_response(response_text, current_type):
+    parsed = parse_deployment_json(response_text)
+    if isinstance(parsed, dict):
+        candidate = (
+            parsed.get('environment')
+            or parsed.get('deployment_type')
+            or parsed.get('deploymentType')
+            or parsed.get('type')
+        )
+        normalized = normalize_deployment_type(str(candidate or '').strip().lower())
+        if normalized != 'other':
+            return normalized
+    return current_type or 'other'
+
+
+def fetch_deployment_endpoint(url):
+    request_obj = Request(url, headers={'User-Agent': 'Vermicelli deployment check'})
+    try:
+        with urlopen(request_obj, timeout=8) as response:
+            body = response.read(65536).decode('utf-8', errors='replace')
+            return response.getcode(), truncate_deployment_response(body), None
+    except HTTPError as error:
+        body = error.read(65536).decode('utf-8', errors='replace')
+        return error.code, truncate_deployment_response(body), None
+    except (URLError, TimeoutError, ValueError) as error:
+        return None, '', str(error)
+
+
+def check_application_deployment(deployment):
+    checked_at = utc_now()
+    endpoints = {
+        'base': deployment_check_url(deployment.base_url),
+        'version': deployment_check_url(deployment.base_url, 'version'),
+        'health': deployment_check_url(deployment.base_url, 'health'),
+    }
+    results = {}
+    errors = []
+    for key, url in endpoints.items():
+        status_code, response_text, error = fetch_deployment_endpoint(url)
+        results[key] = {
+            'url': url,
+            'status_code': status_code,
+            'response': response_text,
+            'error': error,
+        }
+        if error:
+            errors.append(f'{key}: {error}')
+
+    deployment.base_status_code = results['base']['status_code']
+    deployment.base_response = results['base']['response'] or results['base']['error'] or ''
+    deployment.version_status_code = results['version']['status_code']
+    deployment.version_response = results['version']['response'] or results['version']['error'] or ''
+    deployment.health_status_code = results['health']['status_code']
+    deployment.health_response = results['health']['response'] or results['health']['error'] or ''
+    deployment.health_status = deployment_health_status(deployment.health_status_code, deployment.health_response)
+    deployment.deployment_type = deployment_type_from_version_response(
+        deployment.version_response,
+        deployment.deployment_type,
+    )
+    deployment.last_checked_at = checked_at
+    return not errors, '; '.join(errors) if errors else None
+
+
+def serialize_deployment_response(response_text):
+    parsed = parse_deployment_json(response_text)
+    return {
+        'raw': response_text or '',
+        'json': parsed if isinstance(parsed, (dict, list)) else None,
+    }
+
+
+def serialize_application_deployment(deployment, user=None):
+    return {
+        'id': deployment.id,
+        'application_id': deployment.application_id,
+        'name': deployment.name,
+        'deployment_type': deployment.deployment_type,
+        'deployment_type_label': deployment_type_label(deployment.deployment_type),
+        'base_url': deployment.base_url,
+        'base_check_url': deployment_check_url(deployment.base_url),
+        'version_check_url': deployment_check_url(deployment.base_url, 'version'),
+        'health_check_url': deployment_check_url(deployment.base_url, 'health'),
+        'base_status_code': deployment.base_status_code,
+        'version_status_code': deployment.version_status_code,
+        'health_status_code': deployment.health_status_code,
+        'health_status': deployment.health_status or 'unknown',
+        'health_status_label': (deployment.health_status or 'unknown').replace('_', ' ').title(),
+        'base_response': serialize_deployment_response(deployment.base_response),
+        'version_response': serialize_deployment_response(deployment.version_response),
+        'health_response': serialize_deployment_response(deployment.health_response),
+        'last_checked_at': deployment.last_checked_at.isoformat() if deployment.last_checked_at else None,
+        'last_checked_display': format_datetime_for_user(deployment.last_checked_at, user) if deployment.last_checked_at else 'Never checked',
+    }
+
+
 def backup_datetime(value):
     return value.isoformat() if value else None
 
@@ -1546,6 +1728,26 @@ def serialize_backup_payload():
                 }
                 for branch in ApplicationRepositoryBranch.query.order_by(ApplicationRepositoryBranch.id).all()
             ],
+            'application_deployments': [
+                {
+                    'id': deployment.id,
+                    'application_id': deployment.application_id,
+                    'name': deployment.name,
+                    'deployment_type': deployment.deployment_type,
+                    'base_url': deployment.base_url,
+                    'base_status_code': deployment.base_status_code,
+                    'base_response': deployment.base_response or '',
+                    'version_status_code': deployment.version_status_code,
+                    'version_response': deployment.version_response or '',
+                    'health_status_code': deployment.health_status_code,
+                    'health_response': deployment.health_response or '',
+                    'health_status': deployment.health_status or 'unknown',
+                    'last_checked_at': backup_datetime(deployment.last_checked_at),
+                    'created_at': backup_datetime(deployment.created_at),
+                    'updated_at': backup_datetime(deployment.updated_at),
+                }
+                for deployment in ApplicationDeployment.query.order_by(ApplicationDeployment.id).all()
+            ],
             'project_applications': [
                 {
                     'project_id': row.project_id,
@@ -1635,6 +1837,7 @@ def get_backup_data(payload):
         'applications',
         'versions',
         'application_repository_branches',
+        'application_deployments',
         'project_applications',
         'project_memberships',
         'application_memberships',
@@ -1674,6 +1877,9 @@ def validate_backup_data(data):
     _, error = backup_section_ids(data['application_repository_branches'], 'application_repository_branches')
     if error:
         return error
+    _, error = backup_section_ids(data['application_deployments'], 'application_deployments')
+    if error:
+        return error
     _, error = backup_section_ids(data['project_memberships'], 'project_memberships')
     if error:
         return error
@@ -1697,6 +1903,9 @@ def validate_backup_data(data):
     for branch in data['application_repository_branches']:
         if branch.get('application_id') not in application_ids:
             return 'Backup contains repository metadata for an unknown application.'
+    for deployment in data['application_deployments']:
+        if deployment.get('application_id') not in application_ids:
+            return 'Backup contains deployment checks for an unknown application.'
     for link in data['project_applications']:
         if link.get('project_id') not in project_ids or link.get('application_id') not in application_ids:
             return 'Backup contains an invalid project/application link.'
@@ -1714,6 +1923,7 @@ def clear_application_data():
     db.session.execute(project_applications.delete())
     ApplicationMembership.query.delete(synchronize_session=False)
     ProjectMembership.query.delete(synchronize_session=False)
+    ApplicationDeployment.query.delete(synchronize_session=False)
     ApplicationRepositoryBranch.query.delete(synchronize_session=False)
     Version.query.delete(synchronize_session=False)
     Application.query.delete(synchronize_session=False)
@@ -1726,7 +1936,7 @@ def clear_application_data():
 def reset_primary_key_sequences():
     if db.engine.dialect.name != 'postgresql':
         return
-    for table_name in ('users', 'project', 'application', 'version', 'application_repository_branches', 'project_memberships', 'application_memberships'):
+    for table_name in ('users', 'project', 'application', 'version', 'application_repository_branches', 'application_deployments', 'project_memberships', 'application_memberships'):
         quoted_table_name = f'"{table_name}"'
         db.session.execute(text(
             f"SELECT setval(pg_get_serial_sequence('{quoted_table_name}', 'id'), "
@@ -1820,6 +2030,25 @@ def import_backup_payload(payload):
                 build_status=row.get('build_status') or 'unknown',
                 is_default=bool(row.get('is_default', False)),
                 last_checked_at=parse_backup_datetime(row.get('last_checked_at')) or datetime.utcnow(),
+            ))
+
+        for row in data['application_deployments']:
+            db.session.add(ApplicationDeployment(
+                id=row['id'],
+                application_id=row['application_id'],
+                name=row.get('name') or 'Deployment',
+                deployment_type=normalize_deployment_type(row.get('deployment_type')),
+                base_url=normalize_deployment_url(row.get('base_url')),
+                base_status_code=row.get('base_status_code'),
+                base_response=row.get('base_response') or '',
+                version_status_code=row.get('version_status_code'),
+                version_response=row.get('version_response') or '',
+                health_status_code=row.get('health_status_code'),
+                health_response=row.get('health_response') or '',
+                health_status=row.get('health_status') or 'unknown',
+                last_checked_at=parse_backup_datetime(row.get('last_checked_at')),
+                created_at=parse_backup_datetime(row.get('created_at')) or datetime.utcnow(),
+                updated_at=parse_backup_datetime(row.get('updated_at')) or datetime.utcnow(),
             ))
 
         for row in data['project_memberships']:
@@ -1936,6 +2165,14 @@ def application_details_content(app_id):
             serialize_repository_branch(branch, current)
             for branch in sorted(app_obj.repository_branches, key=lambda item: (not item.is_default, item.branch_name.lower()))
         ],
+        deployments=[
+            serialize_application_deployment(deployment, current)
+            for deployment in sorted(app_obj.deployments, key=lambda item: (item.deployment_type, item.name.lower()))
+        ],
+        deployment_types=[
+            {'value': deployment_type, 'label': deployment_type_label(deployment_type)}
+            for deployment_type in DEPLOYMENT_TYPES
+        ],
         project_name=project_name,
         project_id=project_id,
         created_at_display=format_datetime_for_user(app_obj.created_at, current) if app_obj.created_at else 'N/A',
@@ -1973,6 +2210,14 @@ def application_details_page(app_id):
             serialize_repository_branch(branch, current)
             for branch in sorted(app_obj.repository_branches, key=lambda item: (not item.is_default, item.branch_name.lower()))
         ],
+        deployments=[
+            serialize_application_deployment(deployment, current)
+            for deployment in sorted(app_obj.deployments, key=lambda item: (item.deployment_type, item.name.lower()))
+        ],
+        deployment_types=[
+            {'value': deployment_type, 'label': deployment_type_label(deployment_type)}
+            for deployment_type in DEPLOYMENT_TYPES
+        ],
         created_at_display=format_datetime_for_user(app_obj.created_at, current) if app_obj.created_at else 'N/A',
         updated_at_display=format_datetime_for_user(app_obj.updated_at, current) if app_obj.updated_at else 'N/A',
         can_edit_application=can_write_application(current, app_obj),
@@ -2006,6 +2251,10 @@ def get_application(app_id):
             serialize_repository_branch(branch, current)
             for branch in sorted(app_obj.repository_branches, key=lambda item: (not item.is_default, item.branch_name.lower()))
         ],
+        'deployments': [
+            serialize_application_deployment(deployment, current)
+            for deployment in sorted(app_obj.deployments, key=lambda item: (item.deployment_type, item.name.lower()))
+        ],
         'project_id': project.id if project else None,
         'project_name': project.name if project else 'No project',
         'access_level': app_access_level,
@@ -2015,6 +2264,93 @@ def get_application(app_id):
         'can_change_project': has_platform_role(current, PLATFORM_ADMIN)
     }
     return jsonify(app_data)
+
+
+@app.route('/api/application/<int:app_id>/deployments', methods=['POST'])
+@login_required
+def create_application_deployment(app_id):
+    app_obj = Application.query.get_or_404(app_id)
+    current = get_current_user()
+    if not can_write_application(current, app_obj):
+        return json_error('You do not have permission to configure deployments.', 403)
+
+    data = request.get_json(silent=True) or {}
+    name = str(data.get('name') or '').strip()
+    deployment_type = normalize_deployment_type(data.get('deployment_type'))
+    base_url = normalize_deployment_url(data.get('base_url'))
+    if not name:
+        return json_error('Deployment name is required.', 400)
+    if not base_url or not is_valid_url(base_url):
+        return json_error('Deployment URL must start with http:// or https://.', 400)
+
+    deployment = ApplicationDeployment(
+        application_id=app_obj.id,
+        name=name,
+        deployment_type=deployment_type,
+        base_url=base_url,
+    )
+    db.session.add(deployment)
+    db.session.commit()
+    return jsonify({
+        'message': 'Deployment configured.',
+        'deployment': serialize_application_deployment(deployment, current),
+    }), 201
+
+
+@app.route('/api/application_deployments/<int:deployment_id>', methods=['PUT'])
+@login_required
+def update_application_deployment(deployment_id):
+    deployment = ApplicationDeployment.query.get_or_404(deployment_id)
+    current = get_current_user()
+    if not can_write_application(current, deployment.application):
+        return json_error('You do not have permission to update this deployment.', 403)
+
+    data = request.get_json(silent=True) or {}
+    name = str(data.get('name') or '').strip()
+    base_url = normalize_deployment_url(data.get('base_url'))
+    if not name:
+        return json_error('Deployment name is required.', 400)
+    if not base_url or not is_valid_url(base_url):
+        return json_error('Deployment URL must start with http:// or https://.', 400)
+
+    deployment.name = name
+    deployment.deployment_type = normalize_deployment_type(data.get('deployment_type'))
+    deployment.base_url = base_url
+    db.session.commit()
+    return jsonify({
+        'message': 'Deployment updated.',
+        'deployment': serialize_application_deployment(deployment, current),
+    })
+
+
+@app.route('/api/application_deployments/<int:deployment_id>', methods=['DELETE'])
+@login_required
+def delete_application_deployment(deployment_id):
+    deployment = ApplicationDeployment.query.get_or_404(deployment_id)
+    current = get_current_user()
+    if not can_write_application(current, deployment.application):
+        return json_error('You do not have permission to delete this deployment.', 403)
+
+    db.session.delete(deployment)
+    db.session.commit()
+    return jsonify({'message': 'Deployment deleted.'})
+
+
+@app.route('/api/application_deployments/<int:deployment_id>/check', methods=['POST'])
+@login_required
+def check_deployment(deployment_id):
+    deployment = ApplicationDeployment.query.get_or_404(deployment_id)
+    current = get_current_user()
+    if not can_view_application(current, deployment.application):
+        return json_error('You do not have permission to check this deployment.', 403)
+
+    ok, error = check_application_deployment(deployment)
+    db.session.commit()
+    payload = {
+        'message': 'Deployment check completed.' if ok else f'Deployment check completed with errors: {error}',
+        'deployment': serialize_application_deployment(deployment, current),
+    }
+    return jsonify(payload), 200
 
 
 @app.route('/api/application/<int:app_id>/repository/refresh', methods=['POST'])

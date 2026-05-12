@@ -19,6 +19,7 @@ from main import (
     ACCESS_READ_WRITE,
     ACCESS_VIEW_ONLY,
     Application,
+    ApplicationDeployment,
     ApplicationMembership,
     PLATFORM_ADMIN,
     PLATFORM_SUPER_ADMIN,
@@ -1076,6 +1077,100 @@ def test_read_write_user_application_details_show_edit_controls_and_access(clien
     assert b'id="editAppModal"' in response.data
     assert f'openEditAppModal({app_obj.id})'.encode() in response.data
     assert f'deleteApplication({app_obj.id})'.encode() in response.data
+
+
+def test_read_write_user_can_configure_and_check_deployment(client, monkeypatch):
+    user = create_user('member')
+    project = Project(name='Deployment Project', status='Draft')
+    app_obj = Application(name='Deployment App')
+    app_obj.projects.append(project)
+    db.session.add_all([project, app_obj])
+    db.session.flush()
+    db.session.add_all([
+        Version(application_id=app_obj.id, number='1.0.0'),
+        ApplicationMembership(
+            user_id=user.id,
+            application_id=app_obj.id,
+            access_level=ACCESS_READ_WRITE,
+        ),
+    ])
+    db.session.commit()
+    login_as(client, user)
+
+    create_response = client.post(f'/api/application/{app_obj.id}/deployments', json={
+        'name': 'Deployment App Production',
+        'base_url': 'http://deployment.example.test',
+    })
+
+    assert create_response.status_code == 201
+    deployment_id = create_response.get_json()['deployment']['id']
+
+    class FakeResponse:
+        def __init__(self, url):
+            self.url = url
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, tb):
+            return False
+
+        def getcode(self):
+            return 200
+
+        def read(self, _limit):
+            if self.url.endswith('/version'):
+                return json.dumps({
+                    'name': 'nginx',
+                    'version': '1.4.12',
+                    'environment': 'production',
+                }).encode()
+            if self.url.endswith('/health'):
+                return json.dumps({
+                    'status': 'ok',
+                    'service': 'nginx',
+                    'version': '1.4.12',
+                }).encode()
+            return b'nginx'
+
+    monkeypatch.setattr('main.urlopen', lambda request_obj, timeout=8: FakeResponse(request_obj.full_url))
+
+    check_response = client.post(f'/api/application_deployments/{deployment_id}/check')
+    details_response = client.get(f'/content/application_details/{app_obj.id}')
+
+    assert check_response.status_code == 200
+    deployment = check_response.get_json()['deployment']
+    assert deployment['health_status'] == 'healthy'
+    assert deployment['deployment_type'] == 'production'
+    assert deployment['version_response']['json']['version'] == '1.4.12'
+    assert b'Deployments' in details_response.data
+    assert b'Deployment App Production' in details_response.data
+
+
+def test_read_only_user_cannot_configure_deployment(client):
+    user = create_user('member')
+    app_obj = Application(name='Read Only Deployment App')
+    db.session.add(app_obj)
+    db.session.flush()
+    db.session.add_all([
+        Version(application_id=app_obj.id, number='1.0.0'),
+        ApplicationMembership(
+            user_id=user.id,
+            application_id=app_obj.id,
+            access_level=ACCESS_VIEW_ONLY,
+        ),
+    ])
+    db.session.commit()
+    login_as(client, user)
+
+    response = client.post(f'/api/application/{app_obj.id}/deployments', json={
+        'name': 'Production',
+        'deployment_type': 'production',
+        'base_url': 'http://deployment.example.test',
+    })
+
+    assert response.status_code == 403
+    assert ApplicationDeployment.query.count() == 0
 
 
 def test_read_write_user_api_cannot_change_project_from_edit_modal(client):

@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vermicelli Setup</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='public/favicon.ico') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@^2.0/dist/tailwind.min.css" rel="stylesheet">
     <script>
         (function() {
@@ -17,8 +20,17 @@
     <style>
         body {
             min-height: 100vh;
+            font-family: "Outfit", sans-serif;
             background-color: #f9fafb;
             color: #374151;
+        }
+
+        button,
+        input,
+        optgroup,
+        select,
+        textarea {
+            font-family: "Outfit", sans-serif;
         }
 
         .setup-main {

@@ -9,32 +9,56 @@
             --users-blue-text: #376A90;
             --users-blue-strong: #24597D;
             --users-blue-shadow: rgba(115, 165, 202, 0.28);
+            --users-accent: #f59e0b;
+            --users-accent-soft: #fef3c7;
+            --users-accent-hover: #fde68a;
+            --users-accent-text: #b45309;
+            --users-accent-strong: #92400e;
+            --users-accent-shadow: rgba(245, 158, 11, 0.35);
+            --users-coral-border: #fb8f77;
+            --users-coral-bg: #fff1ed;
+            --users-coral-chip: #ffb4a2;
+            --users-coral-text: #9f341f;
         }
 
         .users-page .btn:focus,
         .users-page-primary:focus {
-            box-shadow: 0 0 0 2px var(--users-blue-shadow);
+            box-shadow: 0 0 0 2px var(--users-accent-shadow);
         }
 
         .users-page .btn-primary,
         .users-page-primary,
         .users-page .tab-link.active,
-        .users-page .tab-link:hover,
         .users-page .pagination-page-active,
         .users-page .pagination-page-inactive:hover {
-            background-color: var(--users-blue-soft);
-            color: var(--users-blue-text);
+            background-color: var(--users-accent-soft);
+            color: var(--users-accent-text);
         }
 
         .users-page .btn-primary,
         .users-page-primary {
-            box-shadow: 0 1px 2px rgba(55, 106, 144, 0.14);
+            box-shadow: 0 1px 2px rgba(180, 83, 9, 0.12);
         }
 
         .users-page .btn-primary:hover,
         .users-page-primary:hover {
-            background-color: var(--users-blue-hover);
-            color: var(--users-blue-strong);
+            background-color: var(--users-accent-hover);
+            color: var(--users-accent-strong);
+        }
+
+        .users-page .tab-link.btn-secondary:hover {
+            background-color: #f9fafb;
+            color: #111827;
+        }
+
+        .users-page .tab-link.btn-primary:hover {
+            background-color: var(--users-accent-hover);
+            color: var(--users-accent-strong);
+        }
+
+        .users-page .btn-primary svg,
+        .users-page-primary svg {
+            color: currentColor !important;
         }
 
         .users-blue-surface {
@@ -60,17 +84,86 @@
         .users-shield-icon {
             color: var(--users-blue) !important;
         }
+
+        .users-page .admin-access-summary-card {
+            border-color: var(--users-coral-border) !important;
+            background-color: var(--users-coral-bg) !important;
+            border-radius: 0.75rem;
+        }
+
+        .users-page .admin-access-summary-title,
+        .users-page .admin-access-summary-text {
+            color: var(--users-coral-text) !important;
+        }
+
+        .users-page .admin-access-summary-card .admin-access-summary-chip {
+            border-color: var(--users-coral-border) !important;
+            background-color: var(--users-coral-chip) !important;
+            color: var(--users-coral-text) !important;
+        }
+
+        .users-page .admin-access-summary-card .admin-access-summary-user,
+        .users-page .admin-access-summary-card .admin-access-summary-icon {
+            color: var(--users-coral-text) !important;
+        }
+
+        html[data-theme="dark"] .users-page .btn-primary,
+        html[data-theme="dark"] .users-page-primary,
+        html[data-theme="dark"] .users-page .tab-link.active {
+            background-color: var(--users-accent);
+            color: #111827;
+        }
+
+        html[data-theme="dark"] .users-page .btn-primary:hover,
+        html[data-theme="dark"] .users-page-primary:hover {
+            background-color: #fbbf24;
+            color: #111827;
+        }
+
+        html[data-theme="dark"] .users-page .tab-link.btn-secondary:hover {
+            background-color: #374151;
+            color: #fef3c7;
+        }
+
+        html[data-theme="dark"] .users-page .tab-link.btn-primary:hover {
+            background-color: #fbbf24;
+            color: #111827;
+        }
+
+        html[data-theme="dark"] .users-page .admin-access-summary-card {
+            background-color: #431407 !important;
+            border-color: #e76f51 !important;
+        }
+
+        html[data-theme="dark"] .users-page .admin-access-summary-title,
+        html[data-theme="dark"] .users-page .admin-access-summary-text,
+        html[data-theme="dark"] .users-page .admin-access-summary-card .admin-access-summary-user,
+        html[data-theme="dark"] .users-page .admin-access-summary-card .admin-access-summary-icon {
+            color: #fed7cc !important;
+        }
+
+        html[data-theme="dark"] .users-page .admin-access-summary-card .admin-access-summary-chip {
+            background-color: #e76f51 !important;
+            border-color: #f28b73 !important;
+            color: #fed7cc !important;
+        }
     </style>
     <header class="page-toolbar flex justify-between items-center mb-4">
-        <div class="flex flex-wrap gap-2">
-            <button type="button" class="users-subpage-tab tab-link active" data-subpage="usersTable">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+        <div class="toolbar-actions flex flex-wrap items-center">
+            <button type="button" onclick="window.location.href = '/'; return false;" class="btn btn-secondary">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                </svg>
+                Dashboard
+            </button>
+            <button type="button" class="users-subpage-tab tab-link primary-action btn btn-primary active group justify-start py-3 text-left" data-subpage="usersTable">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 flex-shrink-0 text-yellow-500 group-hover:text-yellow-600" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
                 </svg>
                 Users
             </button>
-            <button type="button" class="users-subpage-tab tab-link" data-subpage="projectAccess">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+            <button type="button" class="users-subpage-tab tab-link primary-action btn btn-secondary group justify-start py-3 text-left" data-subpage="projectAccess">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 flex-shrink-0 text-yellow-500 group-hover:text-yellow-600" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
                 </svg>
                 Access
@@ -406,8 +499,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
         </svg>`;
     const editIcon = `
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" />
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
         </svg>`;
     const accessRemoveIcon = `
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-3.5 w-3.5">
@@ -739,8 +832,12 @@
     function switchSubpage(subpageId) {
         $('.users-subpage').addClass('hidden');
         $(`#${subpageId}`).removeClass('hidden');
-        $('.users-subpage-tab').removeClass('active');
-        $(`.users-subpage-tab[data-subpage="${subpageId}"]`).addClass('active');
+        $('.users-subpage-tab')
+            .removeClass('active btn-primary')
+            .addClass('btn-secondary');
+        $(`.users-subpage-tab[data-subpage="${subpageId}"]`)
+            .removeClass('btn-secondary')
+            .addClass('active btn-primary');
         const accessActive = subpageId === 'projectAccess';
         $('#usersToolbarActions').toggleClass('hidden', accessActive);
         $('#accessToolbarActions').toggleClass('hidden', !accessActive).toggleClass('flex', accessActive);
