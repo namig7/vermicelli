@@ -1251,6 +1251,7 @@
         <div class="flex flex-wrap items-center gap-2">
             <span class="details-chip">ID {{ app.id }}</span>
             <span class="details-chip">{{ access_level_label }}</span>
+            <span class="sr-only"><strong>Access level:</strong> {{ access_level_label }}</span>
             <span class="details-chip">Latest {{ latest_version.number if latest_version else 'No version' }}</span>
         </div>
     </section>
