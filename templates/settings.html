@@ -1,7 +1,173 @@
 <!-- settings.html -->
-<div>
-    <nav class="mb-6 grid gap-3 sm:grid-cols-3" aria-label="Account settings sections">
-        <button type="button" class="settings-tab-button primary-action btn btn-primary group active w-full justify-start py-3 text-left" data-settings-tab="overviewTab">
+<div class="account-settings-page">
+    <style>
+        .account-settings-page {
+            --settings-accent-soft: #fef3c7;
+            --settings-accent-hover: #fde68a;
+            --settings-accent-text: #b45309;
+            --settings-accent-strong: #92400e;
+            --settings-coral-border: #fb8f77;
+            --settings-coral-bg: #fff1ed;
+            --settings-coral-chip: #ffb4a2;
+            --settings-coral-text: #9f341f;
+        }
+
+        .account-settings-page .settings-panel {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            background: #ffffff;
+        }
+
+        .account-settings-page .settings-section-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            color: #6b7280;
+        }
+
+        .account-settings-page .settings-section-icon svg {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+
+        .account-settings-page .settings-section-icon {
+            width: 1.75rem;
+            height: 1.75rem;
+            margin-top: 0.05rem;
+        }
+
+        .account-settings-page .settings-tabs {
+            margin-bottom: 1.5rem;
+            padding-top: 0.25rem;
+        }
+
+        .account-settings-page .settings-tab-button {
+            white-space: normal;
+        }
+
+        .account-settings-page .settings-tab-button.btn-secondary:hover {
+            background-color: #f9fafb;
+            color: #111827;
+        }
+
+        .account-settings-page .settings-tab-button.btn-primary:hover {
+            background-color: var(--settings-accent-hover);
+            color: var(--settings-accent-strong);
+        }
+
+        .account-settings-page .settings-inline-icon-button {
+            display: inline-flex;
+            width: 1.9rem;
+            height: 1.9rem;
+            flex: 0 0 1.9rem;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px;
+            color: #6b7280;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .account-settings-page .settings-inline-icon-button:hover {
+            background: var(--settings-accent-soft);
+            color: var(--settings-accent-strong);
+        }
+
+        .account-settings-page .settings-inline-icon-button svg {
+            width: 1rem;
+            height: 1rem;
+            flex: 0 0 1rem;
+        }
+
+        .account-settings-page .settings-panel {
+            box-shadow: 0 1px 2px rgba(17, 24, 39, 0.06);
+        }
+
+        .account-settings-page .settings-soft-tile {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: #f9fafb;
+        }
+
+        .account-settings-page .settings-admin-badge {
+            border-color: var(--settings-coral-border) !important;
+            background: var(--settings-coral-chip) !important;
+            color: var(--settings-coral-text) !important;
+        }
+
+        .account-settings-page .settings-admin-summary-tile {
+            border-color: var(--settings-coral-border) !important;
+            background: var(--settings-coral-bg) !important;
+        }
+
+        .account-settings-page .settings-admin-summary-tile p {
+            color: var(--settings-coral-text) !important;
+        }
+
+        html[data-theme="dark"] .account-settings-page .settings-panel {
+            border-color: #4b5563;
+            background: #1f2937;
+            color: #e5e7eb;
+        }
+
+        html[data-theme="dark"] .account-settings-page .settings-soft-tile {
+            border-color: #4b5563;
+            background: #111827;
+        }
+
+        html[data-theme="dark"] .account-settings-page .settings-section-icon {
+            color: #cbd5e1;
+        }
+
+        html[data-theme="dark"] .account-settings-page .settings-inline-icon-button {
+            color: #cbd5e1;
+        }
+
+        html[data-theme="dark"] .account-settings-page .settings-inline-icon-button:hover {
+            background: #92400e;
+            color: #fffbeb;
+        }
+
+        html[data-theme="dark"] .account-settings-page .settings-admin-badge {
+            border-color: #f28b73 !important;
+            background: #e76f51 !important;
+            color: #fed7cc !important;
+        }
+
+        html[data-theme="dark"] .account-settings-page .settings-admin-summary-tile {
+            border-color: #e76f51 !important;
+            background: #431407 !important;
+        }
+
+        html[data-theme="dark"] .account-settings-page .settings-admin-summary-tile p {
+            color: #fed7cc !important;
+        }
+
+        html[data-theme="dark"] .account-settings-page .settings-tab-button.btn-secondary:hover {
+            background-color: #374151;
+            color: #fef3c7;
+        }
+
+        html[data-theme="dark"] .account-settings-page .settings-tab-button.btn-primary:hover {
+            background-color: #fbbf24;
+            color: #111827;
+        }
+
+        html[data-theme="dark"] .account-settings-page .settings-theme-button:not([aria-pressed="true"]):hover {
+            background: #451a03 !important;
+            color: #fde68a !important;
+        }
+
+    </style>
+
+    <nav class="settings-tabs page-toolbar flex flex-wrap items-center gap-3" aria-label="Account settings sections">
+        <button type="button" onclick="window.location.href = '/'; return false;" class="btn btn-secondary">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+            </svg>
+            Dashboard
+        </button>
+        <button type="button" class="settings-tab-button primary-action btn btn-primary group active justify-start py-3 text-left" data-settings-tab="overviewTab">
             <svg class="h-5 w-5 flex-shrink-0 text-yellow-500 group-hover:text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Zm6-10.125a1.875 1.875 0 1 1-3.75 0 1.875 1.875 0 0 1 3.75 0Zm1.294 6.336a6.721 6.721 0 0 1-3.17.789 6.721 6.721 0 0 1-3.168-.789 3.376 3.376 0 0 1 6.338 0Z" />
             </svg>
@@ -9,7 +175,7 @@
                 <span class="block font-semibold">Overview</span>
             </span>
         </button>
-        <button type="button" class="settings-tab-button primary-action btn btn-secondary group w-full justify-start py-3 text-left" data-settings-tab="accessTab">
+        <button type="button" class="settings-tab-button primary-action btn btn-secondary group justify-start py-3 text-left" data-settings-tab="accessTab">
             <svg class="h-5 w-5 flex-shrink-0 text-yellow-500 group-hover:text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-1.5 0h12a1.5 1.5 0 0 1 1.5 1.5v6a3 3 0 0 1-3 3h-9a3 3 0 0 1-3-3v-6a1.5 1.5 0 0 1 1.5-1.5Z" />
             </svg>
@@ -17,7 +183,7 @@
                 <span class="block font-semibold">Access</span>
             </span>
         </button>
-        <button type="button" class="settings-tab-button primary-action btn btn-secondary group w-full justify-start py-3 text-left" data-settings-tab="preferencesTab">
+        <button type="button" class="settings-tab-button primary-action btn btn-secondary group justify-start py-3 text-left" data-settings-tab="preferencesTab">
             <svg class="h-5 w-5 flex-shrink-0 text-yellow-500 group-hover:text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M3.75 6h2.25m4.5 12h9.75m-16.5 0h2.25M6 6a2.25 2.25 0 1 1 4.5 0A2.25 2.25 0 0 1 6 6Zm0 12a2.25 2.25 0 1 1 4.5 0A2.25 2.25 0 0 1 6 18Zm8.25-6h6m-16.5 0h8.25" />
             </svg>
@@ -28,7 +194,7 @@
     </nav>
 
     <section id="overviewTab" class="settings-tab-panel">
-        <section class="bg-white border border-gray-200 rounded-lg shadow-md p-6">
+        <section class="settings-panel p-6">
             <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                 <div class="flex items-start gap-4">
                     <div id="settingsAvatar" class="inline-flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-yellow-500 text-2xl font-bold text-white shadow-sm"></div>
@@ -42,45 +208,37 @@
                     </div>
                 </div>
                 <div class="grid min-w-0 gap-3 sm:grid-cols-2 lg:min-w-[18rem] lg:grid-cols-1">
-                    <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+                    <div class="settings-soft-tile px-4 py-3">
                         <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Created</p>
                         <p id="settingsCreatedAt" class="mt-1 text-sm font-medium text-gray-700"></p>
                     </div>
-                    <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+                    <div class="settings-soft-tile px-4 py-3">
                         <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Last Seen</p>
                         <p id="settingsLastSeen" class="mt-1 text-sm font-medium text-gray-700"></p>
                     </div>
                 </div>
             </div>
 
-            <div class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                <div class="rounded-lg border border-gray-200 px-4 py-3">
+            <div class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <div class="settings-soft-tile px-4 py-3">
                     <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">ID</p>
                     <p id="settingsUserIdDisplay" class="mt-1 break-all text-sm font-medium text-gray-700"></p>
                 </div>
-                <div class="rounded-lg border border-gray-200 px-4 py-3">
-                    <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Email</p>
-                    <p id="settingsEmailDisplay" class="mt-1 break-all text-sm font-medium text-gray-700"></p>
-                </div>
-                <div class="rounded-lg border border-gray-200 px-4 py-3">
-                    <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Time Zone</p>
-                    <p id="settingsTimezoneDisplay" class="mt-1 text-sm font-medium text-gray-700"></p>
-                </div>
-                <div class="rounded-lg border border-gray-200 px-4 py-3">
+                <div id="settingsAccessSummaryTile" class="settings-soft-tile px-4 py-3">
                     <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Access Scope</p>
                     <p id="settingsAccessSummary" class="mt-1 text-sm font-medium text-gray-700"></p>
                 </div>
-                <div class="rounded-lg border border-gray-200 px-4 py-3">
+                <div class="settings-soft-tile px-4 py-3">
                     <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Project Creation</p>
                     <p id="settingsProjectCreation" class="mt-1 text-sm font-medium text-gray-700"></p>
                 </div>
-                <div class="rounded-lg border border-gray-200 px-4 py-3">
+                <div class="settings-soft-tile px-4 py-3">
                     <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Assignments</p>
                     <p id="settingsAssignmentsMeta" class="mt-1 text-sm font-medium text-gray-700"></p>
                 </div>
             </div>
         </section>
-        <section class="mt-6 bg-white border border-gray-200 rounded-lg shadow-md p-6">
+        <section class="settings-panel mt-6 p-6">
             <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                     <h2 class="text-xl font-bold text-gray-800">General</h2>
@@ -90,7 +248,7 @@
             </div>
 
             <div class="mt-6 grid gap-4 xl:grid-cols-2">
-                <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-4">
+                <div class="settings-soft-tile px-4 py-4">
                     <div class="flex items-start justify-between gap-3">
                         <div class="min-w-0">
                             <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Username</p>
@@ -100,47 +258,44 @@
                     </div>
                 </div>
 
-                <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-4">
+                <div class="settings-soft-tile px-4 py-4">
                     <div class="flex items-start justify-between gap-3">
                         <div class="min-w-0">
                             <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Email</p>
                             <p id="settingsGeneralEmail" class="mt-2 break-all text-sm font-medium text-gray-700"></p>
                         </div>
-                        <button type="button" class="btn btn-primary btn-sm" data-edit-field="email">
+                        <button type="button" class="settings-inline-icon-button" data-edit-field="email" aria-label="Edit email" title="Edit email">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
                             </svg>
-                            Edit
                         </button>
                     </div>
                 </div>
 
-                <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-4">
+                <div class="settings-soft-tile px-4 py-4">
                     <div class="flex items-start justify-between gap-3">
                         <div class="min-w-0">
                             <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Full Name</p>
                             <p id="settingsGeneralFullName" class="mt-2 break-all text-sm font-medium text-gray-700"></p>
                         </div>
-                        <button type="button" class="btn btn-primary btn-sm" data-edit-field="full_name">
+                        <button type="button" class="settings-inline-icon-button" data-edit-field="full_name" aria-label="Edit full name" title="Edit full name">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
                             </svg>
-                            Edit
                         </button>
                     </div>
                 </div>
 
-                <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-4">
+                <div class="settings-soft-tile px-4 py-4">
                     <div class="flex items-start justify-between gap-3">
                         <div class="min-w-0">
                             <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Password</p>
-                            <p class="mt-2 text-sm font-medium text-gray-700">Change your password from a dedicated popup window.</p>
+                            <p class="mt-2 text-sm font-medium text-gray-700">Update your password with a quick identity check first.</p>
                         </div>
-                        <button type="button" class="btn btn-primary btn-sm" data-edit-field="password">
+                        <button type="button" class="settings-inline-icon-button" data-edit-field="password" aria-label="Change password" title="Change password">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
                             </svg>
-                            Edit
                         </button>
                     </div>
                 </div>
@@ -150,16 +305,16 @@
 
     <section id="accessTab" class="settings-tab-panel hidden">
         <div class="grid gap-6 xl:grid-cols-[minmax(18rem,0.8fr)_minmax(0,1.2fr)]">
-            <section class="bg-white border border-gray-200 rounded-lg shadow-md p-6">
+            <section class="settings-panel p-6">
                 <h2 class="text-xl font-bold text-gray-800">Access</h2>
                 <p class="mt-2 text-sm text-gray-500">Projects come first, then the applications inside each project.</p>
 
                 <div class="mt-5 space-y-4">
-                    <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+                    <div class="settings-soft-tile px-4 py-3">
                         <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Assignment Summary</p>
                         <p id="settingsAssignmentsMetaDuplicate" class="mt-1 text-sm font-medium text-gray-700"></p>
                     </div>
-                    <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+                    <div class="settings-soft-tile px-4 py-3">
                         <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Meaning</p>
                         <div class="mt-2 space-y-2 text-sm text-gray-700">
                             <p><span class="font-medium text-gray-800">Manager</span> can manage the whole project and all applications in it.</p>
@@ -170,7 +325,7 @@
                 </div>
             </section>
 
-            <section class="bg-white border border-gray-200 rounded-lg shadow-md p-6">
+            <section class="settings-panel p-6">
                 <h2 class="text-xl font-bold text-gray-800">Assigned Projects and Applications</h2>
                 <p class="mt-2 text-sm text-gray-500">This is your full access map inside the system.</p>
                 <div id="settingsAssignments" class="mt-5 space-y-4"></div>
@@ -179,7 +334,7 @@
     </section>
 
     <section id="preferencesTab" class="settings-tab-panel hidden">
-        <section class="bg-white border border-gray-200 rounded-lg shadow-md p-6">
+        <section class="settings-panel p-6">
             <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                     <h2 class="text-xl font-bold text-gray-800">Preferences</h2>
@@ -189,22 +344,21 @@
             </div>
 
             <div class="mt-6 grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
-                <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-4">
+                <div class="settings-soft-tile px-4 py-4">
                     <div class="flex items-start justify-between gap-3">
                         <div class="min-w-0">
                             <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Time Zone</p>
                             <p id="settingsPreferenceTimezone" class="mt-2 text-sm font-medium text-gray-700"></p>
                         </div>
-                        <button type="button" class="btn btn-primary btn-sm" data-edit-field="timezone">
+                        <button type="button" class="settings-inline-icon-button" data-edit-field="timezone" aria-label="Edit time zone" title="Edit time zone">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
                             </svg>
-                            Edit
                         </button>
                     </div>
                 </div>
 
-                <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-4">
+                <div class="settings-soft-tile px-4 py-4">
                     <label for="settingsDatetimeFormat" class="text-xs font-semibold uppercase tracking-wide text-gray-500">Time and Date Format</label>
                     <select id="settingsDatetimeFormat" class="mt-2 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500">
                         {% for format_option in datetime_format_options %}
@@ -214,7 +368,7 @@
                     <p id="settingsDatetimeFormatPreview" class="mt-2 text-sm font-medium text-gray-700"></p>
                 </div>
 
-                <div class="rounded-lg border border-gray-200 bg-gray-50 p-4">
+                <div class="settings-soft-tile p-4">
                     <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Theme</p>
                     <div class="mt-3 inline-flex flex-wrap items-center gap-2 rounded-full border border-gray-200 bg-white p-1" role="group" aria-label="Theme preference">
                         <button type="button" class="settings-theme-button rounded-full px-4 py-2 text-sm font-medium transition" data-settings-theme="light">Light</button>
@@ -390,6 +544,24 @@
             .toggleClass('text-green-600', !isError);
     }
 
+    function showSettingsSuccess(message) {
+        Swal.fire({
+            title: 'Saved',
+            text: message,
+            icon: 'success',
+            confirmButtonText: 'OK',
+            customClass: {
+                popup: 'bg-white rounded-lg shadow-lg',
+                title: 'text-xl font-bold text-gray-800',
+                content: 'text-gray-700',
+                confirmButton: 'btn btn-primary',
+                actions: 'flex justify-center'
+            },
+            buttonsStyling: false,
+            scrollbarPadding: false
+        });
+    }
+
     function requestError(error) {
         return error && error.responseJSON && error.responseJSON.error
             ? error.responseJSON.error
@@ -550,8 +722,8 @@
 
         if (user.platform_role === 'admin' && projectCount === 0) {
             $('#settingsAssignments').html(`
-                <div class="rounded-lg border border-blue-200 bg-blue-50 px-4 py-4">
-                    <p class="text-sm font-medium text-blue-800">Admin accounts have platform-wide access to all projects and applications.</p>
+                <div class="settings-admin-summary-tile rounded-lg border px-4 py-4">
+                    <p class="text-sm font-medium">Admin accounts have platform-wide access to all projects and applications.</p>
                 </div>
             `);
             return;
@@ -612,8 +784,6 @@
         $('#settingsUserIdDisplay').text(user.id);
         $('#settingsCreatedAt').addClass('date-time-text').text(user.created_at_display || 'N/A');
         $('#settingsLastSeen').addClass('date-time-text').text(user.last_login_display || 'Never');
-        $('#settingsEmailDisplay').text(user.email || 'Not set');
-        $('#settingsTimezoneDisplay').text(user.timezone || 'UTC');
         $('#settingsGeneralUsername').text(user.username || 'N/A');
         $('#settingsGeneralEmail').text(user.email || 'Not set');
         $('#settingsGeneralFullName').text(user.full_name || 'Not set');
@@ -628,8 +798,10 @@
                 : `${(user.assigned_projects || []).length} assigned project${(user.assigned_projects || []).length === 1 ? '' : 's'}`);
 
         $('#settingsRoleBadge')
-            .attr('class', `inline-flex items-center rounded-md border px-2.5 py-1 text-xs font-semibold ${roleBadgeClass(user.platform_role)}`)
+            .attr('class', `inline-flex items-center rounded-md border px-2.5 py-1 text-xs font-semibold ${roleBadgeClass(user.platform_role)} ${user.platform_role === 'admin' ? 'settings-admin-badge' : ''}`)
             .text(user.platform_role_label || user.platform_role);
+        $('#settingsAccessSummaryTile')
+            .toggleClass('settings-admin-summary-tile', user.platform_role === 'admin');
         $('#settingsStatusBadge')
             .attr('class', `inline-flex items-center rounded-md border px-2.5 py-1 text-xs font-semibold ${statusBadgeClass(user.is_active)}`)
             .text(user.status || 'Active');
@@ -845,7 +1017,7 @@
                 })
             }).done(function() {
                 closeEditModal();
-                showMessage('#generalSettingsMessage', 'Password updated successfully.', false);
+                showSettingsSuccess('Password updated successfully.');
             }).fail(function(error) {
                 showMessage('#settingsEditModalMessage', requestError(error), true);
             });
@@ -867,10 +1039,9 @@
             contentType: 'application/json',
             data: JSON.stringify(payload)
         }).done(function(user) {
-            const savedField = activeEditField;
             renderSettings(user);
             closeEditModal();
-            showMessage(savedField === 'timezone' ? '#settingsPreferenceMessage' : '#generalSettingsMessage', 'Changes saved successfully.', false);
+            showSettingsSuccess('Changes saved successfully.');
         }).fail(function(error) {
             showMessage('#settingsEditModalMessage', requestError(error), true);
         });
@@ -903,7 +1074,7 @@
             data: JSON.stringify({ datetime_format: nextFormat })
         }).done(function(user) {
             renderSettings(user);
-            showMessage('#settingsPreferenceMessage', 'Date and time format saved successfully.', false);
+            showSettingsSuccess('Date and time format saved successfully.');
         }).fail(function(error) {
             if (currentUser) {
                 $('#settingsDatetimeFormat').val(currentUser.datetime_format || 'iso_24');

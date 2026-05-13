@@ -147,6 +147,429 @@
             border-color: #f28b73 !important;
             color: #fed7cc !important;
         }
+
+        .users-page .users-sort-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            color: inherit;
+            font: inherit;
+            letter-spacing: inherit;
+            text-transform: inherit;
+            transition: color 0.2s ease;
+        }
+
+        .users-page .users-sort-button:hover {
+            color: var(--users-accent-text);
+        }
+
+        .users-page .users-sort-indicator {
+            display: inline-flex;
+            width: 1.25rem;
+            height: 1.25rem;
+            flex: 0 0 1.25rem;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+        }
+
+        .users-page .users-sort-icon {
+            width: 1.15rem;
+            height: 1.15rem;
+            flex: 0 0 1.15rem;
+        }
+
+        .users-page .user-form-input {
+            min-height: 2.375rem;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+        }
+
+        .users-page .user-password-input {
+            padding-right: 3rem;
+        }
+
+        .users-page .password-visibility-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            color: #6b7280;
+            transition: color 0.2s ease, background-color 0.2s ease;
+        }
+
+        .users-page .password-visibility-button:hover {
+            color: var(--users-accent-text);
+        }
+
+        .users-page .user-detail-field,
+        .users-page .user-detail-meta {
+            min-height: 2.375rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            background: #ffffff;
+            box-shadow: 0 1px 2px rgba(17, 24, 39, 0.05);
+        }
+
+        .users-page .user-detail-field-label {
+            width: 8.25rem;
+            flex: 0 0 8.25rem;
+        }
+
+        .users-page .user-detail-divider {
+            width: 1px;
+            height: 1.5rem;
+            flex: 0 0 1px;
+            background: #e5e7eb;
+        }
+
+        .users-page .user-detail-setting {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: #f9fafb;
+        }
+
+        .users-page .user-detail-icon-button {
+            display: inline-flex;
+            width: 1.9rem;
+            height: 1.9rem;
+            flex: 0 0 1.9rem;
+            align-items: center;
+            justify-content: center;
+            border: 0;
+            background: transparent;
+            color: #6b7280;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .users-page .user-detail-icon-button:hover {
+            background: var(--users-accent-soft);
+            color: var(--users-accent-strong);
+        }
+
+        .users-page .user-detail-icon-button svg {
+            width: 1rem;
+            height: 1rem;
+            flex: 0 0 1rem;
+        }
+
+        #deleteUserFromDetails {
+            background-color: #FF653F;
+            color: #ffffff;
+        }
+
+        #deleteUserFromDetails:hover {
+            background-color: #e95a38;
+            color: #ffffff;
+        }
+
+        .users-page #saveUserDetailsChanges {
+            border: 1px solid var(--users-accent-hover);
+            box-shadow: 0 1px 2px rgba(180, 83, 9, 0.14);
+        }
+
+        .users-page #detailUserStatusToggle,
+        .users-page #detailProjectCreationToggle {
+            border-width: 1px;
+            box-shadow: 0 1px 2px rgba(17, 24, 39, 0.08);
+        }
+
+        .users-page #projectCreationToggle,
+        .users-page #detailUserStatusToggle,
+        .users-page #detailProjectCreationToggle {
+            height: 1.75rem;
+            width: 3rem;
+        }
+
+        .users-page #projectCreationToggleKnob,
+        .users-page #detailUserStatusToggleKnob,
+        .users-page #detailProjectCreationToggleKnob {
+            height: 1.25rem;
+            width: 1.25rem;
+        }
+
+        .users-page #userDetailsModal > div {
+            display: flex;
+            max-height: calc(100dvh - 1rem);
+            flex-direction: column;
+        }
+
+        .users-page #userDetailsContent {
+            min-height: 0;
+            overflow-y: auto;
+        }
+
+        .swal2-popup .swal2-confirm:focus,
+        .swal2-popup .swal2-confirm:focus-visible {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        .users-page-swal {
+            background: #ffffff !important;
+            color: #374151 !important;
+        }
+
+        .users-page-swal .swal2-title {
+            color: #1f2937 !important;
+        }
+
+        .users-page-swal .swal2-html-container {
+            color: #374151 !important;
+        }
+
+        .users-page-swal .users-page-primary {
+            border: 1px solid #fde68a !important;
+            background-color: #fef3c7 !important;
+            color: #b45309 !important;
+            box-shadow: 0 1px 2px rgba(180, 83, 9, 0.14) !important;
+        }
+
+        .users-page-swal .users-page-primary:hover {
+            border-color: #f59e0b !important;
+            background-color: #fde68a !important;
+            color: #92400e !important;
+        }
+
+        .users-page-swal .btn-secondary {
+            border: 1px solid #d1d5db !important;
+            background-color: #ffffff !important;
+            color: #374151 !important;
+        }
+
+        .users-page-swal .btn-secondary:hover {
+            background-color: #f9fafb !important;
+            color: #111827 !important;
+        }
+
+        html[data-theme="dark"] .users-page #userDetailsModal .bg-white,
+        html[data-theme="dark"] .users-page #newUserModal .bg-white,
+        html[data-theme="dark"] .users-page #accessModal .bg-white,
+        html[data-theme="dark"] .users-page #userPasswordModal .bg-white,
+        html[data-theme="dark"] .users-page #userFieldEditModal .bg-white {
+            background-color: #111827 !important;
+            color: #e5e7eb;
+        }
+
+        html[data-theme="dark"] .users-page #userDetailsModal .bg-gray-100,
+        html[data-theme="dark"] .users-page #newUserModal .bg-gray-100,
+        html[data-theme="dark"] .users-page #accessModal .bg-gray-100,
+        html[data-theme="dark"] .users-page #userPasswordModal .bg-gray-100,
+        html[data-theme="dark"] .users-page #userFieldEditModal .bg-gray-100 {
+            background-color: #1f2937 !important;
+            border-color: #374151 !important;
+        }
+
+        html[data-theme="dark"] .users-page #userDetailsModal .bg-gray-50,
+        html[data-theme="dark"] .users-page #newUserModal .bg-gray-50,
+        html[data-theme="dark"] .users-page #accessModal .bg-gray-50 {
+            background-color: #1f2937 !important;
+        }
+
+        html[data-theme="dark"] .users-page #userDetailsModal .border-gray-200,
+        html[data-theme="dark"] .users-page #newUserModal .border-gray-200,
+        html[data-theme="dark"] .users-page #accessModal .border-gray-200,
+        html[data-theme="dark"] .users-page #userPasswordModal .border-gray-200,
+        html[data-theme="dark"] .users-page #userFieldEditModal .border-gray-200 {
+            border-color: #374151 !important;
+        }
+
+        html[data-theme="dark"] .users-page #userDetailsModal .text-gray-800,
+        html[data-theme="dark"] .users-page #newUserModal .text-gray-800,
+        html[data-theme="dark"] .users-page #accessModal .text-gray-800,
+        html[data-theme="dark"] .users-page #userPasswordModal .text-gray-800,
+        html[data-theme="dark"] .users-page #userFieldEditModal .text-gray-800 {
+            color: #f9fafb !important;
+        }
+
+        html[data-theme="dark"] .users-page #userDetailsModal .text-gray-700,
+        html[data-theme="dark"] .users-page #newUserModal .text-gray-700,
+        html[data-theme="dark"] .users-page #accessModal .text-gray-700,
+        html[data-theme="dark"] .users-page #userPasswordModal .text-gray-700,
+        html[data-theme="dark"] .users-page #userFieldEditModal .text-gray-700 {
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] .users-page #userDetailsModal .text-gray-600,
+        html[data-theme="dark"] .users-page #userDetailsModal .text-gray-500,
+        html[data-theme="dark"] .users-page #userDetailsModal .text-gray-400,
+        html[data-theme="dark"] .users-page #newUserModal .text-gray-600,
+        html[data-theme="dark"] .users-page #newUserModal .text-gray-500,
+        html[data-theme="dark"] .users-page #newUserModal .text-gray-400,
+        html[data-theme="dark"] .users-page #accessModal .text-gray-600,
+        html[data-theme="dark"] .users-page #accessModal .text-gray-500,
+        html[data-theme="dark"] .users-page #accessModal .text-gray-400,
+        html[data-theme="dark"] .users-page #userPasswordModal .text-gray-600,
+        html[data-theme="dark"] .users-page #userPasswordModal .text-gray-500,
+        html[data-theme="dark"] .users-page #userPasswordModal .text-gray-400,
+        html[data-theme="dark"] .users-page #userFieldEditModal .text-gray-600,
+        html[data-theme="dark"] .users-page #userFieldEditModal .text-gray-500,
+        html[data-theme="dark"] .users-page #userFieldEditModal .text-gray-400 {
+            color: #9ca3af !important;
+        }
+
+        html[data-theme="dark"] .users-page .user-detail-field,
+        html[data-theme="dark"] .users-page .user-detail-meta,
+        html[data-theme="dark"] .users-page .user-detail-setting {
+            border-color: #374151 !important;
+            background: #111827 !important;
+            box-shadow: none;
+        }
+
+        html[data-theme="dark"] .users-page .user-detail-divider {
+            background: #374151;
+        }
+
+        html[data-theme="dark"] .users-page .user-detail-icon-button {
+            color: #9ca3af;
+        }
+
+        html[data-theme="dark"] .users-page .user-detail-icon-button:hover {
+            background: #374151;
+            color: #fbbf24;
+        }
+
+        html[data-theme="dark"] .users-page #newUserModal input,
+        html[data-theme="dark"] .users-page #accessModal input,
+        html[data-theme="dark"] .users-page #accessModal button[aria-haspopup="listbox"],
+        html[data-theme="dark"] .users-page #userPasswordModal input,
+        html[data-theme="dark"] .users-page #userFieldEditModal input {
+            border-color: #4b5563 !important;
+            background-color: #111827 !important;
+            color: #f9fafb !important;
+        }
+
+        html[data-theme="dark"] .users-page #newUserModal input:focus,
+        html[data-theme="dark"] .users-page #accessModal input:focus,
+        html[data-theme="dark"] .users-page #accessModal button[aria-haspopup="listbox"]:focus,
+        html[data-theme="dark"] .users-page #userPasswordModal input:focus,
+        html[data-theme="dark"] .users-page #userFieldEditModal input:focus {
+            border-color: #f59e0b !important;
+            box-shadow: 0 0 0 1px #f59e0b !important;
+        }
+
+        html[data-theme="dark"] .users-page #accessProjectDropdownPanel,
+        html[data-theme="dark"] .users-page #accessApplicationDropdownPanel,
+        html[data-theme="dark"] .users-page #accessUserDropdownPanel {
+            background-color: #111827 !important;
+            border: 1px solid #374151;
+            color: #e5e7eb;
+        }
+
+        html[data-theme="dark"] .users-page #accessProjectList li,
+        html[data-theme="dark"] .users-page #accessApplicationList li,
+        html[data-theme="dark"] .users-page #accessUserList li {
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] .users-page #accessProjectList li:hover,
+        html[data-theme="dark"] .users-page #accessApplicationList li:hover,
+        html[data-theme="dark"] .users-page #accessUserList li:hover {
+            background-color: #374151 !important;
+        }
+
+        html[data-theme="dark"] .users-page .detail-role-button.bg-transparent,
+        html[data-theme="dark"] .users-page .platform-role-button.bg-transparent,
+        html[data-theme="dark"] .users-page .membership-role-button.bg-transparent {
+            color: #d1d5db !important;
+        }
+
+        html[data-theme="dark"] .users-page .detail-role-button.bg-yellow-300,
+        html[data-theme="dark"] .users-page .platform-role-button.bg-yellow-300,
+        html[data-theme="dark"] .users-page .membership-role-button.bg-yellow-300 {
+            background-color: #f59e0b !important;
+            color: #111827 !important;
+        }
+
+        html[data-theme="dark"] .users-page #userPasswordModalClose,
+        html[data-theme="dark"] .users-page #userFieldEditModalClose,
+        html[data-theme="dark"] .users-page #userDetailsModal button[onclick="closeUserDetailsModal()"] {
+            color: #9ca3af !important;
+            background-color: transparent !important;
+        }
+
+        html[data-theme="dark"] .users-page #userPasswordModalClose:hover,
+        html[data-theme="dark"] .users-page #userFieldEditModalClose:hover,
+        html[data-theme="dark"] .users-page #userDetailsModal button[onclick="closeUserDetailsModal()"]:hover {
+            color: #f9fafb !important;
+            background-color: transparent !important;
+        }
+
+        html[data-theme="dark"] .users-page #applicationAccessToggle.bg-gray-100 {
+            border-color: #4b5563 !important;
+            background-color: #1f2937 !important;
+        }
+
+        html[data-theme="dark"] .users-page #applicationAccessToggle.bg-green-100 {
+            border-color: #22c55e !important;
+            background-color: rgba(34, 197, 94, 0.18) !important;
+        }
+
+        html[data-theme="dark"] .users-page #applicationAccessToggleTrack.bg-gray-300 {
+            background-color: #4b5563 !important;
+        }
+
+        html[data-theme="dark"] .users-page #applicationAccessToggleTrack.bg-green-400 {
+            background-color: #16a34a !important;
+        }
+
+        html[data-theme="dark"] .users-page #applicationAccessToggleKnob {
+            background-color: #f9fafb !important;
+        }
+
+        html[data-theme="dark"] .users-page #saveUserDetailsChanges {
+            border-color: #fbbf24;
+            background-color: #f59e0b;
+            color: #111827;
+        }
+
+        html[data-theme="dark"] #deleteUserFromDetails,
+        html[data-theme="dark"] #deleteUserFromDetails:hover {
+            color: #111827;
+        }
+
+        html[data-theme="dark"] .users-page-swal {
+            background: #111827 !important;
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] .users-page-swal .swal2-title {
+            color: #f9fafb !important;
+        }
+
+        html[data-theme="dark"] .users-page-swal .swal2-html-container {
+            color: #d1d5db !important;
+        }
+
+        html[data-theme="dark"] .users-page-swal .swal2-icon.swal2-warning {
+            border-color: #f59e0b !important;
+            color: #f59e0b !important;
+        }
+
+        html[data-theme="dark"] .users-page-swal .users-page-primary {
+            border-color: #fbbf24 !important;
+            background-color: #f59e0b !important;
+            color: #111827 !important;
+        }
+
+        html[data-theme="dark"] .users-page-swal .users-page-primary:hover {
+            border-color: #fde68a !important;
+            background-color: #fbbf24 !important;
+            color: #111827 !important;
+        }
+
+        html[data-theme="dark"] .users-page-swal .btn-secondary {
+            border-color: #4b5563 !important;
+            background-color: #1f2937 !important;
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] .users-page-swal .btn-secondary:hover {
+            border-color: #6b7280 !important;
+            background-color: #374151 !important;
+            color: #f9fafb !important;
+        }
     </style>
     <header class="page-toolbar flex justify-between items-center mb-4">
         <div class="toolbar-actions flex flex-wrap items-center">
@@ -215,10 +638,11 @@
                     <thead>
                         <tr>
                             <th class="col-id w-16 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200 text-center"></th>
-                            <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Username</th>
-                            <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Full Name</th>
-                            <th class="w-36 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Role</th>
-                            <th class="hide-sm w-56 py-4 px-5 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Created</th>
+                            <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200"><button type="button" class="users-sort-button" data-sort-key="username"><span>Username</span><span class="users-sort-indicator" aria-hidden="true"></span></button></th>
+                            <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200"><button type="button" class="users-sort-button" data-sort-key="full_name"><span>Full Name</span><span class="users-sort-indicator" aria-hidden="true"></span></button></th>
+                            <th class="w-36 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200"><button type="button" class="users-sort-button" data-sort-key="role"><span>Role</span><span class="users-sort-indicator" aria-hidden="true"></span></button></th>
+                            <th class="hide-sm w-56 py-4 px-5 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200"><button type="button" class="users-sort-button" data-sort-key="created"><span>Created</span><span class="users-sort-indicator" aria-hidden="true"></span></button></th>
+                            <th class="w-28 py-4 px-5 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Enabled</th>
                             <th class="col-actions w-32 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200"></th>
                         </tr>
                     </thead>
@@ -243,8 +667,8 @@
         <div id="membershipsPagination" class="mt-4"></div>
     </section>
 
-    <div id="newUserModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center">
-        <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl mx-auto overflow-visible relative">
+    <div id="newUserModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center p-4">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl mx-auto max-h-[calc(100vh-2rem)] overflow-y-auto relative">
             <div class="rounded-t-md shadow-sm flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
                 <h3 class="text-lg font-bold text-gray-800">Create New User</h3>
                 <button onclick="closeNewUserModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
@@ -258,15 +682,15 @@
                     <input type="hidden" id="userId">
                     <div>
                         <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
-                        <input id="username" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500" required>
+                        <input id="username" class="user-form-input mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500" required>
                     </div>
                     <div>
                         <label for="fullName" class="block text-sm font-medium text-gray-700">Full Name</label>
-                        <input id="fullName" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500">
+                        <input id="fullName" class="user-form-input mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500">
                     </div>
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                        <input id="email" type="email" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500">
+                        <input id="email" type="email" class="user-form-input mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Role</label>
@@ -284,10 +708,10 @@
                             </div>
                             <div>
                                 <input id="canCreateProjects" type="checkbox" class="hidden">
-                                <button type="button" id="projectCreationToggle" class="relative inline-flex h-8 w-14 items-center rounded-full border border-gray-300 bg-white transition focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2" aria-label="Toggle project creation permission" aria-pressed="false">
+                                <button type="button" id="projectCreationToggle" class="relative inline-flex h-7 w-12 items-center rounded-full border border-gray-300 bg-white transition focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2" aria-label="Toggle project creation permission" aria-pressed="false">
                                     <span id="projectCreationToggleTrack" class="absolute inset-0 rounded-full transition"></span>
-                                    <span id="projectCreationToggleKnob" class="relative inline-flex h-6 w-6 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-gray-300 transition-transform duration-200 ease-out" style="transform: translateX(0.25rem);">
-                                        <svg id="projectCreationToggleIconOn" class="hidden h-3.5 w-3.5 text-yellow-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+                                    <span id="projectCreationToggleKnob" class="relative inline-flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-gray-300 transition-transform duration-200 ease-out" style="transform: translateX(0.25rem);">
+                                        <svg id="projectCreationToggleIconOn" class="hidden h-3.5 w-3.5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                                         </svg>
                                         <svg id="projectCreationToggleIconOff" class="h-3.5 w-3.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
@@ -300,11 +724,17 @@
                     </div>
                     <div>
                         <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                        <input id="password" type="password" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500">
+                        <div class="relative mt-1">
+                            <input id="password" type="password" class="user-form-input user-password-input block w-full border border-gray-300 rounded-md shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500">
+                            <button type="button" class="toggle-password-visibility password-visibility-button absolute inset-y-0 right-0 rounded-r-md" data-target="password" aria-label="Show password" aria-pressed="false"></button>
+                        </div>
                     </div>
                     <div>
                         <label for="passwordConfirmation" class="block text-sm font-medium text-gray-700">Confirm Password</label>
-                        <input id="passwordConfirmation" type="password" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500">
+                        <div class="relative mt-1">
+                            <input id="passwordConfirmation" type="password" class="user-form-input user-password-input block w-full border border-gray-300 rounded-md shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500">
+                            <button type="button" class="toggle-password-visibility password-visibility-button absolute inset-y-0 right-0 rounded-r-md" data-target="passwordConfirmation" aria-label="Show password confirmation" aria-pressed="false"></button>
+                        </div>
                     </div>
                     <div class="flex flex-wrap justify-end gap-3 pt-2">
                         <button type="button" id="resetUserForm" class="btn btn-secondary">Reset</button>
@@ -315,8 +745,8 @@
         </div>
     </div>
 
-    <div id="accessModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center">
-        <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-visible relative">
+    <div id="accessModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center p-4">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto max-h-[calc(100vh-2rem)] overflow-y-auto relative">
             <div class="rounded-t-md shadow-sm flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
                 <h3 id="accessModalTitle" class="text-lg font-bold text-gray-800">New Access</h3>
                 <button type="button" onclick="closeAccessModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
@@ -449,20 +879,91 @@
         </div>
     </div>
 
-    <div id="userDetailsModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex items-center justify-center">
-        <div class="bg-white rounded-lg shadow-lg w-full max-w-3xl mx-auto overflow-hidden">
-            <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
+    <div id="userDetailsModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl mx-auto max-h-[calc(100vh-2rem)] overflow-hidden flex flex-col">
+            <div class="flex flex-shrink-0 justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
                 <h3 class="text-lg font-bold text-gray-800">User Details</h3>
-                <button onclick="closeUserDetailsModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                <button onclick="closeUserDetailsModal()" class="text-gray-400 transition hover:text-gray-600 focus:outline-none">
                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
-            <div id="userDetailsContent" class="p-6 space-y-5"></div>
-            <div class="p-4 border-t border-gray-200 bg-gray-100 text-right rounded-b-lg">
-                <button onclick="closeUserDetailsModal()" class="btn btn-secondary">Close</button>
+            <div id="userDetailsContent" class="min-h-0 flex-1 overflow-y-auto p-6 space-y-5"></div>
+            <div class="flex flex-shrink-0 flex-wrap items-center justify-between gap-3 p-4 border-t border-gray-200 bg-gray-100 rounded-b-lg">
+                <button type="button" id="deleteUserFromDetails" class="hidden btn">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166M19.228 5.79 18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                    </svg>
+                    Delete
+                </button>
+                <div class="ml-auto flex flex-wrap items-center gap-3">
+                    <button type="button" id="saveUserDetailsChanges" class="hidden btn btn-primary">Save Changes</button>
+                    <button onclick="closeUserDetailsModal()" class="btn btn-secondary">Close</button>
+                </div>
             </div>
+        </div>
+    </div>
+
+    <div id="userPasswordModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-75 p-4">
+        <div class="w-full max-w-md overflow-hidden rounded-lg bg-white shadow-lg">
+            <div class="flex items-center justify-between border-b border-gray-200 bg-gray-100 px-4 py-4">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800">Change Password</h3>
+                </div>
+                <button type="button" id="userPasswordModalClose" class="text-gray-400 transition hover:text-gray-600 focus:outline-none">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <form id="userPasswordForm" class="space-y-4 p-6">
+                <div>
+                    <label for="detailNewPassword" class="block text-sm font-medium text-gray-700">New Password</label>
+                    <div class="relative mt-1">
+                        <input id="detailNewPassword" type="password" class="user-form-input user-password-input block w-full rounded-md border border-gray-300 shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500">
+                        <button type="button" class="toggle-detail-password-visibility password-visibility-button absolute inset-y-0 right-0 rounded-r-md" data-target="detailNewPassword" aria-label="Show new password" aria-pressed="false"></button>
+                    </div>
+                </div>
+                <div>
+                    <label for="detailPasswordConfirmation" class="block text-sm font-medium text-gray-700">Confirm New Password</label>
+                    <div class="relative mt-1">
+                        <input id="detailPasswordConfirmation" type="password" class="user-form-input user-password-input block w-full rounded-md border border-gray-300 shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500">
+                        <button type="button" class="toggle-detail-password-visibility password-visibility-button absolute inset-y-0 right-0 rounded-r-md" data-target="detailPasswordConfirmation" aria-label="Show password confirmation" aria-pressed="false"></button>
+                    </div>
+                </div>
+                <p id="userPasswordModalMessage" class="text-sm text-gray-600"></p>
+                <div class="flex items-center justify-end gap-3">
+                    <button type="button" id="userPasswordCancel" class="btn btn-secondary">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="userFieldEditModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-75 p-4">
+        <div class="w-full max-w-md overflow-hidden rounded-lg bg-white shadow-lg">
+            <div class="flex items-center justify-between border-b border-gray-200 bg-gray-100 px-4 py-4">
+                <div>
+                    <h3 id="userFieldEditTitle" class="text-lg font-bold text-gray-800">Edit User</h3>
+                </div>
+                <button type="button" id="userFieldEditModalClose" class="text-gray-400 transition hover:text-gray-600 focus:outline-none">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <form id="userFieldEditForm" class="space-y-4 p-6">
+                <div>
+                    <label id="userFieldEditLabel" for="userFieldEditInput" class="block text-sm font-medium text-gray-700">Value</label>
+                    <input id="userFieldEditInput" class="user-form-input mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500">
+                </div>
+                <p id="userFieldEditMessage" class="text-sm text-gray-600"></p>
+                <div class="flex items-center justify-end gap-3">
+                    <button type="button" id="userFieldEditCancel" class="btn btn-secondary">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -475,9 +976,15 @@
     let applicationMemberships = [];
     let projectApplicationsById = {};
     let currentDetailsUser = null;
+    let detailDraftIsActive = null;
+    let detailDraftCanCreateProjects = null;
+    let editingUserField = null;
+    let editingUserFieldLabel = '';
     let membershipSearchTerm = '';
     let usersPage = 1;
     let membershipsPage = 1;
+    let usersSortKey = 'username';
+    let usersSortDirection = 'asc';
     const USERS_PAGE_SIZE = 5;
     const MEMBERSHIPS_PAGE_SIZE = 5;
     const currentSessionUserId = {{ session.get('user_id')|tojson }};
@@ -490,13 +997,18 @@
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
             <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
         </svg>`;
-    const disableIcon = `
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
-        </svg>`;
-    const enableIcon = `
+    const deleteUserIcon = `
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+        </svg>`;
+    const passwordVisibleIcon = `
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+        </svg>`;
+    const passwordHiddenIcon = `
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
         </svg>`;
     const editIcon = `
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -530,7 +1042,7 @@
             icon: 'error',
             confirmButtonText: 'OK',
             customClass: {
-                popup: 'bg-white rounded-lg shadow-lg',
+                popup: 'users-page-swal bg-white rounded-lg shadow-lg',
                 title: 'text-xl font-bold text-gray-800',
                 content: 'text-gray-700',
                 confirmButton: 'btn btn-danger',
@@ -548,7 +1060,7 @@
             icon: 'success',
             confirmButtonText: 'OK',
             customClass: {
-                popup: 'bg-white rounded-lg shadow-lg',
+                popup: 'users-page-swal bg-white rounded-lg shadow-lg',
                 title: 'text-xl font-bold text-gray-800',
                 content: 'text-gray-700',
                 confirmButton: 'btn btn-success',
@@ -570,7 +1082,7 @@
             confirmButtonText: confirmText,
             cancelButtonText: 'Cancel',
             customClass: {
-                popup: 'bg-white rounded-lg shadow-lg',
+                popup: 'users-page-swal bg-white rounded-lg shadow-lg',
                 title: 'text-xl font-bold text-gray-800',
                 content: 'text-gray-700',
                 confirmButton: 'btn btn-primary users-page-primary',
@@ -591,7 +1103,7 @@
             icon: 'info',
             confirmButtonText: 'OK',
             customClass: {
-                popup: 'bg-white rounded-lg shadow-lg',
+                popup: 'users-page-swal bg-white rounded-lg shadow-lg',
                 title: 'text-xl font-bold text-gray-800',
                 content: 'text-gray-700',
                 confirmButton: 'btn btn-primary users-page-primary',
@@ -609,7 +1121,7 @@
             iconHtml: `<span class="users-shield-icon inline-flex items-center justify-center" style="color: #73A5CA; animation: shield-shake 0.8s ease-in-out infinite;">${sweetAlertShieldIcon}</span>`,
             confirmButtonText: 'OK',
             customClass: {
-                popup: 'bg-white rounded-lg shadow-lg',
+                popup: 'users-page-swal bg-white rounded-lg shadow-lg',
                 title: 'text-xl font-bold text-gray-800',
                 content: 'text-gray-700',
                 icon: 'border-0 !w-[9.5rem] !h-[9.5rem]',
@@ -829,6 +1341,62 @@
         renderPagination('#usersPagination', usersPage, totalPages, 'users-page-button', 'users-page-nav', null, true);
     }
 
+    function usersSortIndicatorSvg(direction) {
+        if (direction === 'asc') {
+            return `
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="users-sort-icon">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
+                </svg>
+            `;
+        }
+        if (direction === 'desc') {
+            return `
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="users-sort-icon">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                </svg>
+            `;
+        }
+        return `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="users-sort-icon">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15 12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+            </svg>
+        `;
+    }
+
+    function updateUsersSortIndicators() {
+        $('.users-sort-button').each(function() {
+            const key = $(this).data('sort-key');
+            const direction = key === usersSortKey ? usersSortDirection : 'neutral';
+            $(this).find('.users-sort-indicator').html(usersSortIndicatorSvg(direction));
+        });
+    }
+
+    function sortedUsers() {
+        const multiplier = usersSortDirection === 'asc' ? 1 : -1;
+        return users.slice().sort(function(left, right) {
+            let leftValue = '';
+            let rightValue = '';
+
+            if (usersSortKey === 'full_name') {
+                leftValue = (left.full_name || '').toLowerCase();
+                rightValue = (right.full_name || '').toLowerCase();
+            } else if (usersSortKey === 'role') {
+                leftValue = (left.platform_role_label || left.platform_role || '').toLowerCase();
+                rightValue = (right.platform_role_label || right.platform_role || '').toLowerCase();
+            } else if (usersSortKey === 'created') {
+                leftValue = left.created_at || '';
+                rightValue = right.created_at || '';
+            } else {
+                leftValue = (left.username || '').toLowerCase();
+                rightValue = (right.username || '').toLowerCase();
+            }
+
+            if (leftValue < rightValue) return -1 * multiplier;
+            if (leftValue > rightValue) return 1 * multiplier;
+            return Number(left.id || 0) - Number(right.id || 0);
+        });
+    }
+
     function switchSubpage(subpageId) {
         $('.users-subpage').addClass('hidden');
         $(`#${subpageId}`).removeClass('hidden');
@@ -1008,7 +1576,7 @@
             icon: 'info',
             confirmButtonText: 'OK',
             customClass: {
-                popup: 'bg-white rounded-lg shadow-lg',
+                popup: 'users-page-swal bg-white rounded-lg shadow-lg',
                 title: 'text-xl font-bold text-gray-800',
                 content: 'text-gray-700',
                 confirmButton: 'btn btn-primary users-page-primary',
@@ -1046,7 +1614,7 @@
         $('#projectCreationToggleKnob')
             .toggleClass('ring-yellow-200', isEnabled)
             .toggleClass('ring-gray-300', !isEnabled)
-            .css('transform', isEnabled ? 'translateX(1.75rem)' : 'translateX(0.25rem)');
+            .css('transform', isEnabled ? 'translateX(1.5rem)' : 'translateX(0.25rem)');
         $('#projectCreationToggleIconOn').toggleClass('hidden', !isEnabled);
         $('#projectCreationToggleIconOff').toggleClass('hidden', isEnabled);
     }
@@ -1064,9 +1632,53 @@
         });
     }
 
+    function detailProjectCreationEnabled() {
+        return currentDetailsUser && (currentDetailsUser.platform_role === 'admin' || !!detailDraftCanCreateProjects);
+    }
+
+    function detailHasPendingChanges() {
+        if (!currentDetailsUser) {
+            return false;
+        }
+        const statusChanged = detailDraftIsActive !== null && detailDraftIsActive !== Boolean(currentDetailsUser.is_active);
+        const projectCreationChanged = currentDetailsUser.platform_role !== 'admin'
+            && detailDraftCanCreateProjects !== null
+            && detailDraftCanCreateProjects !== Boolean(currentDetailsUser.can_create_projects);
+        return statusChanged || projectCreationChanged;
+    }
+
+    function updateDetailSaveButton() {
+        $('#saveUserDetailsChanges').toggleClass('hidden', !detailHasPendingChanges());
+    }
+
+    function applyDetailStatusStyles() {
+        if (!currentDetailsUser) return;
+        const isEnabled = detailDraftIsActive !== null ? detailDraftIsActive : Boolean(currentDetailsUser.is_active);
+        const isDisabled = isCurrentSessionUser(currentDetailsUser) && currentDetailsUser.platform_role === 'admin' && currentDetailsUser.is_active;
+        $('#detailUserStatusToggle')
+            .toggleClass('bg-yellow-100 border-yellow-300', isEnabled)
+            .toggleClass('bg-gray-100 border-gray-300', !isEnabled)
+            .toggleClass('opacity-60 cursor-not-allowed', isDisabled)
+            .toggleClass('cursor-pointer', !isDisabled)
+            .prop('disabled', isDisabled)
+            .attr('aria-pressed', isEnabled ? 'true' : 'false')
+            .attr('aria-label', isDisabled ? 'Admins cannot disable their own account' : (isEnabled ? 'Disable User' : 'Enable User'));
+        $('#detailUserStatusToggleTrack')
+            .toggleClass('bg-yellow-400', isEnabled)
+            .toggleClass('bg-gray-300', !isEnabled);
+        $('#detailUserStatusToggleKnob')
+            .toggleClass('ring-yellow-200', isEnabled)
+            .toggleClass('ring-gray-300', !isEnabled)
+            .css('transform', isEnabled ? 'translateX(1.5rem)' : 'translateX(0.25rem)');
+        $('#detailUserStatusToggleIconOn').toggleClass('hidden', !isEnabled);
+        $('#detailUserStatusToggleIconOff').toggleClass('hidden', isEnabled);
+        $('#detailUserStatusText').text(isEnabled ? 'User can sign in.' : 'User sign-in is disabled.');
+        updateDetailSaveButton();
+    }
+
     function applyDetailProjectCreationStyles() {
         if (!currentDetailsUser) return;
-        const isEnabled = projectCreationAllowedForUser(currentDetailsUser);
+        const isEnabled = detailProjectCreationEnabled();
         const isDisabled = currentDetailsUser.platform_role === 'admin';
         $('#detailProjectCreationToggle')
             .toggleClass('bg-yellow-100 border-yellow-300', isEnabled)
@@ -1081,9 +1693,11 @@
         $('#detailProjectCreationToggleKnob')
             .toggleClass('ring-yellow-200', isEnabled)
             .toggleClass('ring-gray-300', !isEnabled)
-            .css('transform', isEnabled ? 'translateX(1.75rem)' : 'translateX(0.25rem)');
+            .css('transform', isEnabled ? 'translateX(1.5rem)' : 'translateX(0.25rem)');
         $('#detailProjectCreationToggleIconOn').toggleClass('hidden', !isEnabled);
         $('#detailProjectCreationToggleIconOff').toggleClass('hidden', isEnabled);
+        $('#detailProjectCreationText').text(isEnabled ? 'Can create new projects.' : 'Cannot create new projects.');
+        updateDetailSaveButton();
     }
 
     function setPlatformRole(role) {
@@ -1116,6 +1730,15 @@
         $('#userForm')[0].reset();
         $('#platformRole').val('user');
         $('#canCreateProjects').prop('checked', false);
+        $('#password, #passwordConfirmation').attr('type', 'password');
+        $('.toggle-password-visibility')
+            .attr('aria-pressed', 'false')
+            .each(function() {
+                const target = $(this).data('target');
+                $(this)
+                    .attr('aria-label', target === 'passwordConfirmation' ? 'Show password confirmation' : 'Show password')
+                    .html(passwordVisibleIcon);
+            });
         syncProjectCreationToggle();
     }
 
@@ -1142,12 +1765,16 @@
     }
 
     function renderUsers() {
-        const totalPages = Math.max(1, Math.ceil(users.length / USERS_PAGE_SIZE));
+        const orderedUsers = sortedUsers();
+        const totalPages = Math.max(1, Math.ceil(orderedUsers.length / USERS_PAGE_SIZE));
         usersPage = Math.min(Math.max(usersPage, 1), totalPages);
-        const pageUsers = users.slice((usersPage - 1) * USERS_PAGE_SIZE, usersPage * USERS_PAGE_SIZE);
+        const pageUsers = orderedUsers.slice((usersPage - 1) * USERS_PAGE_SIZE, usersPage * USERS_PAGE_SIZE);
 
         $('#usersTableBody').html(pageUsers.map(user => {
             const rowState = user.is_active ? '' : 'opacity-55 bg-gray-50';
+            const isSelf = isCurrentSessionUser(user);
+            const selfAdminLocked = isSelf && user.platform_role === 'admin' && user.is_active;
+            const toggleLabel = user.is_active ? 'Disable User' : 'Enable User';
             return `
                 <tr class="hover:bg-gray-50 cursor-pointer ${rowState}" data-id="${user.id}">
                     <td class="col-id text-lg text-gray-600 py-4 px-6 border-b border-gray-200 text-center">
@@ -1157,15 +1784,49 @@
                     <td class="text-base text-gray-600 py-4 px-6 border-b border-gray-200">${escapeHtml(user.full_name || '')}</td>
                     <td class="whitespace-nowrap text-base text-gray-600 py-4 px-6 border-b border-gray-200">${escapeHtml(user.platform_role_label || user.platform_role || '')}</td>
                     <td class="date-time-text hide-sm whitespace-nowrap text-sm text-gray-600 py-4 px-5 border-b border-gray-200" title="${escapeHtml(user.created_at_display || '')}">${escapeHtml(user.created_at_display || '')}</td>
+                    <td class="whitespace-nowrap text-base text-gray-600 py-4 px-5 border-b border-gray-200">
+                        <button
+                            type="button"
+                            class="toggle-user-status relative inline-flex h-7 w-12 items-center rounded-full border transition focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 ${user.is_active ? 'bg-yellow-100 border-yellow-300' : 'bg-gray-100 border-gray-300'} ${selfAdminLocked ? 'cursor-not-allowed opacity-60' : ''}"
+                            data-id="${user.id}"
+                            data-active="${user.is_active}"
+                            aria-label="${selfAdminLocked ? 'Admins cannot disable their own account' : toggleLabel}"
+                            aria-pressed="${user.is_active ? 'true' : 'false'}"
+                            ${selfAdminLocked ? 'disabled' : ''}
+                        >
+                            <span class="absolute inset-0 rounded-full transition ${user.is_active ? 'bg-yellow-400' : 'bg-gray-300'}"></span>
+                            <span
+                                class="relative inline-flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-sm ring-1 transition-transform duration-200 ease-out ${user.is_active ? 'ring-yellow-200' : 'ring-gray-300'}"
+                                style="transform: ${user.is_active ? 'translateX(1.5rem)' : 'translateX(0.25rem)'};"
+                            >
+                                ${user.is_active ? `
+                                    <svg class="h-3.5 w-3.5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                    </svg>
+                                ` : `
+                                    <svg class="h-3.5 w-3.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                    </svg>
+                                `}
+                            </span>
+                        </button>
+                    </td>
                     <td class="col-actions text-base text-gray-600 py-4 px-6 border-b border-gray-200">
                         <div class="table-actions">
                             <button class="details-user table-action-button text-yellow-500 hover:text-yellow-600" data-id="${user.id}" aria-label="User Details">${detailsIcon}</button>
-                            <button class="toggle-user-status table-action-button text-yellow-500 hover:text-red-600" data-id="${user.id}" data-active="${user.is_active}" aria-label="${user.is_active ? 'Disable User' : 'Enable User'}">${user.is_active ? disableIcon : enableIcon}</button>
+                            <button
+                                class="delete-user table-action-button text-yellow-500 hover:text-red-600 ${isSelf ? 'cursor-not-allowed opacity-40' : ''}"
+                                data-id="${user.id}"
+                                data-username="${escapeHtml(user.username)}"
+                                aria-label="${isSelf ? 'Cannot delete your own account' : 'Delete User'}"
+                                ${isSelf ? 'disabled' : ''}
+                            >${deleteUserIcon}</button>
                         </div>
                     </td>
                 </tr>
             `;
         }).join(''));
+        updateUsersSortIndicators();
         renderUsersPagination(totalPages);
         renderAccessUserOptions();
         renderAdminAccessSummary();
@@ -1516,11 +2177,14 @@
 
     function renderUserDetails(user) {
         currentDetailsUser = user;
+        detailDraftIsActive = Boolean(user.is_active);
+        detailDraftCanCreateProjects = Boolean(user.can_create_projects);
         const assignedProjects = user.assigned_projects || [];
         const assignedApplications = user.assigned_applications || [];
         const recentProjects = assignedProjects.slice(0, 1);
         const detailProjectCreationEnabled = projectCreationAllowedForUser(user);
         const isSelf = isCurrentSessionUser(user);
+        const detailStatusLocked = isSelf && user.platform_role === 'admin' && user.is_active;
 
         const recentProjectsHtml = recentProjects.length
             ? recentProjects.map(project => `
@@ -1550,46 +2214,96 @@
             : '<p class="text-sm text-gray-500">No assigned projects.</p>';
 
         $('#userDetailsContent').html(`
-            <div class="grid gap-4 sm:grid-cols-2">
-                <div class="space-y-3">
-                    <p class="text-sm text-gray-600"><strong>Username:</strong> <span id="detailUsername">${escapeHtml(user.username)}</span>
-                        <button class="edit-detail-field inline-flex text-yellow-600 hover:text-yellow-800 align-middle ml-1" data-field="username" data-label="Username">${editIcon}</button>
-                    </p>
-                    <p class="text-sm text-gray-600"><strong>Full Name:</strong> <span id="detailFullName">${escapeHtml(user.full_name || '')}</span>
-                        <button class="edit-detail-field inline-flex text-yellow-600 hover:text-yellow-800 align-middle ml-1" data-field="full_name" data-label="Full Name">${editIcon}</button>
-                    </p>
-                    <p class="text-sm text-gray-600"><strong>ID:</strong> ${user.id}</p>
-                    <p class="text-sm text-gray-600"><strong>Email:</strong> <span id="detailEmail">${escapeHtml(user.email || 'N/A')}</span>
-                        <button class="edit-detail-field inline-flex text-yellow-600 hover:text-yellow-800 align-middle ml-1" data-field="email" data-label="Email">${editIcon}</button>
-                    </p>
+            <div class="space-y-3">
+                <div class="user-detail-field flex items-center gap-3 px-3">
+                    <span class="user-detail-field-label text-xs font-semibold uppercase tracking-wide text-gray-500">Username</span>
+                    <span id="detailUsername" class="min-w-0 flex-1 truncate text-sm font-medium text-gray-700">${escapeHtml(user.username)}</span>
+                    <span class="user-detail-divider" aria-hidden="true"></span>
+                    <button class="edit-detail-field user-detail-icon-button" data-field="username" data-label="Username" aria-label="Edit username" title="Edit username">${editIcon}</button>
                 </div>
-                <div class="space-y-3">
-                    <p class="text-sm text-gray-600"><strong>Created:</strong> <span class="date-time-text">${escapeHtml(user.created_at_display || 'N/A')}</span></p>
-                    <p class="text-sm text-gray-600"><strong>Status:</strong> ${escapeHtml(user.status)}</p>
-                    <p class="text-sm text-gray-600"><strong>Last login date:</strong> <span class="date-time-text">${escapeHtml(user.last_login_display || 'Never')}</span></p>
-                    <div class="text-sm text-gray-600">
-                        <strong>Role:</strong>
-                        <div class="mt-2 inline-flex flex-wrap items-center gap-2 rounded-full border border-gray-200 bg-white p-1" role="group" aria-label="User role">
-                            <button type="button" class="detail-role-button rounded-full px-4 py-2 text-sm font-medium transition" data-role="admin">Admin</button>
-                            <button type="button" class="detail-role-button rounded-full px-4 py-2 text-sm font-medium transition" data-role="user">User</button>
-                        </div>
-                        ${isSelf ? '<p class="mt-2 text-xs text-gray-500">Your own platform role is locked here to avoid accidental access loss.</p>' : ''}
+                <div class="user-detail-field flex items-center gap-3 px-3">
+                    <span class="user-detail-field-label text-xs font-semibold uppercase tracking-wide text-gray-500">Full Name</span>
+                    <span id="detailFullName" class="min-w-0 flex-1 truncate text-sm font-medium text-gray-700">${escapeHtml(user.full_name || 'N/A')}</span>
+                    <span class="user-detail-divider" aria-hidden="true"></span>
+                    <button class="edit-detail-field user-detail-icon-button" data-field="full_name" data-label="Full Name" aria-label="Edit full name" title="Edit full name">${editIcon}</button>
+                </div>
+                <div class="user-detail-field flex items-center gap-3 px-3">
+                    <span class="user-detail-field-label text-xs font-semibold uppercase tracking-wide text-gray-500">Email</span>
+                    <span id="detailEmail" class="min-w-0 flex-1 truncate text-sm font-medium text-gray-700">${escapeHtml(user.email || 'N/A')}</span>
+                    <span class="user-detail-divider" aria-hidden="true"></span>
+                    <button class="edit-detail-field user-detail-icon-button" data-field="email" data-label="Email" aria-label="Edit email" title="Edit email">${editIcon}</button>
+                </div>
+                <div class="user-detail-field flex items-center gap-3 px-3">
+                    <span class="user-detail-field-label text-xs font-semibold uppercase tracking-wide text-gray-500">Password</span>
+                    <span class="min-w-0 flex-1 truncate text-sm font-medium text-gray-700">********</span>
+                    <span class="user-detail-divider" aria-hidden="true"></span>
+                    <button type="button" class="open-user-password-modal user-detail-icon-button" aria-label="Change password" title="Change password">${editIcon}</button>
+                </div>
+            </div>
+            <div class="space-y-3">
+                <div class="user-detail-meta flex items-center gap-3 px-3 py-2">
+                    <span class="user-detail-field-label text-xs font-semibold uppercase tracking-wide text-gray-500">ID</span>
+                    <span class="min-w-0 flex-1 truncate text-sm font-medium text-gray-700">${user.id}</span>
+                </div>
+                <div class="user-detail-meta flex items-center gap-3 px-3 py-2">
+                    <span class="user-detail-field-label text-xs font-semibold uppercase tracking-wide text-gray-500">Created</span>
+                    <span class="date-time-text min-w-0 flex-1 whitespace-normal break-words text-sm font-medium text-gray-700">${escapeHtml(user.created_at_display || 'N/A')}</span>
+                </div>
+                <div class="user-detail-meta flex items-center gap-3 px-3 py-2">
+                    <span class="user-detail-field-label text-xs font-semibold uppercase tracking-wide text-gray-500">Last Login</span>
+                    <span class="date-time-text min-w-0 flex-1 whitespace-normal break-words text-sm font-medium text-gray-700">${escapeHtml(user.last_login_display || 'Never')}</span>
+                </div>
+            </div>
+            <div class="user-detail-setting px-4 py-3">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Role</p>
+                        ${isSelf ? '<p class="mt-1 text-xs text-gray-500">Your own platform role is locked here to avoid accidental access loss.</p>' : ''}
                     </div>
-                    <div class="text-sm text-gray-600">
-                        <strong>Can create projects:</strong>
-                        <div class="mt-2">
-                            <button type="button" id="detailProjectCreationToggle" class="relative inline-flex h-8 w-14 items-center rounded-full border border-gray-300 bg-white transition focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2" aria-label="Toggle project creation permission" aria-pressed="${detailProjectCreationEnabled ? 'true' : 'false'}">
-                                <span id="detailProjectCreationToggleTrack" class="absolute inset-0 rounded-full transition"></span>
-                                <span id="detailProjectCreationToggleKnob" class="relative inline-flex h-6 w-6 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-gray-300 transition-transform duration-200 ease-out" style="transform: ${detailProjectCreationEnabled ? 'translateX(1.75rem)' : 'translateX(0.25rem)'};">
-                                    <svg id="detailProjectCreationToggleIconOn" class="${detailProjectCreationEnabled ? '' : 'hidden '}h-3.5 w-3.5 text-yellow-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                                    </svg>
-                                    <svg id="detailProjectCreationToggleIconOff" class="${detailProjectCreationEnabled ? 'hidden ' : ''}h-3.5 w-3.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                                    </svg>
-                                </span>
-                            </button>
+                    <div class="inline-flex flex-wrap items-center gap-2 rounded-full border border-gray-200 bg-white p-1" role="group" aria-label="User role">
+                        <button type="button" class="detail-role-button rounded-full px-4 py-2 text-sm font-medium transition" data-role="admin">Admin</button>
+                        <button type="button" class="detail-role-button rounded-full px-4 py-2 text-sm font-medium transition" data-role="user">User</button>
+                    </div>
+                </div>
+            </div>
+            <div class="grid gap-3 sm:grid-cols-2">
+                <div class="user-detail-setting px-4 py-3">
+                    <div class="flex items-center justify-between gap-4">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Enabled</p>
+                            <p id="detailUserStatusText" class="mt-1 text-sm text-gray-600">${user.is_active ? 'User can sign in.' : 'User sign-in is disabled.'}</p>
                         </div>
+                        <button type="button" id="detailUserStatusToggle" class="relative inline-flex h-7 w-12 flex-shrink-0 items-center rounded-full border transition focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 ${user.is_active ? 'bg-yellow-100 border-yellow-300' : 'bg-gray-100 border-gray-300'} ${detailStatusLocked ? 'cursor-not-allowed opacity-60' : ''}" aria-label="${detailStatusLocked ? 'Admins cannot disable their own account' : (user.is_active ? 'Disable User' : 'Enable User')}" aria-pressed="${user.is_active ? 'true' : 'false'}" ${detailStatusLocked ? 'disabled' : ''}>
+                            <span id="detailUserStatusToggleTrack" class="absolute inset-0 rounded-full transition ${user.is_active ? 'bg-yellow-400' : 'bg-gray-300'}"></span>
+                            <span id="detailUserStatusToggleKnob" class="relative inline-flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-sm ring-1 transition-transform duration-200 ease-out ${user.is_active ? 'ring-yellow-200' : 'ring-gray-300'}" style="transform: ${user.is_active ? 'translateX(1.5rem)' : 'translateX(0.25rem)'};">
+                                ${user.is_active ? `
+                                    <svg id="detailUserStatusToggleIconOn" class="h-3.5 w-3.5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                                    <svg id="detailUserStatusToggleIconOff" class="hidden h-3.5 w-3.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+                                ` : `
+                                    <svg id="detailUserStatusToggleIconOn" class="hidden h-3.5 w-3.5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                                    <svg id="detailUserStatusToggleIconOff" class="h-3.5 w-3.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+                                `}
+                            </span>
+                        </button>
+                    </div>
+                </div>
+                <div class="user-detail-setting px-4 py-3">
+                    <div class="flex items-center justify-between gap-4">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Can Create Projects</p>
+                            <p id="detailProjectCreationText" class="mt-1 text-sm text-gray-600">${detailProjectCreationEnabled ? 'Can create new projects.' : 'Cannot create new projects.'}</p>
+                        </div>
+                        <button type="button" id="detailProjectCreationToggle" class="relative inline-flex h-7 w-12 flex-shrink-0 items-center rounded-full border border-gray-300 bg-white transition focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2" aria-label="Toggle project creation permission" aria-pressed="${detailProjectCreationEnabled ? 'true' : 'false'}">
+                            <span id="detailProjectCreationToggleTrack" class="absolute inset-0 rounded-full transition"></span>
+                            <span id="detailProjectCreationToggleKnob" class="relative inline-flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-gray-300 transition-transform duration-200 ease-out" style="transform: ${detailProjectCreationEnabled ? 'translateX(1.5rem)' : 'translateX(0.25rem)'};">
+                                <svg id="detailProjectCreationToggleIconOn" class="${detailProjectCreationEnabled ? '' : 'hidden '}h-3.5 w-3.5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                </svg>
+                                <svg id="detailProjectCreationToggleIconOff" class="${detailProjectCreationEnabled ? 'hidden ' : ''}h-3.5 w-3.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                </svg>
+                            </span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1607,7 +2321,12 @@
                 </div>
             </div>
         `);
+        $('#deleteUserFromDetails')
+            .toggleClass('hidden', isSelf)
+            .data('user-id', user.id)
+            .data('username', user.username || '');
         applyDetailRoleStyles();
+        applyDetailStatusStyles();
         applyDetailProjectCreationStyles();
     }
 
@@ -1642,9 +2361,61 @@
         }).fail(showError);
     }
 
+    function openUserFieldEditModal(field, label) {
+        if (!currentDetailsUser) return;
+        editingUserField = field;
+        editingUserFieldLabel = label;
+        $('#userFieldEditTitle').text(`Edit ${label}`);
+        $('#userFieldEditLabel').text(label);
+        $('#userFieldEditInput')
+            .attr('type', field === 'email' ? 'email' : 'text')
+            .val(currentDetailsUser[field] || '');
+        $('#userFieldEditMessage').text('').removeClass('text-red-600');
+        $('#userFieldEditModal').removeClass('hidden');
+        setTimeout(function() {
+            $('#userFieldEditInput').trigger('focus').trigger('select');
+        }, 0);
+    }
+
+    function closeUserFieldEditModal() {
+        $('#userFieldEditModal').addClass('hidden');
+        $('#userFieldEditForm')[0].reset();
+        $('#userFieldEditMessage').text('').removeClass('text-red-600');
+        editingUserField = null;
+        editingUserFieldLabel = '';
+    }
+
+    function openUserPasswordModal() {
+        if (!currentDetailsUser) return;
+        $('#detailNewPassword, #detailPasswordConfirmation').val('').attr('type', 'password');
+        $('#userPasswordModalMessage').text('').removeClass('text-red-600');
+        $('.toggle-detail-password-visibility')
+            .attr('aria-pressed', 'false')
+            .each(function() {
+                const target = $(this).data('target');
+                $(this)
+                    .attr('aria-label', target === 'detailPasswordConfirmation' ? 'Show password confirmation' : 'Show new password')
+                    .html(passwordVisibleIcon);
+            });
+        $('#userPasswordModal').removeClass('hidden');
+    }
+
+    function closeUserPasswordModal() {
+        $('#userPasswordModal').addClass('hidden');
+        $('#userPasswordForm')[0].reset();
+        $('#detailNewPassword, #detailPasswordConfirmation').attr('type', 'password');
+        $('#userPasswordModalMessage').text('').removeClass('text-red-600');
+    }
+
     window.closeUserDetailsModal = function() {
         $('#userDetailsModal').addClass('hidden');
         currentDetailsUser = null;
+        detailDraftIsActive = null;
+        detailDraftCanCreateProjects = null;
+        closeUserFieldEditModal();
+        closeUserPasswordModal();
+        $('#deleteUserFromDetails').addClass('hidden').removeData('user-id').removeData('username');
+        $('#saveUserDetailsChanges').addClass('hidden').prop('disabled', false);
     }
 
     window.openNewUserModal = function() {
@@ -1734,6 +2505,16 @@
         openUserDetails(Number($(this).data('id')));
     });
 
+    $('.users-table-section').on('click', '.users-sort-button', function() {
+        const nextSortKey = $(this).data('sort-key');
+        usersSortDirection = usersSortKey === nextSortKey && usersSortDirection === 'asc'
+            ? 'desc'
+            : 'asc';
+        usersSortKey = nextSortKey;
+        usersPage = 1;
+        renderUsers();
+    });
+
     $('#usersTableBody').on('click', 'tr', function(e) {
         if ($(e.target).closest('button, a, input, select, textarea, label').length) return;
         openUserDetails(Number($(this).data('id')));
@@ -1742,6 +2523,11 @@
     $('#usersTableBody').on('click', '.toggle-user-status', function(event) {
         event.stopPropagation();
         const userId = Number($(this).data('id'));
+        const targetUser = users.find(user => Number(user.id) === userId);
+        if (targetUser && isCurrentSessionUser(targetUser) && targetUser.platform_role === 'admin' && targetUser.is_active) {
+            showInfo('Disable Blocked', 'Admins cannot disable their own account.');
+            return;
+        }
         const makeActive = String($(this).data('active')) !== 'true';
         const label = makeActive ? 'enable' : 'disable';
         showConfirm(
@@ -1762,57 +2548,85 @@
         );
     });
 
+    $('#userForm').on('click', '.toggle-password-visibility', function() {
+        const targetId = $(this).data('target');
+        const input = $(`#${targetId}`);
+        const reveal = input.attr('type') === 'password';
+        input.attr('type', reveal ? 'text' : 'password');
+        $(this)
+            .attr('aria-pressed', reveal ? 'true' : 'false')
+            .attr('aria-label', targetId === 'passwordConfirmation'
+                ? `${reveal ? 'Hide' : 'Show'} password confirmation`
+                : `${reveal ? 'Hide' : 'Show'} password`)
+            .html(reveal ? passwordHiddenIcon : passwordVisibleIcon);
+    });
+
+    $('#usersTableBody').on('click', '.delete-user', function(event) {
+        event.stopPropagation();
+        const userId = Number($(this).data('id'));
+        const username = String($(this).data('username') || 'this user');
+
+        if (currentSessionUserId && userId === Number(currentSessionUserId)) {
+            showInfo('Deletion Blocked', 'You cannot delete your own account.');
+            return;
+        }
+
+        showConfirm(
+            'Delete user',
+            `Delete ${username}? This permanently removes the user. User ID ${userId} cannot be used again.`,
+            'Delete',
+            function() {
+                $.ajax({
+                    url: `/api/users/${userId}`,
+                    method: 'DELETE'
+                }).done(function(response) {
+                    loadAll();
+                    showSuccess('Deleted', response && response.message ? response.message : 'User deleted successfully.');
+                }).fail(showError);
+            }
+        );
+    });
+
     $('#userDetailsContent').on('click', '.edit-detail-field', function() {
         if (!currentDetailsUser) return;
         const field = $(this).data('field');
         const label = $(this).data('label');
-        Swal.fire({
-            title: `Edit ${label}`,
-            input: field === 'email' ? 'email' : 'text',
-            inputLabel: label,
-            inputValue: currentDetailsUser[field] || '',
-            showCancelButton: true,
-            confirmButtonText: 'Save',
-            cancelButtonText: 'Cancel',
-            customClass: {
-                popup: 'bg-white rounded-lg shadow-lg',
-                title: 'text-xl font-bold text-gray-800',
-                content: 'text-gray-700',
-                input: 'border border-gray-300 rounded-md px-3 py-2 focus:shadow-none focus:border-yellow-500 focus:outline-none',
-                confirmButton: 'btn btn-primary users-page-primary',
-                cancelButton: 'btn btn-secondary',
-                actions: 'flex justify-center space-x-4'
-            },
-            buttonsStyling: false,
-            scrollbarPadding: false,
-            preConfirm: function(nextValue) {
-                if (field === 'username' && !String(nextValue || '').trim()) {
-                    Swal.showValidationMessage('Username is required.');
-                    return false;
-                }
-                return String(nextValue || '').trim();
-            }
-        }).then(function(result) {
-            if (!result.isConfirmed) return;
-            const payload = {
-                username: currentDetailsUser.username,
-                full_name: currentDetailsUser.full_name || '',
-                email: currentDetailsUser.email || '',
-                platform_role: currentDetailsUser.platform_role,
-                can_create_projects: currentDetailsUser.can_create_projects,
-                timezone: currentDetailsUser.timezone
-            };
-            payload[field] = result.value;
-            $.ajax({
-                url: `/api/users/${currentDetailsUser.id}`,
-                method: 'PUT',
-                contentType: 'application/json',
-                data: JSON.stringify(payload)
-            }).done(function() {
-                loadAll();
-                openUserDetails(currentDetailsUser.id);
-                showSuccess('Saved', `${label} was updated successfully.`);
-            }).fail(showError);
+        openUserFieldEditModal(field, label);
+    });
+
+    $('#userFieldEditForm').on('submit', function(event) {
+        event.preventDefault();
+        if (!currentDetailsUser || !editingUserField) return;
+        const nextValue = String($('#userFieldEditInput').val() || '').trim();
+        if (editingUserField === 'username' && !nextValue) {
+            $('#userFieldEditMessage').text('Username is required.').addClass('text-red-600');
+            return;
+        }
+        const payload = {
+            username: currentDetailsUser.username,
+            full_name: currentDetailsUser.full_name || '',
+            email: currentDetailsUser.email || '',
+            platform_role: currentDetailsUser.platform_role,
+            can_create_projects: currentDetailsUser.can_create_projects,
+            timezone: currentDetailsUser.timezone
+        };
+        payload[editingUserField] = nextValue;
+        const userId = currentDetailsUser.id;
+        const label = editingUserFieldLabel;
+        $.ajax({
+            url: `/api/users/${userId}`,
+            method: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify(payload)
+        }).done(function() {
+            closeUserFieldEditModal();
+            loadAll();
+            openUserDetails(userId);
+            showSuccess('Saved', `${label} was updated successfully.`);
+        }).fail(function(error) {
+            $('#userFieldEditMessage')
+                .text(error && error.responseJSON && error.responseJSON.error ? error.responseJSON.error : 'Request failed.')
+                .addClass('text-red-600');
         });
     });
 
@@ -1832,9 +2646,152 @@
 
     $('#userDetailsContent').on('click', '#detailProjectCreationToggle', function() {
         if (!currentDetailsUser || currentDetailsUser.platform_role === 'admin') return;
-        saveCurrentUserDetails({
-            can_create_projects: !currentDetailsUser.can_create_projects
-        }, 'Project creation permission was updated successfully.');
+        detailDraftCanCreateProjects = !detailDraftCanCreateProjects;
+        applyDetailProjectCreationStyles();
+    });
+
+    $('#userDetailsContent').on('click', '#detailUserStatusToggle', function() {
+        if (!currentDetailsUser) return;
+        if (isCurrentSessionUser(currentDetailsUser) && currentDetailsUser.platform_role === 'admin' && currentDetailsUser.is_active) {
+            showInfo('Disable Blocked', 'Admins cannot disable their own account.');
+            return;
+        }
+        detailDraftIsActive = !detailDraftIsActive;
+        applyDetailStatusStyles();
+    });
+
+    $('#saveUserDetailsChanges').on('click', function() {
+        if (!currentDetailsUser || !detailHasPendingChanges()) return;
+        const userId = currentDetailsUser.id;
+        const requests = [];
+        if (detailDraftIsActive !== Boolean(currentDetailsUser.is_active)) {
+            requests.push($.ajax({
+                url: `/api/users/${userId}/status`,
+                method: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify({ is_active: detailDraftIsActive })
+            }));
+        }
+        if (currentDetailsUser.platform_role !== 'admin' && detailDraftCanCreateProjects !== Boolean(currentDetailsUser.can_create_projects)) {
+            requests.push($.ajax({
+                url: `/api/users/${userId}`,
+                method: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    username: currentDetailsUser.username,
+                    full_name: currentDetailsUser.full_name || '',
+                    email: currentDetailsUser.email || '',
+                    platform_role: currentDetailsUser.platform_role,
+                    can_create_projects: detailDraftCanCreateProjects,
+                    timezone: currentDetailsUser.timezone
+                })
+            }));
+        }
+        $(this).prop('disabled', true);
+        $.when.apply($, requests)
+            .done(function() {
+                loadAll();
+                openUserDetails(userId);
+                showSuccess('Saved', 'User details were updated successfully.');
+            })
+            .fail(showError)
+            .always(function() {
+                $('#saveUserDetailsChanges').prop('disabled', false);
+            });
+    });
+
+    $('#userDetailsContent').on('click', '.open-user-password-modal', openUserPasswordModal);
+
+    $('#userPasswordForm').on('submit', function(event) {
+        event.preventDefault();
+        if (!currentDetailsUser) return;
+        const password = $('#detailNewPassword').val();
+        const passwordConfirmation = $('#detailPasswordConfirmation').val();
+        if (!password || !passwordConfirmation) {
+            $('#userPasswordModalMessage').text('Enter and confirm the new password.').addClass('text-red-600');
+            return;
+        }
+        if (password !== passwordConfirmation) {
+            $('#userPasswordModalMessage').text('Password confirmation does not match.').addClass('text-red-600');
+            return;
+        }
+        const payload = {
+            username: currentDetailsUser.username,
+            full_name: currentDetailsUser.full_name || '',
+            email: currentDetailsUser.email || '',
+            platform_role: currentDetailsUser.platform_role,
+            can_create_projects: currentDetailsUser.can_create_projects,
+            timezone: currentDetailsUser.timezone,
+            password,
+            password_confirmation: passwordConfirmation
+        };
+        $.ajax({
+            url: `/api/users/${currentDetailsUser.id}`,
+            method: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify(payload)
+        }).done(function() {
+            const userId = currentDetailsUser.id;
+            closeUserPasswordModal();
+            loadAll();
+            openUserDetails(userId);
+            showSuccess('Saved', 'Password was updated successfully.');
+        }).fail(function(error) {
+            $('#userPasswordModalMessage')
+                .text(error && error.responseJSON && error.responseJSON.error ? error.responseJSON.error : 'Request failed.')
+                .addClass('text-red-600');
+        });
+    });
+
+    $('#userPasswordForm').on('click', '.toggle-detail-password-visibility', function() {
+        const targetId = $(this).data('target');
+        const input = $(`#${targetId}`);
+        const reveal = input.attr('type') === 'password';
+        input.attr('type', reveal ? 'text' : 'password');
+        $(this)
+            .attr('aria-pressed', reveal ? 'true' : 'false')
+            .attr('aria-label', targetId === 'detailPasswordConfirmation'
+                ? `${reveal ? 'Hide' : 'Show'} password confirmation`
+                : `${reveal ? 'Hide' : 'Show'} new password`)
+            .html(reveal ? passwordHiddenIcon : passwordVisibleIcon);
+    });
+
+    $('#deleteUserFromDetails').on('click', function() {
+        const userId = Number($(this).data('user-id'));
+        const username = String($(this).data('username') || 'this user');
+        if (!userId || !currentDetailsUser) return;
+        if (currentSessionUserId && userId === Number(currentSessionUserId)) {
+            showInfo('Deletion Blocked', 'You cannot delete your own account.');
+            return;
+        }
+        showConfirm(
+            'Delete user',
+            `Delete ${username}? This permanently removes the user. User ID ${userId} cannot be used again.`,
+            'Delete',
+            function() {
+                $.ajax({
+                    url: `/api/users/${userId}`,
+                    method: 'DELETE'
+                }).done(function(response) {
+                    closeUserDetailsModal();
+                    loadAll();
+                    showSuccess('Deleted', response && response.message ? response.message : 'User deleted successfully.');
+                }).fail(showError);
+            }
+        );
+    });
+
+    $('#userPasswordCancel, #userPasswordModalClose').on('click', closeUserPasswordModal);
+    $('#userPasswordModal').on('click', function(event) {
+        if (event.target.id === 'userPasswordModal') {
+            closeUserPasswordModal();
+        }
+    });
+    $('#userFieldEditCancel, #userFieldEditModalClose').on('click', closeUserFieldEditModal);
+    $('#userFieldEditModal').on('click', function(event) {
+        if (event.target.id === 'userFieldEditModal') {
+            closeUserFieldEditModal();
+        }
     });
 
     $('#userDetailsContent').on('click', '.open-user-projects-page', function() {

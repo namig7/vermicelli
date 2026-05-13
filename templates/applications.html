@@ -142,7 +142,7 @@
                             type="text"
                             name="name"
                             id="name"
-                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500"
+                            class="form-input mt-1 block w-full focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500"
                             required
                         />
                     </div>
@@ -250,7 +250,7 @@
                             type="url"
                             name="link"
                             id="link"
-                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500"
+                            class="form-input mt-1 block w-full focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500"
                         />
                     </div>
                     <div class="mb-4">
@@ -264,7 +264,7 @@
                             type="text"
                             name="label"
                             id="label"
-                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500"
+                            class="form-input mt-1 block w-full focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500"
                         />
                     </div>
                 </form>
@@ -291,6 +291,8 @@
     let appsData = [];
     let currentPage = 1;
     const appsPerPage = 5;
+    let appSortKey = 'id';
+    let appSortDirection = 'asc';
 
     // ================== SweetAlert Helpers ==================
     function getButtonClass(icon, type) {
@@ -363,7 +365,7 @@
     function displayApps(page) {
         let startIndex = (page - 1) * appsPerPage;
         let endIndex = startIndex + appsPerPage;
-        let appsToShow = appsData.slice(startIndex, endIndex);
+        let appsToShow = sortedAppsData().slice(startIndex, endIndex);
 
         let appListHtml = `
             <div class="responsive-table-wrap bg-white shadow-md rounded-lg border border-gray-200 my-6">
@@ -371,16 +373,16 @@
                     <thead>
                         <tr>
                             <th class="col-id w-16 py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">
-                                ID
+                                ${appSortHeader('id', 'ID')}
                             </th>
                             <th class="py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">
-                                Name
+                                ${appSortHeader('name', 'Name')}
                             </th>
                             <th class="hide-sm w-48 whitespace-nowrap py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">
                                 Latest Version
                             </th>
                             <th class="hide-sm w-56 whitespace-nowrap py-4 px-5 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">
-                                Release Date
+                                ${appSortHeader('release_date', 'Release Date')}
                             </th>
                             <th class="col-access whitespace-nowrap py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">
                                 Access
@@ -517,46 +519,7 @@
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
                                         stroke-width="2"
-                                        d="M19.5
-                                           14.25v-2.625a3.375
-                                           3.375
-                                           0 0
-                                           0-3.375-3.375h-1.5A1.125
-                                           1.125
-                                           0 0
-                                           1
-                                           13.5
-                                           7.125v-1.5a3.375
-                                           3.375
-                                           0 0
-                                           0-3.375-3.375H8.25m5.231
-                                           13.481L15
-                                           17.25m-4.5-15H5.625c-.621
-                                           0-1.125.504-1.125
-                                           1.125v16.5c0
-                                           .621.504
-                                           1.125
-                                           1.125
-                                           1.125h12.75c.621
-                                           0
-                                           1.125-.504
-                                           1.125-1.125V11.25a9
-                                           9
-                                           0 0
-                                           0-9-9Zm3.75
-                                           11.625a2.625
-                                           2.625
-                                           0
-                                           1
-                                           1-5.25
-                                           0
-                                           2.625
-                                           2.625
-                                           0
-                                           0
-                                           1
-                                           5.25
-                                           0Z"
+                                        d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
                                     />
                                 </svg>
                             </button>
@@ -601,6 +564,72 @@
         $('#appListContainer .app-row').off('click').on('click', function(e) {
             if ($(e.target).closest('button, a, input, select, textarea, label').length) return;
             window.loadPage('application_details', Number($(this).data('id')));
+        });
+
+        $('#appListContainer .app-sort-button').off('click').on('click', function() {
+            const nextSortKey = $(this).data('sort-key');
+            appSortDirection = appSortKey === nextSortKey && appSortDirection === 'asc'
+                ? 'desc'
+                : 'asc';
+            appSortKey = nextSortKey;
+            currentPage = 1;
+            displayApps(currentPage);
+            updatePaginationControls();
+        });
+    }
+
+    function appSortHeader(key, label) {
+        const active = appSortKey === key;
+        return `
+            <button type="button" class="table-sort-button app-sort-button" data-sort-key="${key}">
+                <span>${label}</span>
+                <span class="table-sort-indicator" aria-hidden="true">${sortIndicatorSvg(active ? appSortDirection : 'neutral')}</span>
+            </button>
+        `;
+    }
+
+    function sortIndicatorSvg(direction) {
+        if (direction === 'asc') {
+            return `
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="table-sort-icon">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
+                </svg>
+            `;
+        }
+        if (direction === 'desc') {
+            return `
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="table-sort-icon">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                </svg>
+            `;
+        }
+        return `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="table-sort-icon">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15 12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+            </svg>
+        `;
+    }
+
+    function sortedAppsData() {
+        const multiplier = appSortDirection === 'asc' ? 1 : -1;
+        return appsData.slice().sort(function(left, right) {
+            let leftValue = '';
+            let rightValue = '';
+
+            if (appSortKey === 'id') {
+                leftValue = Number(left.id) || 0;
+                rightValue = Number(right.id) || 0;
+            } else if (appSortKey === 'name') {
+                leftValue = (left.name || '').toLowerCase();
+                rightValue = (right.name || '').toLowerCase();
+            } else if (appSortKey === 'release_date') {
+                leftValue = left.change_sort || '';
+                rightValue = right.change_sort || '';
+            }
+
+            if (leftValue < rightValue) return -1 * multiplier;
+            if (leftValue > rightValue) return 1 * multiplier;
+            return 0;
         });
     }
 

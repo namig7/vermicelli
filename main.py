@@ -3,6 +3,7 @@ import json
 import base64
 import hashlib
 import hmac
+import math
 import secrets
 from dotenv import load_dotenv
 from datetime import datetime, timezone
@@ -2443,6 +2444,7 @@ def fetch_applications_data():
             'version_info': version_info,
             'change_date': change_date,
             'change_datetime': change_datetime,
+            'change_sort': last_version.change_date.isoformat() if last_version else '',
             'access_level': app_access_level,
             'access_label': access_label(app_access_level),
             'access_code': access_code(app_access_level),
@@ -2650,15 +2652,16 @@ def get_projects_data():
     search_query = request.args.get('search', '').strip()
     ids_param = request.args.get('ids', '').strip()
     page = request.args.get('page', 1, type=int)
+    sort_by = request.args.get('sort_by', 'start_date').strip().lower()
+    sort_dir = request.args.get('sort_dir', 'desc').strip().lower()
     per_page = 5
 
     user = get_current_user()
     project_ids = accessible_project_ids(user)
     requested_ids = [int(value) for value in ids_param.split(',') if value.strip().isdigit()] if ids_param else []
+    projects_query = Project.query
     if search_query:
-        projects_query = Project.query.filter(Project.name.ilike(f'%{search_query}%')).order_by(Project.created_at.desc())
-    else:
-        projects_query = Project.query.order_by(Project.start_date.desc())
+        projects_query = projects_query.filter(Project.name.ilike(f'%{search_query}%'))
     if requested_ids:
         projects_query = projects_query.filter(Project.id.in_(requested_ids))
     if project_ids is not None:
@@ -2674,8 +2677,27 @@ def get_projects_data():
             })
         projects_query = projects_query.filter(Project.id.in_(project_ids))
 
-    pagination = projects_query.paginate(page=page, per_page=per_page, error_out=False)
-    projects = pagination.items
+    projects = projects_query.all()
+
+    def project_access_sort_value(project):
+        return project_role_display_code(user, project.id) or access_code(project_access_level_for_user(user, project.id)) or ''
+
+    sorters = {
+        'name': lambda project: (project.name or '').lower(),
+        'status': lambda project: (project.status or '').lower(),
+        'start_date': lambda project: project.start_date or datetime.min,
+        'access': lambda project: project_access_sort_value(project).lower(),
+    }
+    sort_key = sorters.get(sort_by, sorters['start_date'])
+    reverse = sort_dir != 'asc'
+    projects = sorted(projects, key=sort_key, reverse=reverse)
+
+    total_projects = len(projects)
+    total_pages = math.ceil(total_projects / per_page) if total_projects else 0
+    page = min(max(page, 1), total_pages or 1)
+    start = (page - 1) * per_page
+    end = start + per_page
+    projects = projects[start:end]
 
     projects_data = []
     for project in projects:
@@ -2696,12 +2718,12 @@ def get_projects_data():
 
     return jsonify({
         'projects': projects_data,
-        'has_prev': pagination.has_prev,
-        'has_next': pagination.has_next,
-        'prev_num': pagination.prev_num,
-        'next_num': pagination.next_num,
-        'page': pagination.page,
-        'total_pages': pagination.pages,
+        'has_prev': page > 1,
+        'has_next': page < total_pages,
+        'prev_num': page - 1 if page > 1 else None,
+        'next_num': page + 1 if page < total_pages else None,
+        'page': page,
+        'total_pages': total_pages,
     })
 
 @app.route('/create_project', methods=['POST'])
@@ -2776,6 +2798,7 @@ def get_project_details(project_id):
         return json_error('You do not have access to this project.', 403)
     project_access_level = project_access_level_for_user(current, project_id)
     return jsonify({
+        'id': project.id,
         'name': project.name,
         'description': project.description,
         'source_link': project.source_link,
