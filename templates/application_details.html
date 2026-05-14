@@ -12,9 +12,8 @@
 {%- endmacro %}
 
 {% macro manager_access_icon() -%}
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor" class="h-4 w-4">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9A2.25 2.25 0 0 1 5.25 16.5V7.86a2.25 2.25 0 0 1 .659-1.591l1.86-1.859a2.25 2.25 0 0 1 1.591-.659H16.5a2.25 2.25 0 0 1 2.25 2.25v10.5a2.25 2.25 0 0 1-2.25 2.25Z" />
-        <path stroke-linecap="round" stroke-linejoin="round" d="M9 8.25h6M9 12h6M9 15.75h3" />
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0M12 12.75h.008v.008H12v-.008Z" />
     </svg>
 {%- endmacro %}
 
@@ -26,19 +25,21 @@
     </span>
 {%- endmacro %}
 
-{% macro access_user_chip(member, manager=False, remove_scope='project') -%}
+{% macro access_user_chip(member, manager=False, remove_scope='project', can_remove=False) -%}
     {% set is_current_user = member.user_id == session.get('user_id') %}
     <span class="inline-flex items-center rounded-full border px-3 py-1 text-sm {{ 'current-user-access-chip border-yellow-300 bg-yellow-100 text-yellow-900' if is_current_user else 'border-gray-200 bg-white text-gray-700' }}">
         <button type="button" class="open-access-user-details min-w-0 truncate text-left font-medium transition hover:text-yellow-700 {{ 'text-yellow-900' if is_current_user else 'text-gray-700' }}" data-user-id="{{ member.user_id }}" onclick="openApplicationAccessUser({{ member.user_id }}); return false;">{{ member.username }}</button>
         {% if manager %}
             <span class="ml-2 inline-flex items-center text-yellow-600" title="Manager" aria-label="Manager">{{ manager_access_icon() }}</span>
         {% endif %}
-        {% if remove_scope == 'application' and member.membership_id %}
-            <button type="button" class="ml-2 inline-flex h-4 w-4 items-center justify-center rounded-full text-gray-400 transition hover:bg-red-100 hover:text-red-600 delete-application-access" data-application-membership-id="{{ member.membership_id }}" onclick="deleteApplicationAccess({{ member.membership_id }}); return false;" aria-label="Delete access">{{ access_remove_icon() }}</button>
-        {% elif member.membership_id %}
-            <button type="button" class="ml-2 inline-flex h-4 w-4 items-center justify-center rounded-full text-gray-400 transition hover:bg-red-100 hover:text-red-600 delete-project-access" data-membership-id="{{ member.membership_id }}" onclick="deleteProjectAccess({{ member.membership_id }}); return false;" aria-label="Delete access">{{ access_remove_icon() }}</button>
-        {% elif remove_scope == 'application' and member.project_membership_id %}
-            <button type="button" class="ml-2 inline-flex h-4 w-4 items-center justify-center rounded-full text-gray-400 transition hover:bg-red-100 hover:text-red-600 delete-project-access" data-membership-id="{{ member.project_membership_id }}" onclick="deleteProjectAccess({{ member.project_membership_id }}); return false;" aria-label="Delete access">{{ access_remove_icon() }}</button>
+        {% if can_remove and remove_scope == 'application' and manager and member.project_membership_id %}
+            <button type="button" class="ml-2 inline-flex h-4 w-4 items-center justify-center text-gray-400 transition hover:text-red-600 delete-project-access" data-membership-id="{{ member.project_membership_id }}" onclick="deleteProjectAccess({{ member.project_membership_id }}); return false;" aria-label="Delete access">{{ access_remove_icon() }}</button>
+        {% elif can_remove and remove_scope == 'application' and member.membership_id %}
+            <button type="button" class="ml-2 inline-flex h-4 w-4 items-center justify-center text-gray-400 transition hover:text-red-600 delete-application-access" data-application-membership-id="{{ member.membership_id }}" onclick="deleteApplicationAccess({{ member.membership_id }}); return false;" aria-label="Delete access">{{ access_remove_icon() }}</button>
+        {% elif can_remove and member.membership_id %}
+            <button type="button" class="ml-2 inline-flex h-4 w-4 items-center justify-center text-gray-400 transition hover:text-red-600 delete-project-access" data-membership-id="{{ member.membership_id }}" onclick="deleteProjectAccess({{ member.membership_id }}); return false;" aria-label="Delete access">{{ access_remove_icon() }}</button>
+        {% elif can_remove and remove_scope == 'application' and member.project_membership_id %}
+            <button type="button" class="ml-2 inline-flex h-4 w-4 items-center justify-center text-gray-400 transition hover:text-red-600 delete-project-access" data-membership-id="{{ member.project_membership_id }}" onclick="deleteProjectAccess({{ member.project_membership_id }}); return false;" aria-label="Delete access">{{ access_remove_icon() }}</button>
         {% endif %}
     </span>
 {%- endmacro %}
@@ -878,6 +879,18 @@
             color: #fee2e2;
         }
 
+        .app-details-page .delete-application-access:hover,
+        .app-details-page .delete-project-access:hover {
+            background: transparent !important;
+            color: #dc2626 !important;
+        }
+
+        html[data-theme="dark"] .app-details-page .delete-application-access:hover,
+        html[data-theme="dark"] .app-details-page .delete-project-access:hover {
+            background: transparent !important;
+            color: #f87171 !important;
+        }
+
         html[data-theme="dark"] .app-details-page .access-person-meta,
         html[data-theme="dark"] .app-details-page .access-empty {
             color: #cbd5e1;
@@ -1133,6 +1146,212 @@
             font-family: "Outfit", sans-serif !important;
         }
 
+        #accessModal {
+            --users-accent: #f59e0b;
+            --users-accent-soft: #fef3c7;
+            --users-accent-hover: #fde68a;
+            --users-accent-text: #b45309;
+            --users-accent-strong: #92400e;
+            --users-accent-shadow: rgba(245, 158, 11, 0.35);
+        }
+
+        #accessModal .btn:focus {
+            box-shadow: 0 0 0 2px var(--users-accent-shadow);
+        }
+
+        #accessModal .btn-primary {
+            background-color: var(--users-accent-soft);
+            color: var(--users-accent-text);
+            box-shadow: 0 1px 2px rgba(180, 83, 9, 0.12);
+        }
+
+        #accessModal .btn-primary:hover {
+            background-color: var(--users-accent-hover);
+            color: var(--users-accent-strong);
+        }
+
+        #accessModal .btn-primary svg {
+            color: currentColor !important;
+        }
+
+        #accessModal .access-mode-button {
+            border-radius: 9999px;
+        }
+
+        #accessModal .access-mode-button.is-active {
+            background-color: #fcd34d;
+            color: #78350f;
+            box-shadow: 0 1px 2px rgba(180, 83, 9, 0.12);
+        }
+
+        #accessModal .access-mode-button:not(.is-active) {
+            color: #4b5563;
+        }
+
+        #accessModal .access-mode-button:not(.is-active):hover {
+            background-color: var(--users-accent-soft);
+            color: var(--users-accent);
+        }
+
+        #accessModal .membership-role-button {
+            border-radius: 9999px;
+        }
+
+        #accessModal .membership-role-button.is-active {
+            background-color: #fcd34d;
+            color: #78350f;
+            box-shadow: 0 1px 2px rgba(180, 83, 9, 0.12);
+        }
+
+        #accessModal .membership-role-button:not(.is-active) {
+            color: #4b5563;
+        }
+
+        #accessModal .membership-role-button:not(.is-active):not(:disabled):not(.is-unavailable):hover {
+            background-color: var(--users-accent-soft);
+            color: var(--users-accent);
+        }
+
+        #accessModal .membership-role-button.is-unavailable:not(.is-active) {
+            color: #9ca3af;
+        }
+
+        #accessModalMessage {
+            color: var(--users-accent);
+        }
+
+        html[data-theme="dark"] #accessModal .bg-white {
+            background-color: #1f2937 !important;
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] #accessModal .bg-gray-100 {
+            background-color: #111827 !important;
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] #accessModal .bg-gray-50 {
+            background-color: #111827 !important;
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] #accessModal .border-gray-200 {
+            border-color: #374151 !important;
+        }
+
+        html[data-theme="dark"] #accessModal .text-gray-800,
+        html[data-theme="dark"] #accessModal .text-gray-700 {
+            color: #f3f4f6 !important;
+        }
+
+        html[data-theme="dark"] #accessModal .text-gray-600,
+        html[data-theme="dark"] #accessModal .text-gray-500,
+        html[data-theme="dark"] #accessModal .text-gray-400 {
+            color: #d1d5db !important;
+        }
+
+        html[data-theme="dark"] #accessModal input,
+        html[data-theme="dark"] #accessModal button[aria-haspopup="listbox"] {
+            background-color: #111827 !important;
+            border-color: #4b5563 !important;
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] #accessModal input:focus,
+        html[data-theme="dark"] #accessModal button[aria-haspopup="listbox"]:focus {
+            border-color: #f59e0b !important;
+            box-shadow: 0 0 0 1px #f59e0b !important;
+        }
+
+        html[data-theme="dark"] #accessProjectList li,
+        html[data-theme="dark"] #accessApplicationList li,
+        html[data-theme="dark"] #accessUserList li {
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] #accessProjectList li:hover,
+        html[data-theme="dark"] #accessApplicationList li:hover,
+        html[data-theme="dark"] #accessUserList li:hover {
+            background-color: #374151 !important;
+        }
+
+        html[data-theme="dark"] #accessUserList li[aria-disabled="true"],
+        html[data-theme="dark"] #accessUserList li[aria-disabled="true"]:hover {
+            background-color: transparent !important;
+            color: #9ca3af !important;
+        }
+
+        html[data-theme="dark"] #accessModal .membership-role-button:not(.is-active) {
+            color: #d1d5db !important;
+        }
+
+        html[data-theme="dark"] #accessModal .membership-role-button.is-active,
+        html[data-theme="dark"] #accessModal .access-mode-button.is-active {
+            background-color: #f59e0b !important;
+            color: #111827 !important;
+        }
+
+        html[data-theme="dark"] #saveAccessButton {
+            background-color: #f59e0b !important;
+            color: #111827 !important;
+            box-shadow: 0 1px 2px rgba(245, 158, 11, 0.18) !important;
+        }
+
+        html[data-theme="dark"] #saveAccessButton:hover {
+            background-color: #fbbf24 !important;
+            color: #111827 !important;
+        }
+
+        html[data-theme="dark"] #accessModal .access-mode-tabs {
+            border-color: #374151 !important;
+            background-color: #111827 !important;
+        }
+
+        html[data-theme="dark"] #accessModal .access-mode-button:not(.is-active) {
+            color: #d1d5db;
+        }
+
+        html[data-theme="dark"] #accessModal .access-mode-button:not(.is-active):hover,
+        html[data-theme="dark"] #accessModal .membership-role-button:not(.is-active):not(:disabled):not(.is-unavailable):hover {
+            background-color: #374151 !important;
+            color: #fbbf24 !important;
+        }
+
+        html[data-theme="dark"] #accessModal .membership-role-button.is-unavailable:not(.is-active) {
+            color: #9ca3af !important;
+        }
+
+        html[data-theme="dark"] #accessModalMessage {
+            color: #fbbf24 !important;
+        }
+
+        html[data-theme="dark"] #applicationAccessEnabledToggle.bg-gray-100,
+        html[data-theme="dark"] #applicationAccessToggle.bg-gray-100 {
+            border-color: #4b5563 !important;
+            background-color: #1f2937 !important;
+        }
+
+        html[data-theme="dark"] #applicationAccessEnabledToggle.bg-yellow-100,
+        html[data-theme="dark"] #applicationAccessToggle.bg-yellow-100 {
+            border-color: #f59e0b !important;
+            background-color: #fef3c7 !important;
+        }
+
+        html[data-theme="dark"] #applicationAccessEnabledToggleTrack.bg-gray-300,
+        html[data-theme="dark"] #applicationAccessToggleTrack.bg-gray-300 {
+            background-color: #4b5563 !important;
+        }
+
+        html[data-theme="dark"] #applicationAccessEnabledToggleTrack.bg-yellow-400,
+        html[data-theme="dark"] #applicationAccessToggleTrack.bg-yellow-400 {
+            background-color: #facc15 !important;
+        }
+
+        html[data-theme="dark"] #applicationAccessEnabledToggleKnob,
+        html[data-theme="dark"] #applicationAccessToggleKnob {
+            background-color: #f9fafb !important;
+        }
+
         html[data-theme="dark"] .app-details-swal {
             background: #1f2937 !important;
             color: #e5e7eb !important;
@@ -1204,7 +1423,7 @@
             </button>
         </div>
         <div class="toolbar-actions flex items-center app-details-actions hidden" data-app-actions-view="access">
-            {% if can_change_project %}
+            {% if access_summary.can_manage_access %}
                 <button type="button" onclick="openAccessManagement(); return false;" class="btn btn-primary">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.5v15m7.5-7.5h-15" />
@@ -1458,7 +1677,7 @@
                                 <p class="access-person-meta mt-1">Project access appears first, followed by application-level access for this application.</p>
                             </div>
                         </div>
-                        {% if can_change_project %}
+                        {% if access_summary.can_manage_access %}
                             <button type="button" onclick="openAccessManagement(); return false;" class="inline-icon-button flex-shrink-0" aria-label="Edit access" title="Edit access">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
@@ -1487,7 +1706,7 @@
                                 {% if access_summary.project_managers %}
                                     <div class="access-list">
                                         {% for member in access_summary.project_managers %}
-                                            {{ access_user_chip(member, True, 'project') }}
+                                            {{ access_user_chip(member, True, 'project', member.can_remove_access) }}
                                         {% endfor %}
                                     </div>
                                 {% else %}
@@ -1499,7 +1718,7 @@
                                 {% if access_summary.project_operators %}
                                     <div class="access-list">
                                         {% for member in access_summary.project_operators %}
-                                            {{ access_user_chip(member, False, 'project') }}
+                                            {{ access_user_chip(member, False, 'project', member.can_remove_access) }}
                                         {% endfor %}
                                     </div>
                                 {% else %}
@@ -1517,7 +1736,7 @@
                                 {% if access_summary.application_read_write %}
                                     <div class="access-list">
                                         {% for member in access_summary.application_read_write %}
-                                            {{ access_user_chip(member, member.is_project_manager, 'application') }}
+                                            {{ access_user_chip(member, member.is_project_manager, 'application', member.can_remove_access) }}
                                         {% endfor %}
                                     </div>
                                 {% else %}
@@ -1529,7 +1748,7 @@
                                 {% if access_summary.application_read_only %}
                                     <div class="access-list">
                                         {% for member in access_summary.application_read_only %}
-                                            {{ access_user_chip(member, member.is_project_manager, 'application') }}
+                                            {{ access_user_chip(member, member.is_project_manager, 'application', member.can_remove_access) }}
                                         {% endfor %}
                                     </div>
                                 {% else %}
@@ -1811,9 +2030,140 @@
     </div>
 </div>
 
+<div id="accessModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center p-4">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto max-h-[calc(100vh-2rem)] overflow-y-auto relative">
+        <div class="rounded-t-md shadow-sm flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
+            <h3 id="accessModalTitle" class="text-lg font-bold text-gray-800">New Access</h3>
+            <button type="button" onclick="closeAccessModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none" aria-label="Close access editor">
+                <svg class="w-6 h-6 my-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div class="p-6">
+            <form id="membershipForm" class="space-y-4">
+                <input type="hidden" id="accessMode" value="application">
+                <input type="hidden" id="membershipProject" value="{{ project_id or '' }}">
+                <input type="hidden" id="membershipUser" value="">
+                <input type="hidden" id="membershipApplication" value="{{ app.id }}">
+                <input type="hidden" id="applicationAccessEnabled" value="false">
+                <input type="hidden" id="applicationAccessLevel" value="view_only">
+                <input type="hidden" id="projectRole" value="none">
+                <div class="access-mode-tabs inline-flex w-full rounded-full border border-gray-200 bg-white p-1" role="tablist" aria-label="Access type">
+                    <button type="button" class="access-mode-button flex-1 px-4 py-2 text-sm font-medium transition" data-access-mode="project" role="tab" aria-selected="false">Projects</button>
+                    <button type="button" class="access-mode-button flex-1 px-4 py-2 text-sm font-medium transition" data-access-mode="application" role="tab" aria-selected="true">Applications</button>
+                </div>
+                <div>
+                    <label id="accessProjectDropdownLabel" class="block text-sm font-medium text-gray-700">Project</label>
+                    <div class="relative mt-1">
+                        <button type="button" id="accessProjectDropdownButton" class="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500 sm:text-sm" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="block truncate" id="accessProjectDropdownSelected">{{ project_name or 'Select Project' }}</span>
+                            <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.23 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                                </svg>
+                            </span>
+                        </button>
+                        <div id="accessProjectDropdownPanel" class="absolute z-50 mt-1 hidden w-full rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="listbox" aria-labelledby="accessProjectDropdownLabel">
+                            <div class="border-b border-gray-200 p-2">
+                                <input type="text" id="accessProjectSearchInput" class="w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500" placeholder="Type to filter..." />
+                            </div>
+                            <ul id="accessProjectList" class="max-h-48 overflow-auto py-1 text-base sm:text-sm"></ul>
+                        </div>
+                    </div>
+                </div>
+                <div id="accessApplicationSection">
+                    <label id="accessApplicationDropdownLabel" class="block text-sm font-medium text-gray-700">Application</label>
+                    <div class="relative mt-1">
+                        <button type="button" id="accessApplicationDropdownButton" class="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500 sm:text-sm" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="block truncate" id="accessApplicationDropdownSelected">{{ app.name }}</span>
+                            <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.23 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                                </svg>
+                            </span>
+                        </button>
+                        <div id="accessApplicationDropdownPanel" class="absolute z-50 mt-1 hidden w-full rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="listbox" aria-labelledby="accessApplicationDropdownLabel">
+                            <div class="border-b border-gray-200 p-2">
+                                <input type="text" id="accessApplicationSearchInput" class="w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500" placeholder="Type to filter..." />
+                            </div>
+                            <ul id="accessApplicationList" class="max-h-48 overflow-auto py-1 text-base sm:text-sm"></ul>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <label id="accessUserDropdownLabel" class="block text-sm font-medium text-gray-700">User</label>
+                    <div class="relative mt-1">
+                        <button type="button" id="accessUserDropdownButton" class="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500 sm:text-sm" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="block truncate" id="accessUserDropdownSelected">Select User</span>
+                            <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.23 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                                </svg>
+                            </span>
+                        </button>
+                        <div id="accessUserDropdownPanel" class="absolute z-50 mt-1 hidden w-full rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="listbox" aria-labelledby="accessUserDropdownLabel">
+                            <div class="border-b border-gray-200 p-2">
+                                <input type="text" id="accessUserSearchInput" class="w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500" placeholder="Type to filter..." />
+                            </div>
+                            <ul id="accessUserList" class="max-h-48 overflow-auto py-1 text-base sm:text-sm"></ul>
+                        </div>
+                    </div>
+                </div>
+                <div id="projectRoleSection" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700">Project Role</label>
+                    <div class="mt-1 inline-flex flex-wrap items-center gap-2 rounded-full border border-gray-200 bg-white p-1" role="group" aria-label="Project role">
+                        <button type="button" class="membership-role-button rounded-full px-4 py-2 text-sm font-medium transition" data-role="none" aria-pressed="false">None</button>
+                        <button type="button" class="membership-role-button rounded-full px-4 py-2 text-sm font-medium transition" data-role="project_admin" aria-pressed="false">Manager</button>
+                        <button type="button" class="membership-role-button rounded-full px-4 py-2 text-sm font-medium transition" data-role="project_user" aria-pressed="false">Operator</button>
+                    </div>
+                </div>
+                <div id="applicationAccessEnabledSection" class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-4">
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-700">Application access</p>
+                            <p class="mt-1 text-xs text-gray-500">Turn this on to assign application-level access.</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span id="applicationAccessEnabledLabelOff" class="text-xs font-semibold text-gray-500">Off</span>
+                            <button type="button" id="applicationAccessEnabledToggle" class="relative inline-flex h-7 w-12 items-center rounded-full border border-gray-300 bg-white transition focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2" aria-label="Toggle application access" aria-pressed="false">
+                                <span id="applicationAccessEnabledToggleTrack" class="absolute inset-0 rounded-full transition"></span>
+                                <span id="applicationAccessEnabledToggleKnob" class="relative inline-flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-gray-300 transition-transform duration-200 ease-out" style="transform: translateX(0.25rem);"></span>
+                            </button>
+                            <span id="applicationAccessEnabledLabelOn" class="text-xs font-semibold text-gray-500">On</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="applicationAccessToggleSection" class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-4">
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-700">Access type</p>
+                            <p class="mt-1 text-xs text-gray-500">Choose read-only or read-write access.</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span id="applicationAccessLabelRo" class="text-xs font-semibold text-gray-500">RO</span>
+                            <button type="button" id="applicationAccessToggle" class="relative inline-flex h-7 w-12 items-center rounded-full border border-gray-300 bg-white transition focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2" aria-label="Toggle application access level" aria-pressed="false">
+                                <span id="applicationAccessToggleTrack" class="absolute inset-0 rounded-full transition"></span>
+                                <span id="applicationAccessToggleKnob" class="relative inline-flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-gray-300 transition-transform duration-200 ease-out" style="transform: translateX(0.25rem);"></span>
+                            </button>
+                            <span id="applicationAccessLabelRw" class="text-xs font-semibold text-gray-500">RW</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-wrap justify-end gap-3 pt-2">
+                    <p id="accessModalMessage" class="mr-auto hidden self-center text-sm font-medium text-yellow-700">Access saved.</p>
+                    <button type="button" id="cancelAccessModal" class="btn btn-secondary">Close</button>
+                    <button type="submit" id="saveAccessButton" class="hidden btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
     (function() {
         const currentAppId = $('#app-details').data('app-id');
+        const activeTabStorageKey = `applicationDetailsActiveTab:${currentAppId}`;
         const canEditApplication = {{ 'true' if can_edit_application else 'false' }};
         const currentApplicationName = {{ app.name|tojson }};
         const currentApplicationLink = {{ (app.link or '')|tojson }};
@@ -1837,6 +2187,10 @@
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166M19.228 5.79 18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
             </svg>`;
+        const managerAccessIcon = `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0M12 12.75h.008v.008H12v-.008Z" />
+            </svg>`;
         const currentApplicationInfo = {
             id: currentAppId,
             name: currentApplicationName,
@@ -1850,6 +2204,14 @@
             latestReleaseDate: {{ (latest_version_display if latest_version else 'N/A')|tojson }},
             latestReleaseNotes: {{ (latest_version_notes or 'No release notes available.')|tojson }}
         };
+        const currentProjectId = {{ project_id|tojson }};
+        const currentProjectName = {{ (project_name or '')|tojson }};
+        const accessProjects = currentProjectId ? [{ id: currentProjectId, name: currentProjectName || 'Selected Project' }] : [];
+        const accessApplications = [{ id: currentAppId, name: currentApplicationName, project_id: currentProjectId }];
+        let accessUsers = [];
+        let accessProjectMemberships = [];
+        let accessApplicationMemberships = [];
+        let accessDataLoaded = false;
         let currentRepositoryBranches = {{ repository_branches|tojson }};
         let currentDeployments = {{ deployments|tojson }};
 
@@ -2042,6 +2404,439 @@
             return escapeHtml(value).replace(/`/g, '&#096;');
         }
 
+        function userDisplayName(user) {
+            if (!user) return '';
+            return user.full_name ? `${user.username} (${user.full_name})` : user.username;
+        }
+
+        function accessModalMode() {
+            return $('#accessMode').val() === 'project' ? 'project' : 'application';
+        }
+
+        function selectedMembershipProjectId() {
+            return Number($('#membershipProject').val() || 0);
+        }
+
+        function selectedMembershipApplicationId() {
+            return Number($('#membershipApplication').val() || 0);
+        }
+
+        function selectedMembershipUserId() {
+            return Number($('#membershipUser').val() || 0);
+        }
+
+        function selectedMembershipUser() {
+            const userId = selectedMembershipUserId();
+            return accessUsers.find(user => Number(user.id) === userId) || null;
+        }
+
+        function selectedMembershipRecord() {
+            const projectId = selectedMembershipProjectId();
+            const userId = selectedMembershipUserId();
+            if (!projectId || !userId) return null;
+            return accessProjectMemberships.find(membership =>
+                Number(membership.project_id) === projectId && Number(membership.user_id) === userId
+            ) || null;
+        }
+
+        function projectMembershipForUser(userId) {
+            const projectId = selectedMembershipProjectId();
+            if (!projectId || !userId) return null;
+            return accessProjectMemberships.find(membership =>
+                Number(membership.project_id) === projectId && Number(membership.user_id) === Number(userId)
+            ) || null;
+        }
+
+        function userIsProjectManager(userId) {
+            const membership = projectMembershipForUser(userId);
+            return Boolean(membership && membership.project_role === 'project_admin');
+        }
+
+        function selectedApplicationMembershipRecord() {
+            const applicationId = selectedMembershipApplicationId();
+            const userId = selectedMembershipUserId();
+            if (!applicationId || !userId) return null;
+            return accessApplicationMemberships.find(membership =>
+                Number(membership.application_id) === applicationId && Number(membership.user_id) === userId
+            ) || null;
+        }
+
+        function selectedUserHasInheritedApplicationAccess() {
+            const membership = selectedMembershipRecord();
+            return Boolean(membership && membership.project_role === 'project_admin');
+        }
+
+        function membershipRoleForCurrentSelection() {
+            const selectedUser = selectedMembershipUser();
+            if (!selectedMembershipProjectId() || !selectedUser) return 'none';
+            if (selectedUser.platform_role === 'admin') return 'project_admin';
+            const membership = selectedMembershipRecord();
+            return membership ? membership.project_role : 'none';
+        }
+
+        function applicationAccessLevelForCurrentSelection() {
+            const selectedUser = selectedMembershipUser();
+            if (!selectedMembershipApplicationId() || !selectedUser) return 'view_only';
+            if (selectedUser.platform_role === 'admin' || selectedUserHasInheritedApplicationAccess()) return 'read_write';
+            const membership = selectedApplicationMembershipRecord();
+            return membership ? membership.access_level : 'view_only';
+        }
+
+        function clearAccessModalMessage() {
+            $('#accessModalMessage').addClass('hidden').text('');
+        }
+
+        function showAccessSavedMessage(text) {
+            $('#accessModalMessage').text(text || 'Access saved.').removeClass('hidden');
+            $('#saveAccessButton').addClass('hidden');
+        }
+
+        function reloadApplicationAccessDetails() {
+            sessionStorage.setItem(activeTabStorageKey, 'access');
+            window.loadPage('application_details', currentAppId);
+        }
+
+        function applyAccessModalMode() {
+            const applicationMode = accessModalMode() === 'application';
+            $('#accessApplicationSection').toggleClass('hidden', !applicationMode);
+            $('#applicationAccessEnabledSection').toggleClass('hidden', !applicationMode);
+            $('#applicationAccessToggleSection').toggleClass('hidden', !applicationMode);
+            $('#projectRoleSection').toggleClass('hidden', applicationMode);
+            $('.access-mode-button').each(function() {
+                const isActive = $(this).data('access-mode') === accessModalMode();
+                $(this)
+                    .toggleClass('is-active', isActive)
+                    .attr('aria-selected', isActive ? 'true' : 'false');
+            });
+        }
+
+        function applyMembershipRoleStyles() {
+            const currentRole = $('#projectRole').val() || 'none';
+            const hasSelection = Boolean(selectedMembershipProjectId() && selectedMembershipUser());
+            const selectedUser = selectedMembershipUser();
+            const isAdminUser = Boolean(selectedUser && selectedUser.platform_role === 'admin');
+            $('.membership-role-button').each(function() {
+                const role = $(this).data('role');
+                const isActive = role === currentRole;
+                const isUnavailableForAdmin = isAdminUser && role !== 'project_admin';
+                $(this)
+                    .toggleClass('cursor-not-allowed opacity-60', !hasSelection)
+                    .toggleClass('cursor-pointer', hasSelection)
+                    .toggleClass('is-active', isActive)
+                    .toggleClass('is-unavailable', isUnavailableForAdmin && !isActive)
+                    .toggleClass('bg-gray-100 shadow-none', (!hasSelection || isUnavailableForAdmin) && !isActive)
+                    .prop('disabled', !hasSelection)
+                    .attr('aria-pressed', isActive ? 'true' : 'false');
+            });
+        }
+
+        function applicationAccessToggleDisabled() {
+            const selectedUser = selectedMembershipUser();
+            return !selectedMembershipApplicationId()
+                || !selectedUser
+                || !applicationAccessEnabled()
+                || selectedUser.platform_role === 'admin'
+                || selectedUserHasInheritedApplicationAccess();
+        }
+
+        function applicationAccessEnabled() {
+            return ($('#applicationAccessEnabled').val() || 'false') === 'true';
+        }
+
+        function applicationAccessEnabledForCurrentSelection() {
+            const selectedUser = selectedMembershipUser();
+            if (!selectedMembershipApplicationId() || !selectedUser) return false;
+            if (selectedUser.platform_role === 'admin' || selectedUserHasInheritedApplicationAccess()) return true;
+            return Boolean(selectedApplicationMembershipRecord());
+        }
+
+        function applicationAccessEnabledToggleDisabled() {
+            const selectedUser = selectedMembershipUser();
+            return !selectedMembershipApplicationId()
+                || !selectedUser
+                || selectedUser.platform_role === 'admin'
+                || selectedUserHasInheritedApplicationAccess();
+        }
+
+        function applyApplicationAccessEnabledStyles() {
+            const isEnabled = applicationAccessEnabled();
+            const isDisabled = applicationAccessEnabledToggleDisabled();
+            $('#applicationAccessEnabledToggle')
+                .toggleClass('bg-yellow-100 border-yellow-300', isEnabled)
+                .toggleClass('bg-gray-100 border-gray-300', !isEnabled)
+                .toggleClass('opacity-60 cursor-not-allowed', isDisabled)
+                .toggleClass('cursor-pointer', !isDisabled)
+                .prop('disabled', isDisabled)
+                .attr('aria-pressed', isEnabled ? 'true' : 'false');
+            $('#applicationAccessEnabledToggleTrack')
+                .toggleClass('bg-yellow-400', isEnabled)
+                .toggleClass('bg-gray-300', !isEnabled);
+            $('#applicationAccessEnabledToggleKnob')
+                .toggleClass('ring-yellow-200', isEnabled)
+                .toggleClass('ring-gray-300', !isEnabled)
+                .css('transform', isEnabled ? 'translateX(1.5rem)' : 'translateX(0.25rem)');
+            $('#applicationAccessEnabledLabelOff')
+                .toggleClass('text-gray-700', !isEnabled)
+                .toggleClass('text-gray-500', isEnabled);
+            $('#applicationAccessEnabledLabelOn')
+                .toggleClass('text-yellow-700', isEnabled)
+                .toggleClass('text-gray-500', !isEnabled);
+        }
+
+        function applyApplicationAccessStyles() {
+            const isReadWrite = ($('#applicationAccessLevel').val() || 'view_only') === 'read_write';
+            const isDisabled = applicationAccessToggleDisabled();
+            $('#applicationAccessToggle')
+                .toggleClass('bg-yellow-100 border-yellow-300', isReadWrite)
+                .toggleClass('bg-gray-100 border-gray-300', !isReadWrite)
+                .toggleClass('opacity-60 cursor-not-allowed', isDisabled)
+                .toggleClass('cursor-pointer', !isDisabled)
+                .prop('disabled', isDisabled)
+                .attr('aria-pressed', isReadWrite ? 'true' : 'false');
+            $('#applicationAccessToggleTrack')
+                .toggleClass('bg-yellow-400', isReadWrite)
+                .toggleClass('bg-gray-300', !isReadWrite);
+            $('#applicationAccessToggleKnob')
+                .toggleClass('ring-yellow-200', isReadWrite)
+                .toggleClass('ring-gray-300', !isReadWrite)
+                .css('transform', isReadWrite ? 'translateX(1.5rem)' : 'translateX(0.25rem)');
+            $('#applicationAccessLabelRo')
+                .toggleClass('text-gray-700', !isReadWrite)
+                .toggleClass('text-gray-500', isReadWrite);
+            $('#applicationAccessLabelRw')
+                .toggleClass('text-yellow-700', isReadWrite)
+                .toggleClass('text-gray-500', !isReadWrite);
+            $('#applicationAccessToggleSection')
+                .toggleClass('opacity-60', isDisabled)
+                .toggleClass('opacity-100', !isDisabled);
+        }
+
+        function shouldShowAccessSaveButton() {
+            const selectedUser = selectedMembershipUser();
+            if (!selectedMembershipProjectId() || !selectedUser || selectedUser.platform_role === 'admin') return false;
+            if (accessModalMode() === 'application') {
+                const currentAccessLevel = $('#applicationAccessLevel').val() || 'view_only';
+                if (!selectedMembershipApplicationId() || selectedUserHasInheritedApplicationAccess()) return false;
+                const existingMembership = selectedApplicationMembershipRecord();
+                const isEnabled = applicationAccessEnabled();
+                return existingMembership
+                    ? !isEnabled || currentAccessLevel !== applicationAccessLevelForCurrentSelection()
+                    : isEnabled && ['view_only', 'read_write'].includes(currentAccessLevel);
+            }
+            return ($('#projectRole').val() || 'none') !== membershipRoleForCurrentSelection();
+        }
+
+        function updateAccessSaveButton() {
+            const shouldShow = shouldShowAccessSaveButton();
+            $('#saveAccessButton').toggleClass('hidden', !shouldShow);
+            if (shouldShow) clearAccessModalMessage();
+        }
+
+        function syncMembershipRoleFromSelection() {
+            $('#projectRole').val(membershipRoleForCurrentSelection());
+            $('#applicationAccessEnabled').val(applicationAccessEnabledForCurrentSelection() ? 'true' : 'false');
+            $('#applicationAccessLevel').val(applicationAccessLevelForCurrentSelection());
+            applyMembershipRoleStyles();
+            applyApplicationAccessEnabledStyles();
+            applyApplicationAccessStyles();
+            updateAccessSaveButton();
+        }
+
+        function renderAccessProjectOptions() {
+            const term = ($('#accessProjectSearchInput').val() || '').trim().toLowerCase();
+            const filteredProjects = accessProjects.filter(project => {
+                return !term || String(project.name || '').toLowerCase().includes(term);
+            });
+            $('#accessProjectList').html(filteredProjects.map(project => `
+                <li class="cursor-pointer px-3 py-2 text-sm text-gray-700 hover:bg-yellow-100" data-id="${project.id}" data-name="${escapeAttribute(project.name)}">
+                    <span class="truncate">${escapeHtml(project.name)}</span>
+                </li>
+            `).join('') || '<li class="px-3 py-2 text-sm text-gray-500">No project selected.</li>');
+            const selectedProject = accessProjects.find(project => Number(project.id) === selectedMembershipProjectId());
+            $('#accessProjectDropdownSelected').text(selectedProject ? selectedProject.name : 'Select Project');
+        }
+
+        function renderAccessApplicationOptions() {
+            const term = ($('#accessApplicationSearchInput').val() || '').trim().toLowerCase();
+            const filteredApplications = accessApplications.filter(application => {
+                return !term || String(application.name || '').toLowerCase().includes(term);
+            });
+            $('#accessApplicationList').html(filteredApplications.map(application => `
+                <li class="cursor-pointer px-3 py-2 text-sm text-gray-700 hover:bg-yellow-100" data-id="${application.id}" data-name="${escapeAttribute(application.name)}">
+                    <span class="truncate">${escapeHtml(application.name)}</span>
+                </li>
+            `).join('') || '<li class="px-3 py-2 text-sm text-gray-500">No applications found.</li>');
+            const selectedApplication = accessApplications.find(application => Number(application.id) === selectedMembershipApplicationId());
+            $('#accessApplicationDropdownSelected').text(selectedApplication ? selectedApplication.name : 'Select Application');
+        }
+
+        function renderAccessUserOptions() {
+            const selectedUserId = selectedMembershipUserId();
+            const term = ($('#accessUserSearchInput').val() || '').trim().toLowerCase();
+            const filteredUsers = accessUsers.filter(user => {
+                if (user.platform_role === 'admin' || !user.is_active) return false;
+                const haystack = `${user.username || ''} ${user.full_name || ''}`.toLowerCase();
+                return !term || haystack.includes(term);
+            });
+            $('#accessUserList').html(filteredUsers.map(user => {
+                const statusDotClass = 'bg-yellow-400 shadow-[0_0_0_2px_rgba(250,204,21,0.18),0_0_8px_rgba(245,158,11,0.35)]';
+                const managerBadge = userIsProjectManager(user.id)
+                    ? `<span class="inline-flex flex-shrink-0 items-center text-yellow-600" title="Manager" aria-label="Manager">${managerAccessIcon}</span>`
+                    : '';
+                return `
+                    <li class="cursor-pointer px-3 py-2 text-sm text-gray-700 hover:bg-yellow-100" data-id="${user.id}" data-name="${escapeAttribute(userDisplayName(user))}">
+                        <div class="flex min-w-0 items-center gap-2">
+                            <span class="inline-flex h-3.5 w-3.5 flex-shrink-0 rounded-full ${statusDotClass}" title="Enabled"></span>
+                            <span class="min-w-0 truncate">${escapeHtml(userDisplayName(user))}</span>
+                            ${managerBadge}
+                        </div>
+                    </li>
+                `;
+            }).join('') || '<li class="px-3 py-2 text-sm text-gray-500">No users found.</li>');
+            if (selectedUserId) {
+                const selectedUser = accessUsers.find(user => Number(user.id) === selectedUserId);
+                $('#accessUserDropdownSelected').text(selectedUser ? userDisplayName(selectedUser) : 'Select User');
+            }
+        }
+
+        function resetAccessModal(userId) {
+            $('#accessMode').val('application');
+            $('#membershipProject').val(currentProjectId || '');
+            $('#membershipApplication').val(currentAppId);
+            $('#membershipUser').val(userId || '');
+            const selectedUser = userId ? accessUsers.find(user => Number(user.id) === Number(userId)) : null;
+            $('#accessUserDropdownSelected').text(selectedUser ? userDisplayName(selectedUser) : 'Select User');
+            $('#accessProjectSearchInput').val('');
+            $('#accessApplicationSearchInput').val('');
+            $('#accessUserSearchInput').val('');
+            $('#accessModalTitle').text('New Access');
+            clearAccessModalMessage();
+            applyAccessModalMode();
+            renderAccessProjectOptions();
+            renderAccessApplicationOptions();
+            renderAccessUserOptions();
+            syncMembershipRoleFromSelection();
+        }
+
+        function loadAccessData() {
+            if (accessDataLoaded) return $.Deferred().resolve().promise();
+            const membershipQuery = currentProjectId ? `?project_id=${encodeURIComponent(currentProjectId)}` : '';
+            return $.when(
+                $.getJSON('/api/users'),
+                $.getJSON(`/api/project_memberships${membershipQuery}`),
+                $.getJSON(`/api/application_memberships${membershipQuery}`)
+            ).done(function(usersResponse, projectMembershipsResponse, applicationMembershipsResponse) {
+                accessUsers = usersResponse[0] || [];
+                accessProjectMemberships = projectMembershipsResponse[0] || [];
+                accessApplicationMemberships = applicationMembershipsResponse[0] || [];
+                accessDataLoaded = true;
+            });
+        }
+
+        function openApplicationAccessModal(userId) {
+            if (!currentProjectId) {
+                showPermissionNotice('Choose a project for this application before assigning access.');
+                return;
+            }
+            loadAccessData()
+                .done(function() {
+                    resetAccessModal(userId);
+                    $('#accessModal').removeClass('hidden').addClass('flex');
+                })
+                .fail(function(xhr) {
+                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error loading access data.';
+                    showAppAlert({ title: 'Error', text: error, icon: 'error' });
+                });
+        }
+
+        function closeAccessModal() {
+            $('#accessModal').removeClass('flex').addClass('hidden');
+            resetAccessModal();
+        }
+
+        function setAccessModalMode(mode) {
+            $('#accessMode').val(mode === 'project' ? 'project' : 'application');
+            clearAccessModalMessage();
+            applyAccessModalMode();
+            syncMembershipRoleFromSelection();
+        }
+
+        function setApplicationAccessLevel(level) {
+            $('#applicationAccessLevel').val(level === 'read_write' ? 'read_write' : 'view_only');
+            clearAccessModalMessage();
+            applyApplicationAccessStyles();
+            updateAccessSaveButton();
+        }
+
+        function setApplicationAccessEnabled(enabled) {
+            $('#applicationAccessEnabled').val(enabled ? 'true' : 'false');
+            clearAccessModalMessage();
+            applyApplicationAccessEnabledStyles();
+            applyApplicationAccessStyles();
+            updateAccessSaveButton();
+        }
+
+        function saveAccess(event) {
+            event.preventDefault();
+            const projectId = selectedMembershipProjectId();
+            const userId = selectedMembershipUserId();
+            const selectedUser = selectedMembershipUser();
+            if (!projectId || !userId || !selectedUser || selectedUser.platform_role === 'admin') return;
+            if (accessModalMode() === 'application') {
+                if (selectedUserHasInheritedApplicationAccess()) return;
+                const existingMembership = selectedApplicationMembershipRecord();
+                if (!applicationAccessEnabled()) {
+                    if (!existingMembership) return;
+                    $.ajax({ url: `/api/application_memberships/${existingMembership.id}`, method: 'DELETE' })
+                        .done(function() {
+                            showAccessSavedMessage('Application access removed.');
+                            reloadApplicationAccessDetails();
+                        })
+                        .fail(function(xhr) {
+                            const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error removing application access.';
+                            showAppAlert({ title: 'Error', text: error, icon: 'error' });
+                        });
+                    return;
+                }
+                const payload = {
+                    user_id: userId,
+                    project_id: projectId,
+                    application_id: selectedMembershipApplicationId(),
+                    access_level: $('#applicationAccessLevel').val() || 'view_only'
+                };
+                const request = existingMembership
+                    ? $.ajax({ url: `/api/application_memberships/${existingMembership.id}`, method: 'PUT', contentType: 'application/json', data: JSON.stringify(payload) })
+                    : $.ajax({ url: '/api/application_memberships', method: 'POST', contentType: 'application/json', data: JSON.stringify(payload) });
+                request.done(function() {
+                    showAccessSavedMessage('Application access saved.');
+                    reloadApplicationAccessDetails();
+                }).fail(function(xhr) {
+                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error saving application access.';
+                    showAppAlert({ title: 'Error', text: error, icon: 'error' });
+                });
+                return;
+            }
+
+            const projectRole = $('#projectRole').val() || 'none';
+            const existingMembership = selectedMembershipRecord();
+            if (projectRole === 'none') {
+                if (!existingMembership) return;
+                deleteProjectAccess(existingMembership.id);
+                return;
+            }
+            const payload = { user_id: userId, project_id: projectId, project_role: projectRole };
+            const request = existingMembership
+                ? $.ajax({ url: `/api/project_memberships/${existingMembership.id}`, method: 'PUT', contentType: 'application/json', data: JSON.stringify(payload) })
+                : $.ajax({ url: '/api/project_memberships', method: 'POST', contentType: 'application/json', data: JSON.stringify(payload) });
+            request.done(function() {
+                showAccessSavedMessage('Access saved.');
+                reloadApplicationAccessDetails();
+            }).fail(function(xhr) {
+                const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error saving access.';
+                showAppAlert({ title: 'Error', text: error, icon: 'error' });
+            });
+        }
+
         function repositoryBranchRow(branch) {
             const branchName = escapeHtml(branch.branch_name || 'N/A');
             const branchTitle = escapeAttribute(branch.branch_name || '');
@@ -2070,6 +2865,7 @@
 
         function showApplicationDetailsView(viewName) {
             const activeView = viewName || 'overview';
+            sessionStorage.setItem(activeTabStorageKey, activeView);
             $('[data-app-details-view]').toggleClass('hidden', true);
             $(`[data-app-details-view="${activeView}"]`).toggleClass('hidden', false);
             $('.app-details-actions').toggleClass('hidden', true);
@@ -2437,24 +3233,86 @@
 
         function deleteProjectAccess(membershipId) {
             if (!membershipId) return;
-            confirmAppAction({
-                title: 'Remove project access?',
-                text: 'This user will be removed from the project access list.',
-                confirmButtonText: 'Remove',
-                danger: true
-            }).then(function(confirmed) {
-                if (!confirmed) return;
+
+            function removeProjectAccess(deleteApplicationAccess) {
                 $.ajax({
                     url: `/api/project_memberships/${membershipId}`,
                     type: 'DELETE',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ delete_application_access: Boolean(deleteApplicationAccess) }),
                     success: function() {
-                        window.loadPage('application_details', currentAppId);
+                        reloadApplicationAccessDetails();
                     },
                     error: function(xhr) {
                         const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error removing project access';
                         showAppAlert({ title: 'Error', text: error, icon: 'error' });
                     }
                 });
+            }
+
+            function askApplicationAccessRemoval(details) {
+                const applications = details.applications || [];
+                if (!applications.length) {
+                    confirmAppAction({
+                        title: 'Remove project access?',
+                        text: 'This user will be removed from the project access list.',
+                        confirmButtonText: 'Remove',
+                        danger: true
+                    }).then(function(confirmed) {
+                        if (confirmed) removeProjectAccess(false);
+                    });
+                    return;
+                }
+
+                const accessList = applications
+                    .map(function(application) {
+                        return `${application.application_name} (${application.access_code || application.access_label})`;
+                    })
+                    .join(', ');
+                const message = `The user has access to the applications inside ${details.project_name}: ${accessList}. Do you want to delete the user from all the applications of the project?`;
+
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Remove project access?',
+                        text: message,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        showDenyButton: true,
+                        confirmButtonText: 'Yes, delete all',
+                        denyButtonText: 'No, keep application access',
+                        cancelButtonText: 'Cancel',
+                        customClass: {
+                            popup: 'app-details-swal',
+                            title: 'app-details-swal-title',
+                            htmlContainer: 'app-details-swal-content',
+                            confirmButton: 'btn btn-danger',
+                            denyButton: 'btn btn-secondary',
+                            cancelButton: 'btn btn-secondary',
+                            actions: 'flex justify-center space-x-4'
+                        },
+                        buttonsStyling: false,
+                        scrollbarPadding: false
+                    }).then(function(result) {
+                        if (result.isConfirmed) {
+                            removeProjectAccess(true);
+                        } else if (result.isDenied) {
+                            removeProjectAccess(false);
+                        }
+                    });
+                    return;
+                }
+
+                removeProjectAccess(confirm(message));
+            }
+
+            $.ajax({
+                url: `/api/project_memberships/${membershipId}/application_access`,
+                type: 'GET',
+                success: askApplicationAccessRemoval,
+                error: function(xhr) {
+                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error loading application access';
+                    showAppAlert({ title: 'Error', text: error, icon: 'error' });
+                }
             });
         }
 
@@ -2471,7 +3329,7 @@
                     url: `/api/application_memberships/${membershipId}`,
                     type: 'DELETE',
                     success: function() {
-                        window.loadPage('application_details', currentAppId);
+                        reloadApplicationAccessDetails();
                     },
                     error: function(xhr) {
                         const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error removing application access';
@@ -2482,12 +3340,12 @@
         }
 
         function openAccessManagement() {
-            window.location.href = '/users?tab=access';
+            openApplicationAccessModal();
         }
 
         function openApplicationAccessUser(userId) {
             if (!userId) return;
-            window.location.href = `/users?tab=access&user_id=${encodeURIComponent(userId)}`;
+            openApplicationAccessModal(userId);
         }
 
         // Variables for version history
@@ -2832,6 +3690,7 @@
         window.removeRepositoryLink = removeRepositoryLink;
         window.openAccessManagement = openAccessManagement;
         window.openApplicationAccessUser = openApplicationAccessUser;
+        window.closeAccessModal = closeAccessModal;
         window.goToPage = goToPage;
         window.closeVersionModal = closeVersionModal;
         window.copyToClipboard = copyToClipboard;
@@ -2850,7 +3709,88 @@
 
         $(function() {
             renderDeployments(currentDeployments);
+            resetAccessModal();
+            $('#membershipForm').on('submit', saveAccess);
+            $('#cancelAccessModal').on('click', closeAccessModal);
+            $('.access-mode-button').on('click', function() {
+                setAccessModalMode($(this).data('access-mode'));
+            });
+            $('.membership-role-button').on('click', function() {
+                const selectedUser = selectedMembershipUser();
+                const nextRole = $(this).data('role');
+                if ($(this).prop('disabled')) return;
+                if (selectedUser && selectedUser.platform_role === 'admin' && nextRole !== 'project_admin') {
+                    showPermissionNotice('Platform admins already have manager-level access here, so they can only appear as Manager in this access editor.');
+                    return;
+                }
+                $('#projectRole').val(nextRole);
+                clearAccessModalMessage();
+                applyMembershipRoleStyles();
+                updateAccessSaveButton();
+            });
+            $('#applicationAccessToggle').on('click', function() {
+                if (applicationAccessToggleDisabled()) return;
+                setApplicationAccessLevel(($('#applicationAccessLevel').val() || 'view_only') === 'read_write' ? 'view_only' : 'read_write');
+            });
+            $('#applicationAccessEnabledToggle').on('click', function() {
+                if (applicationAccessEnabledToggleDisabled()) return;
+                setApplicationAccessEnabled(!applicationAccessEnabled());
+            });
+            $('#accessProjectDropdownButton').on('click', function(event) {
+                event.stopPropagation();
+                $('#accessApplicationDropdownPanel, #accessUserDropdownPanel').addClass('hidden');
+                $('#accessProjectDropdownPanel').toggleClass('hidden');
+            });
+            $('#accessApplicationDropdownButton').on('click', function(event) {
+                event.stopPropagation();
+                $('#accessProjectDropdownPanel, #accessUserDropdownPanel').addClass('hidden');
+                $('#accessApplicationDropdownPanel').toggleClass('hidden');
+            });
+            $('#accessUserDropdownButton').on('click', function(event) {
+                event.stopPropagation();
+                $('#accessProjectDropdownPanel, #accessApplicationDropdownPanel').addClass('hidden');
+                $('#accessUserDropdownPanel').toggleClass('hidden');
+            });
+            $('#accessUserSearchInput').on('input', renderAccessUserOptions);
+            $('#accessProjectSearchInput').on('input', renderAccessProjectOptions);
+            $('#accessApplicationSearchInput').on('input', renderAccessApplicationOptions);
+            $('#accessProjectList').on('click', 'li[data-id]', function() {
+                $('#membershipProject').val($(this).data('id'));
+                $('#accessProjectDropdownSelected').text($(this).data('name'));
+                $('#accessProjectDropdownPanel').addClass('hidden');
+                clearAccessModalMessage();
+                syncMembershipRoleFromSelection();
+            });
+            $('#accessApplicationList').on('click', 'li[data-id]', function() {
+                $('#membershipApplication').val($(this).data('id'));
+                $('#accessApplicationDropdownSelected').text($(this).data('name'));
+                $('#accessApplicationDropdownPanel').addClass('hidden');
+                clearAccessModalMessage();
+                syncMembershipRoleFromSelection();
+            });
+            $('#accessUserList').on('click', 'li[data-id]', function() {
+                $('#membershipUser').val($(this).data('id'));
+                $('#accessUserDropdownSelected').text($(this).data('name'));
+                $('#accessUserDropdownPanel').addClass('hidden');
+                clearAccessModalMessage();
+                syncMembershipRoleFromSelection();
+            });
+            $('#accessModal').on('click', function(event) {
+                if (event.target.id === 'accessModal') closeAccessModal();
+            });
+            $(document).off('click.applicationAccessDropdowns').on('click.applicationAccessDropdowns', function(event) {
+                if (!$(event.target).closest('#accessProjectDropdownButton, #accessProjectDropdownPanel').length) {
+                    $('#accessProjectDropdownPanel').addClass('hidden');
+                }
+                if (!$(event.target).closest('#accessApplicationDropdownButton, #accessApplicationDropdownPanel').length) {
+                    $('#accessApplicationDropdownPanel').addClass('hidden');
+                }
+                if (!$(event.target).closest('#accessUserDropdownButton, #accessUserDropdownPanel').length) {
+                    $('#accessUserDropdownPanel').addClass('hidden');
+                }
+            });
             $('#deploymentForm').on('submit', upsertDeployment);
+            showApplicationDetailsView(sessionStorage.getItem(activeTabStorageKey) || 'overview');
             if (!currentRepositoryBranches.length) {
                 refreshRepositoryMetadata({ silent: true });
             }

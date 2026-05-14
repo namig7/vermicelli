@@ -3174,6 +3174,7 @@ def serialize_application_membership(membership):
 
 def serialize_application_access_summary(app_obj, viewer=None):
     project = app_obj.projects[0] if app_obj.projects else None
+    can_manage_access = can_manage_application_membership(viewer, app_obj, project_id=project.id) if project else has_platform_role(viewer, PLATFORM_ADMIN)
     project_memberships = []
     if project:
         project_memberships = ProjectMembership.query.join(User).filter(
@@ -3184,6 +3185,8 @@ def serialize_application_access_summary(app_obj, viewer=None):
     project_operators = []
     for membership in project_memberships:
         user_data = {
+            'membership_id': membership.id,
+            'can_remove_access': can_manage_project_membership(viewer, project.id, membership.user),
             'user_id': membership.user_id,
             'username': membership.user.username,
             'full_name': membership.user.full_name or '',
@@ -3220,7 +3223,11 @@ def serialize_application_access_summary(app_obj, viewer=None):
         if effective_access not in (ACCESS_READ_WRITE, ACCESS_VIEW_ONLY):
             continue
         project_membership = get_project_membership(user, project.id) if project else None
+        application_membership = get_application_membership(user, app_obj.id)
         user_data = {
+            'membership_id': application_membership.id if application_membership else None,
+            'project_membership_id': project_membership.id if project_membership else None,
+            'can_remove_access': can_manage_application_membership(viewer, app_obj, user, project_id=project.id if project else None),
             'user_id': user.id,
             'username': user.username,
             'full_name': user.full_name or '',
@@ -3239,6 +3246,7 @@ def serialize_application_access_summary(app_obj, viewer=None):
 
     return {
         'project_name': project.name if project else 'No project',
+        'can_manage_access': can_manage_access,
         'platform_admins': platform_admins,
         'show_platform_admin_names': include_platform_admins,
         'project_managers': project_managers,
@@ -3658,6 +3666,27 @@ def list_project_memberships():
     return jsonify([serialize_membership(membership) for membership in memberships])
 
 
+def ensure_project_applications_read_write_access(user_id, project):
+    """Give a user explicit read-write access to every application in a project."""
+    updated_memberships = []
+    for app_obj in project.applications:
+        app_membership = ApplicationMembership.query.filter_by(
+            user_id=user_id,
+            application_id=app_obj.id,
+        ).first()
+        if app_membership:
+            app_membership.access_level = ACCESS_READ_WRITE
+        else:
+            app_membership = ApplicationMembership(
+                user_id=user_id,
+                application_id=app_obj.id,
+                access_level=ACCESS_READ_WRITE,
+            )
+            db.session.add(app_membership)
+        updated_memberships.append(app_membership)
+    return updated_memberships
+
+
 @app.route('/api/project_memberships', methods=['POST'])
 @login_required
 def create_project_membership():
@@ -3667,7 +3696,7 @@ def create_project_membership():
     project_id = data.get('project_id')
     project_role = data.get('project_role', PROJECT_USER)
     target_user = User.query.get_or_404(user_id)
-    Project.query.get_or_404(project_id)
+    project = Project.query.get_or_404(project_id)
     if target_user.platform_role == PLATFORM_ADMIN:
         return json_error('Admin accounts already have platform-wide access.', 400)
     if project_role not in PROJECT_ROLES:
@@ -3686,6 +3715,8 @@ def create_project_membership():
         access_level=access_level
     )
     db.session.add(membership)
+    if project_role == PROJECT_ADMIN:
+        ensure_project_applications_read_write_access(user_id, project)
     db.session.commit()
     return jsonify(serialize_membership(membership)), 201
 
@@ -3707,8 +3738,66 @@ def update_project_membership(membership_id):
 
     membership.project_role = project_role
     membership.access_level = ACCESS_READ_WRITE if project_role == PROJECT_ADMIN else ACCESS_VIEW_ONLY
+    if project_role == PROJECT_ADMIN:
+        ensure_project_applications_read_write_access(membership.user_id, membership.project)
     db.session.commit()
     return jsonify(serialize_membership(membership))
+
+
+def project_membership_application_access(membership):
+    project_applications = sorted(membership.project.applications, key=lambda app_obj: app_obj.name.lower())
+    project_application_ids = [app_obj.id for app_obj in project_applications]
+    if not project_application_ids:
+        return []
+    memberships = ApplicationMembership.query.join(Application).filter(
+        ApplicationMembership.user_id == membership.user_id,
+        ApplicationMembership.application_id.in_(project_application_ids)
+    ).order_by(Application.name).all()
+    memberships_by_application = {
+        app_membership.application_id: app_membership
+        for app_membership in memberships
+    }
+    if membership.project_role == PROJECT_ADMIN:
+        return [
+            {
+                'membership_id': memberships_by_application.get(app_obj.id).id if memberships_by_application.get(app_obj.id) else None,
+                'application_id': app_obj.id,
+                'application_name': app_obj.name,
+                'access_level': ACCESS_READ_WRITE,
+                'access_code': access_code(ACCESS_READ_WRITE),
+                'access_label': access_label(ACCESS_READ_WRITE),
+            }
+            for app_obj in project_applications
+        ]
+    return [
+        {
+            'membership_id': app_membership.id,
+            'application_id': app_membership.application_id,
+            'application_name': app_membership.application.name,
+            'access_level': app_membership.access_level,
+            'access_code': access_code(app_membership.access_level),
+            'access_label': access_label(app_membership.access_level),
+        }
+        for app_membership in memberships
+        if app_membership.access_level in (ACCESS_READ_WRITE, ACCESS_VIEW_ONLY)
+    ]
+
+
+@app.route('/api/project_memberships/<int:membership_id>/application_access', methods=['GET'])
+@login_required
+def project_membership_application_access_preview(membership_id):
+    current = get_current_user()
+    membership = ProjectMembership.query.get_or_404(membership_id)
+    if not can_manage_project_membership(current, membership.project_id, membership.user):
+        return json_error('You do not have permission to view this membership.', 403)
+
+    return jsonify({
+        'project_id': membership.project_id,
+        'project_name': membership.project.name,
+        'user_id': membership.user_id,
+        'username': membership.user.username,
+        'applications': project_membership_application_access(membership),
+    })
 
 
 @app.route('/api/project_memberships/<int:membership_id>', methods=['DELETE'])
@@ -3719,9 +3808,28 @@ def delete_project_membership(membership_id):
     if not can_manage_project_membership(current, membership.project_id, membership.user):
         return json_error('You do not have permission to delete this membership.', 403)
 
+    data = request.get_json(silent=True) or {}
+    delete_application_access = bool(data.get('delete_application_access'))
+    deleted_application_memberships = []
+    if delete_application_access:
+        project_application_ids = [app_obj.id for app_obj in membership.project.applications]
+        if project_application_ids:
+            deleted_application_memberships = ApplicationMembership.query.filter(
+                ApplicationMembership.user_id == membership.user_id,
+                ApplicationMembership.application_id.in_(project_application_ids)
+            ).all()
+            for app_membership in deleted_application_memberships:
+                if can_manage_application_membership(current, app_membership.application, app_membership.user, membership.project_id):
+                    db.session.delete(app_membership)
+    elif membership.project_role == PROJECT_ADMIN:
+        ensure_project_applications_read_write_access(membership.user_id, membership.project)
+
     db.session.delete(membership)
     db.session.commit()
-    return jsonify({'message': 'Membership deleted successfully'})
+    return jsonify({
+        'message': 'Membership deleted successfully',
+        'deleted_application_memberships': len(deleted_application_memberships),
+    })
 
 
 @app.route('/api/application_memberships', methods=['GET', 'POST'])
