@@ -22,6 +22,7 @@ from sqlalchemy.engine import URL
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from flask_session import Session
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from werkzeug.exceptions import HTTPException
 from werkzeug.security import check_password_hash, generate_password_hash
 
 load_dotenv()
@@ -330,6 +331,132 @@ def ensure_runtime_schema():
 
 def json_error(message, status_code=403):
     return jsonify({'error': message}), status_code
+
+
+ERROR_PAGE_MESSAGES = {
+    400: {
+        'title': 'Bad Request',
+        'eyebrow': 'Request issue',
+        'message': 'The request could not be processed. Check the details and try again.',
+    },
+    401: {
+        'title': 'Sign In Required',
+        'eyebrow': 'Authentication needed',
+        'message': 'Please sign in before opening this page.',
+    },
+    403: {
+        'title': 'Access Denied',
+        'eyebrow': 'Permission needed',
+        'message': 'Your account does not have permission to access this area.',
+    },
+    404: {
+        'title': 'Page Not Found',
+        'eyebrow': 'Missing page',
+        'message': 'The page you are looking for does not exist or may have moved.',
+    },
+    405: {
+        'title': 'Method Not Allowed',
+        'eyebrow': 'Unsupported action',
+        'message': 'This page does not support the action used by your browser.',
+    },
+    500: {
+        'title': 'Server Error',
+        'eyebrow': 'Something went wrong',
+        'message': 'The server hit an unexpected problem. Try again in a moment.',
+    },
+}
+
+
+def request_wants_json():
+    if request.path.startswith('/api/'):
+        return True
+    if request.is_json:
+        return True
+    best = request.accept_mimetypes.best_match(['application/json', 'text/html'])
+    return best == 'application/json' and request.accept_mimetypes[best] > request.accept_mimetypes['text/html']
+
+
+def current_user_for_error_page():
+    try:
+        return get_current_user()
+    except Exception:
+        return None
+
+
+def registration_open_for_error_page():
+    try:
+        return admin_count() == 0
+    except Exception:
+        return False
+
+
+def error_page_response(status_code, description=None, title=None, eyebrow=None):
+    defaults = ERROR_PAGE_MESSAGES.get(status_code, {
+        'title': 'Request Error',
+        'eyebrow': 'Unexpected response',
+        'message': 'The request could not be completed.',
+    })
+    message = description or defaults['message']
+    if request_wants_json():
+        return json_error(message, status_code)
+
+    current = current_user_for_error_page()
+    registration_open = registration_open_for_error_page()
+    primary_url = url_for('index') if current else url_for('login')
+    primary_label = 'Dashboard' if current else 'Sign In'
+    if not current and registration_open:
+        primary_url = url_for('register')
+        primary_label = 'Set Up Vermicelli'
+
+    return render_template(
+        'error.html',
+        status_code=status_code,
+        title=title or defaults['title'],
+        eyebrow=eyebrow or defaults['eyebrow'],
+        message=message,
+        primary_url=primary_url,
+        primary_label=primary_label,
+        secondary_url=url_for('logout') if current else None,
+        secondary_label='Sign Out' if current else None,
+        current_user=current,
+    ), status_code
+
+
+@app.errorhandler(400)
+def handle_bad_request(error):
+    return error_page_response(400, getattr(error, 'description', None))
+
+
+@app.errorhandler(401)
+def handle_unauthorized(error):
+    return error_page_response(401, getattr(error, 'description', None))
+
+
+@app.errorhandler(403)
+def handle_forbidden(error):
+    return error_page_response(403, getattr(error, 'description', None))
+
+
+@app.errorhandler(404)
+def handle_not_found(error):
+    return error_page_response(404)
+
+
+@app.errorhandler(405)
+def handle_method_not_allowed(error):
+    return error_page_response(405)
+
+
+@app.errorhandler(HTTPException)
+def handle_http_exception(error):
+    return error_page_response(error.code or 500, error.description, title=error.name)
+
+
+@app.errorhandler(Exception)
+def handle_unexpected_error(error):
+    db.session.rollback()
+    logging.exception("Unhandled application error")
+    return error_page_response(500)
 
 
 def get_current_user():
@@ -2111,7 +2238,7 @@ def projects_page():
 def users_page():
     user = get_current_user()
     if not can_manage_users_page(user):
-        return json_error('You do not have permission to access user management.', 403)
+        return error_page_response(403, 'You do not have permission to access user management.')
     return render_template('index.html', initial_page='users', current_user=user, can_manage_access=True, can_manage_users=True)
 
 @app.route('/settings')
@@ -2126,7 +2253,7 @@ def settings_page():
 def system_settings_page():
     user = get_current_user()
     if not has_platform_role(user, PLATFORM_ADMIN):
-        return json_error('You do not have permission to access system settings.', 403)
+        return error_page_response(403, 'You do not have permission to access system settings.')
     return render_template('index.html', initial_page='system-settings', current_user=user, can_manage_access=can_manage_access_page(user), can_manage_users=can_manage_users_page(user))
 
 
@@ -2190,7 +2317,7 @@ def application_details_page(app_id):
     app_obj = Application.query.get_or_404(app_id)
     current = get_current_user()
     if not can_view_application(current, app_obj):
-        return json_error('You do not have access to this application.', 403)
+        return error_page_response(403, 'You do not have access to this application.')
     project_name = app_obj.projects[0].name if app_obj.projects else None
     project_id = app_obj.projects[0].id if app_obj.projects else None
     latest_version = Version.query.filter_by(application_id=app_obj.id).order_by(Version.change_date.desc()).first()

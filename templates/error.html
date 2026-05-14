@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ status_code }} {{ title }} · Vermicelli</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='public/favicon.ico') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+    <script>
+        (function() {
+            const storedTheme = localStorage.getItem('themePreference');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const initialTheme = storedTheme === 'dark' || storedTheme === 'light'
+                ? storedTheme
+                : storedTheme === 'system'
+                    ? (prefersDark ? 'dark' : 'light')
+                    : (prefersDark ? 'dark' : 'light');
+            document.documentElement.dataset.theme = initialTheme;
+            document.documentElement.style.colorScheme = initialTheme;
+        })();
+    </script>
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            min-height: 100%;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            background: #f9fafb;
+            color: #374151;
+            font-family: "Outfit", sans-serif;
+        }
+
+        .error-page {
+            width: min(100%, 42rem);
+        }
+
+        .error-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            background: #ffffff;
+            box-shadow: 0 18px 45px rgba(17, 24, 39, 0.10);
+            overflow: hidden;
+        }
+
+        .error-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #e5e7eb;
+            background: #f3f4f6;
+        }
+
+        .error-brand {
+            display: inline-flex;
+            align-items: center;
+            min-width: 0;
+            gap: 0.75rem;
+            color: #111827;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .error-brand img {
+            width: 2rem;
+            height: 2rem;
+            flex: 0 0 2rem;
+        }
+
+        .error-user {
+            min-width: 0;
+            color: #6b7280;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .error-body {
+            padding: 2rem;
+        }
+
+        .error-code {
+            display: inline-flex;
+            align-items: center;
+            border: 1px solid #fde68a;
+            border-radius: 9999px;
+            background: #fef3c7;
+            color: #b45309;
+            padding: 0.35rem 0.75rem;
+            font-size: 0.8125rem;
+            font-weight: 700;
+            letter-spacing: 0;
+        }
+
+        h1 {
+            margin: 1rem 0 0;
+            color: #111827;
+            font-size: clamp(2.25rem, 7vw, 4.5rem);
+            line-height: 0.95;
+            letter-spacing: 0;
+        }
+
+        .error-title {
+            margin: 0.75rem 0 0;
+            color: #1f2937;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .error-message {
+            margin: 0.75rem 0 0;
+            color: #4b5563;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .error-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 2.5rem;
+            border: 1px solid transparent;
+            border-radius: 0.375rem;
+            padding: 0.625rem 1rem;
+            color: inherit;
+            font-weight: 700;
+            text-decoration: none;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+        }
+
+        .btn-primary {
+            border-color: #fde68a;
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .btn-primary:hover {
+            border-color: #f59e0b;
+            background: #fde68a;
+            color: #92400e;
+        }
+
+        .btn-secondary {
+            border-color: #d1d5db;
+            background: #ffffff;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #f9fafb;
+            color: #111827;
+        }
+
+        .error-hint {
+            margin-top: 1.5rem;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 1rem;
+            color: #6b7280;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        html[data-theme="dark"] body {
+            background: #030712;
+            color: #e5e7eb;
+        }
+
+        html[data-theme="dark"] .error-card {
+            border-color: #374151;
+            background: #111827;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.38);
+        }
+
+        html[data-theme="dark"] .error-header {
+            border-color: #374151;
+            background: #1f2937;
+        }
+
+        html[data-theme="dark"] .error-brand,
+        html[data-theme="dark"] h1 {
+            color: #f9fafb;
+        }
+
+        html[data-theme="dark"] .error-user,
+        html[data-theme="dark"] .error-message,
+        html[data-theme="dark"] .error-hint {
+            color: #d1d5db;
+        }
+
+        html[data-theme="dark"] .error-title {
+            color: #f3f4f6;
+        }
+
+        html[data-theme="dark"] .error-code,
+        html[data-theme="dark"] .btn-primary {
+            border-color: #fbbf24;
+            background: #f59e0b;
+            color: #111827;
+        }
+
+        html[data-theme="dark"] .btn-primary:hover {
+            border-color: #fde68a;
+            background: #fbbf24;
+            color: #111827;
+        }
+
+        html[data-theme="dark"] .btn-secondary {
+            border-color: #4b5563;
+            background: #1f2937;
+            color: #e5e7eb;
+        }
+
+        html[data-theme="dark"] .btn-secondary:hover {
+            border-color: #6b7280;
+            background: #374151;
+            color: #f9fafb;
+        }
+
+        html[data-theme="dark"] .error-hint {
+            border-color: #374151;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                align-items: stretch;
+                padding: 1rem;
+            }
+
+            .error-card {
+                min-height: calc(100vh - 2rem);
+            }
+
+            .error-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .error-body {
+                padding: 1.5rem;
+            }
+
+            .error-actions {
+                align-items: stretch;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="error-page">
+        <section class="error-card" aria-labelledby="error-title">
+            <header class="error-header">
+                <a class="error-brand" href="{{ primary_url }}">
+                    <img src="{{ url_for('static', filename='public/logo-vermicelli.svg') }}" alt="" aria-hidden="true">
+                    <span>Vermicelli</span>
+                </a>
+                {% if current_user %}
+                    <div class="error-user">{{ current_user.username }}</div>
+                {% endif %}
+            </header>
+            <div class="error-body">
+                <span class="error-code">{{ status_code }} · {{ eyebrow }}</span>
+                <h1>{{ status_code }}</h1>
+                <p id="error-title" class="error-title">{{ title }}</p>
+                <p class="error-message">{{ message }}</p>
+                <div class="error-actions">
+                    <a class="btn btn-primary" href="{{ primary_url }}">{{ primary_label }}</a>
+                    {% if secondary_url %}
+                        <a class="btn btn-secondary" href="{{ secondary_url }}">{{ secondary_label }}</a>
+                    {% endif %}
+                </div>
+                <p class="error-hint">If this keeps happening, check the URL or return to a page you can access.</p>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
