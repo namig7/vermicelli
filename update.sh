@@ -34,6 +34,10 @@ while [[ $# -gt 0 ]]; do
             RELEASE_NOTES="$2"
             shift 2
             ;;
+        --prerelease)
+            PRERELEASE="$2"
+            shift 2
+            ;;
         *)
             echo "Error: Invalid argument '$1'"
             exit 1
@@ -50,9 +54,10 @@ RELEASE_NOTES=${RELEASE_NOTES:-${CI_COMMIT_MESSAGE:-${GITHUB_EVENT_HEAD_COMMIT_M
 
 # Ensure the required flag `--version` is provided
 if [ -z "$VERSION_PART" ]; then
-    echo "Error: Missing required flag --version. Usage: ./update.sh --version <major|minor|patch> [other flags]"
+    echo "Error: Missing required flag --version. Usage: ./update.sh --version <major|minor|patch> [--prerelease <id>] [other flags]"
     exit 1
 fi
+VERSION_PART=$(printf '%s' "$VERSION_PART" | tr '[:upper:]' '[:lower:]')
 
 # API endpoints
 LOGIN_ENDPOINT="/api/login"
@@ -86,7 +91,9 @@ update_version() {
     PAYLOAD=$(jq -n \
         --arg version_part "$VERSION_PART" \
         --arg releasenotes "$RELEASE_NOTES" \
-        '{version_part: $version_part, releasenotes: $releasenotes}')
+        --arg prerelease "${PRERELEASE:-}" \
+        '{version_part: $version_part, releasenotes: $releasenotes}
+         + (if $prerelease == "" then {} else {prerelease: $prerelease} end)')
 
     RESPONSE=$(curl -s -X POST -H "Content-Type: application/json" \
         -H "Authorization: Bearer $TOKEN" \

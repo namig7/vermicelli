@@ -101,6 +101,22 @@ DEPLOYMENT_TYPES = (
 DEFAULT_TIMEZONE = 'UTC'
 DEFAULT_DATETIME_FORMAT = 'iso_24'
 DEFAULT_RELEASE_NOTES = 'No release notes available.'
+VERSIONING_SEMVER = 'semver'
+VERSIONING_SEMVER_PRERELEASE = 'semver_prerelease'
+VERSIONING_SEMVER_BUILD = 'semver_build'
+VERSIONING_SEMVER_PRERELEASE_BUILD = 'semver_pre_build'
+VERSIONING_TYPES = (
+    VERSIONING_SEMVER,
+    VERSIONING_SEMVER_PRERELEASE,
+    VERSIONING_SEMVER_BUILD,
+    VERSIONING_SEMVER_PRERELEASE_BUILD,
+)
+VERSIONING_INITIAL_DEFAULTS = {
+    VERSIONING_SEMVER: '0.0.0',
+    VERSIONING_SEMVER_PRERELEASE: '0.0.0',
+    VERSIONING_SEMVER_BUILD: '0.0.0.0',
+    VERSIONING_SEMVER_PRERELEASE_BUILD: '0.0.0.0',
+}
 DATETIME_FORMAT_OPTIONS = {
     'iso_24': {
         'label': '2026-04-28 14:30',
@@ -956,6 +972,206 @@ def release_notes_from_payload(payload):
             if value:
                 return str(value).strip()
     return DEFAULT_RELEASE_NOTES
+
+
+def normalize_versioning_type(value):
+    versioning_type = (value or VERSIONING_SEMVER).strip()
+    return versioning_type if versioning_type in VERSIONING_TYPES else VERSIONING_SEMVER
+
+
+def versioning_uses_prerelease(value):
+    return normalize_versioning_type(value) in (
+        VERSIONING_SEMVER_PRERELEASE,
+        VERSIONING_SEMVER_PRERELEASE_BUILD,
+    )
+
+
+def versioning_uses_build(value):
+    return normalize_versioning_type(value) in (
+        VERSIONING_SEMVER_BUILD,
+        VERSIONING_SEMVER_PRERELEASE_BUILD,
+    )
+
+
+def versioning_type_from_options(enable_prerelease=False, enable_build=False):
+    if enable_prerelease and enable_build:
+        return VERSIONING_SEMVER_PRERELEASE_BUILD
+    if enable_prerelease:
+        return VERSIONING_SEMVER_PRERELEASE
+    if enable_build:
+        return VERSIONING_SEMVER_BUILD
+    return VERSIONING_SEMVER
+
+
+def versioning_type_label(value):
+    versioning_type = normalize_versioning_type(value)
+    labels = {
+        VERSIONING_SEMVER: 'Semantic Versioning (Major.Minor.Patch)',
+        VERSIONING_SEMVER_PRERELEASE: 'Semantic Versioning + Pre-release Label',
+        VERSIONING_SEMVER_BUILD: 'Semantic Versioning + Build Number',
+        VERSIONING_SEMVER_PRERELEASE_BUILD: 'Semantic Versioning + Pre-release Label + Build Number',
+    }
+    return labels[versioning_type]
+
+
+def versioning_type_short_label(value):
+    versioning_type = normalize_versioning_type(value)
+    labels = {
+        VERSIONING_SEMVER: 'SemVer',
+        VERSIONING_SEMVER_PRERELEASE: 'SemVer + Pre-release',
+        VERSIONING_SEMVER_BUILD: 'SemVer Build',
+        VERSIONING_SEMVER_PRERELEASE_BUILD: 'SemVer Pre-release Build',
+    }
+    return labels[versioning_type]
+
+
+def prerelease_identifier_from_version(version_number):
+    if not version_number or '-' not in version_number:
+        return ''
+    return version_number.split('-', 1)[1]
+
+
+def validate_prerelease_identifier(identifier):
+    value = (identifier or '').strip()
+    if not value:
+        return value, None
+    if not re.match(r'^[A-Za-z][A-Za-z0-9]*$', value):
+        return None, 'Pre-release Label must start with a letter and contain only letters and numbers.'
+    return value, None
+
+
+def validate_initial_version(versioning_type, version_number):
+    value = (version_number or VERSIONING_INITIAL_DEFAULTS[versioning_type]).strip()
+    if versioning_type == VERSIONING_SEMVER:
+        pattern = r'^\d+\.\d+\.\d+$'
+        message = 'Initial version must use Major.Minor.Patch, for example 0.0.0.'
+    elif versioning_type == VERSIONING_SEMVER_PRERELEASE:
+        pattern = r'^\d+\.\d+\.\d+(?:-[A-Za-z][A-Za-z0-9]*)?$'
+        message = 'Initial version must use Major.Minor.Patch or Major.Minor.Patch-id, for example 0.0.0 or 4.1.2-rc1.'
+    elif versioning_type == VERSIONING_SEMVER_BUILD:
+        pattern = r'^\d+\.\d+\.\d+\.\d+$'
+        message = 'Initial version must use Major.Minor.Patch.Build, for example 0.0.0.0.'
+    else:
+        pattern = r'^\d+\.\d+\.\d+\.\d+(?:-[A-Za-z][A-Za-z0-9]*)?$'
+        message = 'Initial version must use Major.Minor.Patch.Build or Major.Minor.Patch.Build-id, for example 0.0.0.0 or 3.2.1.45-rc1.'
+    if not re.match(pattern, value):
+        return None, message
+    return value, None
+
+
+def split_semver_prerelease(version_number):
+    core, _, prerelease = version_number.partition('-')
+    return core, prerelease
+
+
+def parse_version_number(version_number):
+    core, prerelease = split_semver_prerelease(version_number or '')
+    parts = core.split('.')
+    if len(parts) not in (3, 4):
+        raise ValueError('Latest version is not a supported semantic version.')
+    try:
+        major, minor, patch = [int(part) for part in parts[:3]]
+        build = int(parts[3]) if len(parts) == 4 else None
+    except ValueError as exc:
+        raise ValueError('Latest version contains a non-numeric version segment.') from exc
+    return major, minor, patch, build, prerelease
+
+
+def format_version_number(major, minor, patch, build, prerelease, versioning_type):
+    if versioning_uses_build(versioning_type):
+        build_value = 0 if build is None else int(build)
+        version_number = f"{major}.{minor}.{patch}.{build_value}"
+    else:
+        version_number = f"{major}.{minor}.{patch}"
+    if versioning_uses_prerelease(versioning_type) and prerelease:
+        version_number = f"{version_number}-{prerelease}"
+    return version_number
+
+
+def version_build_number(version_number):
+    try:
+        _, _, _, build, _ = parse_version_number(version_number)
+        return build
+    except ValueError:
+        return None
+
+
+def normalize_initial_version_for_options(versioning_type, initial_version, prerelease_identifier=None):
+    initial_version_number, version_error = validate_initial_version(versioning_type, initial_version)
+    if version_error:
+        return None, version_error
+    prerelease_value, prerelease_error = validate_prerelease_identifier(prerelease_identifier)
+    if prerelease_error:
+        return None, prerelease_error
+    if versioning_uses_prerelease(versioning_type) and prerelease_value and '-' not in initial_version_number:
+        initial_version_number = f"{initial_version_number}-{prerelease_value}"
+    if versioning_uses_prerelease(versioning_type) and not prerelease_identifier_from_version(initial_version_number):
+        return None, 'Pre-release Label is required when Pre-release Label is enabled.'
+    return initial_version_number, None
+
+
+def increment_version_number(latest_number, versioning_type, version_part, prerelease=None):
+    major, minor, patch, build, existing_prerelease = parse_version_number(latest_number)
+    if version_part == 'major':
+        major += 1
+        minor = 0
+        patch = 0
+    elif version_part == 'minor':
+        minor += 1
+        patch = 0
+    elif version_part == 'patch':
+        patch += 1
+
+    if versioning_uses_build(versioning_type):
+        build = (build or 0) + 1
+
+    prerelease_value = ''
+    if versioning_uses_prerelease(versioning_type):
+        prerelease_value = (prerelease or existing_prerelease or '').strip()
+        if prerelease_value:
+            prerelease_value, prerelease_error = validate_prerelease_identifier(prerelease_value)
+            if prerelease_error:
+                raise ValueError(prerelease_error)
+        if not prerelease_value:
+            raise ValueError('Pre-release Label is required for this application versioning mode.')
+    return format_version_number(major, minor, patch, build, prerelease_value, versioning_type)
+
+
+def serialize_version(version, current_user):
+    versioning_type = normalize_versioning_type(version.version_type)
+    return {
+        'number': version.number,
+        'change_date': format_datetime_for_user(version.change_date, current_user),
+        'notes': version.notes or '',
+        'version_type': versioning_type,
+        'version_type_label': versioning_type_label(versioning_type),
+        'version_type_short_label': versioning_type_short_label(versioning_type),
+        'prerelease_identifier': prerelease_identifier_from_version(version.number),
+        'uses_prerelease': versioning_uses_prerelease(versioning_type),
+        'uses_build': versioning_uses_build(versioning_type),
+        'build_number': version_build_number(version.number),
+    }
+
+
+def application_version_context(app_id, current_user):
+    latest_version = Version.query.filter_by(application_id=app_id).order_by(Version.change_date.desc()).first()
+    initial_version = Version.query.filter_by(application_id=app_id).order_by(Version.change_date.asc(), Version.id.asc()).first()
+    version_count = Version.query.filter_by(application_id=app_id).count()
+    versioning_type = normalize_versioning_type(latest_version.version_type if latest_version else None)
+    return {
+        'latest_version': latest_version,
+        'latest_version_display': format_datetime_for_user(latest_version.change_date, current_user) if latest_version else None,
+        'latest_version_notes': latest_version.notes if latest_version and latest_version.notes else '',
+        'latest_version_type': versioning_type,
+        'latest_version_type_label': versioning_type_label(versioning_type),
+        'latest_version_type_short_label': versioning_type_short_label(versioning_type),
+        'latest_prerelease_identifier': prerelease_identifier_from_version(latest_version.number if latest_version else ''),
+        'latest_uses_prerelease': versioning_uses_prerelease(versioning_type),
+        'latest_uses_build': versioning_uses_build(versioning_type),
+        'latest_build_number': version_build_number(latest_version.number if latest_version else ''),
+        'initial_version_number': initial_version.number if initial_version else VERSIONING_INITIAL_DEFAULTS[versioning_type],
+        'version_count': version_count,
+    }
 
 
 def commit_title(commit_note):
@@ -2274,9 +2490,7 @@ def application_details_content(app_id):
     current = get_current_user()
     if not can_view_application(current, app_obj):
         return json_error('You do not have access to this application.', 403)
-    latest_version = Version.query.filter_by(application_id=app_id).order_by(Version.change_date.desc()).first()
-    latest_version_display = format_datetime_for_user(latest_version.change_date, current) if latest_version else None
-    version_count = Version.query.filter_by(application_id=app_id).count()
+    version_context = application_version_context(app_id, current)
     project_name = app_obj.projects[0].name if app_obj.projects else None
     project_id = app_obj.projects[0].id if app_obj.projects else None
     app_access_level = application_access_level_for_user(current, app_obj)
@@ -2284,10 +2498,7 @@ def application_details_content(app_id):
     return render_template(
         'application_details.html',
         app=app_obj,
-        latest_version=latest_version,
-        latest_version_display=latest_version_display,
-        latest_version_notes=latest_version.notes if latest_version and latest_version.notes else '',
-        version_count=version_count,
+        **version_context,
         app_labels=application_labels(app_obj.label),
         repository_branches=[
             serialize_repository_branch(branch, current)
@@ -2308,7 +2519,8 @@ def application_details_content(app_id):
         can_edit_application=can_write_application(current, app_obj),
         can_change_project=has_platform_role(current, PLATFORM_ADMIN),
         access_summary=serialize_application_access_summary(app_obj, current),
-        access_level_label=access_label(app_access_level)
+        access_level_label=access_label(app_access_level),
+        script_username=current.username if current else 'USERNAME'
     )
 
 @app.route('/application/<int:app_id>/details')
@@ -2320,19 +2532,14 @@ def application_details_page(app_id):
         return error_page_response(403, 'You do not have access to this application.')
     project_name = app_obj.projects[0].name if app_obj.projects else None
     project_id = app_obj.projects[0].id if app_obj.projects else None
-    latest_version = Version.query.filter_by(application_id=app_obj.id).order_by(Version.change_date.desc()).first()
-    latest_version_display = format_datetime_for_user(latest_version.change_date, current) if latest_version else None
-    version_count = Version.query.filter_by(application_id=app_obj.id).count()
+    version_context = application_version_context(app_obj.id, current)
     app_access_level = application_access_level_for_user(current, app_obj)
     return render_template(
         'application_details.html',
         app=app_obj,
         project_name=project_name,
         project_id=project_id,
-        latest_version=latest_version,
-        latest_version_display=latest_version_display,
-        latest_version_notes=latest_version.notes if latest_version and latest_version.notes else '',
-        version_count=version_count,
+        **version_context,
         app_labels=application_labels(app_obj.label),
         repository_branches=[
             serialize_repository_branch(branch, current)
@@ -2351,7 +2558,8 @@ def application_details_page(app_id):
         can_edit_application=can_write_application(current, app_obj),
         can_change_project=has_platform_role(current, PLATFORM_ADMIN),
         access_summary=serialize_application_access_summary(app_obj, current),
-        access_level_label=access_label(app_access_level)
+        access_level_label=access_label(app_access_level),
+        script_username=current.username if current else 'USERNAME'
     )
 
 @app.route('/application/<int:app_id>', methods=['GET'])
@@ -2587,13 +2795,7 @@ def get_app_versions(app_id):
     if not can_view_application(current, app_obj):
         return json_error('You do not have access to this application.', 403)
     versions = Version.query.filter_by(application_id=app_id).order_by(Version.change_date.desc()).all()
-    versions_data = []
-    for version in versions:
-        versions_data.append({
-            'number': version.number,
-            'change_date': format_datetime_for_user(version.change_date, current),
-            'notes': version.notes or ''
-        })
+    versions_data = [serialize_version(version, current) for version in versions]
     return jsonify(versions_data)
 
 @app.route('/edit_application/<int:app_id>', methods=['POST'])
@@ -2652,6 +2854,15 @@ def create_application():
         if not name:
             return jsonify({'error': 'Application name cannot be empty.'}), 400
 
+        versioning_type = normalize_versioning_type(data.get('versioning_type'))
+        initial_version_number, version_error = normalize_initial_version_for_options(
+            versioning_type,
+            data.get('initial_version'),
+            data.get('prerelease_identifier')
+        )
+        if version_error:
+            return jsonify({'error': version_error}), 400
+
         existing_app = Application.query.filter(func.lower(Application.name) == name.lower()).first()
         if existing_app:
             return jsonify({'error': 'Application name already exists. Please choose another name.'}), 400
@@ -2663,7 +2874,12 @@ def create_application():
         db.session.add(new_app)
         db.session.flush()
 
-        initial_version = Version(application_id=new_app.id, number='0.0.0', change_date=datetime.utcnow())
+        initial_version = Version(
+            application_id=new_app.id,
+            number=initial_version_number,
+            version_type=versioning_type,
+            change_date=datetime.utcnow()
+        )
         db.session.add(initial_version)
         db.session.commit()
 
@@ -2746,22 +2962,23 @@ def update_version(application_id):
         if latest_version is None:
             return jsonify({'error': 'No versions found for this application'}), 404
 
-        major, minor, patch = map(int, latest_version.number.split('.'))
-        if version_part == 'major':
-            major += 1
-            minor = 0
-            patch = 0
-        elif version_part == 'minor':
-            minor += 1
-            patch = 0
-        elif version_part == 'patch':
-            patch += 1
+        versioning_type = normalize_versioning_type(latest_version.version_type)
+        prerelease = payload.get('prerelease') or payload.get('pre_release') or payload.get('prerelease_identifier')
+        try:
+            new_version_number = increment_version_number(
+                latest_version.number,
+                versioning_type,
+                version_part,
+                prerelease=prerelease
+            )
+        except ValueError as error:
+            return jsonify({'error': str(error)}), 400
 
-        new_version_number = f"{major}.{minor}.{patch}"
         release_notes = release_notes_from_payload(payload)
         new_version = Version(
             application_id=application_id,
             number=new_version_number,
+            version_type=versioning_type,
             notes=release_notes
         )
         db.session.add(new_version)
@@ -2771,6 +2988,73 @@ def update_version(application_id):
     except Exception as e:
         logging.error(f"Error updating version for application {application_id}: {str(e)}")
         return jsonify({'error': 'Server error while updating version'}), 500
+
+
+@app.route('/app/<int:application_id>/versioning', methods=['PUT'])
+@login_required
+def update_application_versioning(application_id):
+    app_obj = Application.query.get_or_404(application_id)
+    current = get_current_user()
+    if not can_write_application(current, app_obj):
+        return json_error('You do not have permission to update this application.', 403)
+
+    payload = request.get_json(silent=True) or {}
+    versioning_type = versioning_type_from_options(
+        bool(payload.get('enable_prerelease')),
+        bool(payload.get('enable_build'))
+    )
+    prerelease_value, prerelease_error = validate_prerelease_identifier(payload.get('prerelease_identifier'))
+    if prerelease_error:
+        return json_error(prerelease_error, 400)
+    if versioning_uses_prerelease(versioning_type) and not prerelease_value:
+        return json_error('Pre-release Label is required when Pre-release Label is enabled.', 400)
+
+    latest_version = Version.query.filter_by(application_id=application_id).order_by(Version.change_date.desc()).first()
+    if latest_version is None:
+        return json_error('No versions found for this application.', 404)
+
+    try:
+        major, minor, patch, build, existing_prerelease = parse_version_number(latest_version.number)
+    except ValueError as error:
+        return json_error(str(error), 400)
+
+    build_value = build
+    if versioning_uses_build(versioning_type):
+        raw_build_number = payload.get('build_number')
+        if raw_build_number in (None, ''):
+            build_value = build if build is not None else 0
+        else:
+            try:
+                build_value = int(raw_build_number)
+            except (TypeError, ValueError):
+                return json_error('Build number must be a whole number.', 400)
+            if build_value < 0:
+                return json_error('Build number must be zero or greater.', 400)
+
+    next_prerelease = prerelease_value or existing_prerelease
+    next_build = build_value if versioning_uses_build(versioning_type) else None
+    latest_version.version_type = versioning_type
+    latest_version.number = format_version_number(
+        major,
+        minor,
+        patch,
+        next_build,
+        next_prerelease,
+        versioning_type
+    )
+    db.session.commit()
+    version_context = application_version_context(application_id, current)
+
+    return jsonify({
+        'message': 'Versioning options updated successfully.',
+        'latest_version': serialize_version(latest_version, current),
+        'latest_version_type': version_context['latest_version_type'],
+        'latest_version_type_label': version_context['latest_version_type_label'],
+        'latest_prerelease_identifier': version_context['latest_prerelease_identifier'],
+        'latest_uses_prerelease': version_context['latest_uses_prerelease'],
+        'latest_uses_build': version_context['latest_uses_build'],
+        'latest_build_number': version_context['latest_build_number'],
+    })
 
 ### Project JSON API routes
 @app.route('/get_projects_data', methods=['GET'])

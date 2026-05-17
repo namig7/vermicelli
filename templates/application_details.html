@@ -364,6 +364,330 @@
             height: 1.1rem;
         }
 
+        .app-details-page .version-option-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: #f9fafb;
+            padding: 0.85rem;
+        }
+
+        .app-details-page .version-page-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.15fr) minmax(20rem, 0.85fr);
+            gap: 1rem;
+        }
+
+        .app-details-page .version-page-layout.is-read-only {
+            grid-template-columns: 1fr;
+        }
+
+        .app-details-page .version-panel {
+            min-width: 0;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: #ffffff;
+            padding: 1rem;
+        }
+
+        .app-details-page .version-panel-muted {
+            background: #f9fafb;
+        }
+
+        .app-details-page .version-panel-heading {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+            min-width: 0;
+        }
+
+        .app-details-page .version-number-display {
+            color: #111827;
+            font-size: 1.75rem;
+            font-weight: 800;
+            line-height: 2.1rem;
+            overflow-wrap: anywhere;
+        }
+
+        .app-details-page .version-release-flow {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+            align-items: stretch;
+            gap: 0.75rem;
+        }
+
+        .app-details-page .version-flow-node {
+            min-width: 0;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: #ffffff;
+            padding: 0.85rem;
+        }
+
+        .app-details-page .version-flow-arrow {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            color: #b45309;
+        }
+
+        .app-details-page .version-flow-arrow svg {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+
+        .app-details-page .version-flow-value {
+            margin-top: 0.35rem;
+            color: #111827;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 1rem;
+            font-weight: 800;
+            overflow-wrap: anywhere;
+        }
+
+        .app-details-page .version-next-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.75rem;
+        }
+
+        .app-details-page .version-next-detail-card {
+            min-width: 0;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: #ffffff;
+            padding: 0.75rem;
+        }
+
+        .app-details-page .version-next-detail-value {
+            margin-top: 0.2rem;
+            color: #111827;
+            font-weight: 800;
+            overflow-wrap: anywhere;
+        }
+
+        .app-details-page .version-dropdown-button,
+        .app-details-page .version-build-number-input {
+            min-height: 2.75rem;
+        }
+
+        .app-details-page .version-dropdown-button {
+            display: inline-flex;
+            width: 100%;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            background: #ffffff;
+            padding: 0.6rem 0.75rem;
+            color: #111827;
+            text-align: left;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        }
+
+        .app-details-page .version-dropdown-button:focus {
+            border-color: #eab308;
+            box-shadow: 0 0 0 1px #eab308;
+            outline: none;
+        }
+
+        .app-details-page .version-dropdown-button:disabled,
+        .app-details-page .version-build-number-input:disabled {
+            cursor: not-allowed;
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .app-details-page .version-dropdown-panel {
+            position: absolute;
+            z-index: 50;
+            margin-top: 0.25rem;
+            width: 100%;
+            overflow: hidden;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            background: #ffffff;
+            box-shadow: 0 16px 28px rgba(17, 24, 39, 0.16);
+        }
+
+        .app-details-page .version-dropdown-option {
+            cursor: pointer;
+            padding: 0.7rem 0.85rem;
+            color: #374151;
+            font-size: 0.875rem;
+        }
+
+        .app-details-page .version-dropdown-option:hover,
+        .app-details-page .version-dropdown-option.is-active {
+            background: #fef3c7;
+            color: #78350f;
+        }
+
+        .app-details-page .version-part-selector {
+            display: inline-flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: #ffffff;
+            padding: 0.3rem;
+        }
+
+        .app-details-page .version-option-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.75rem;
+        }
+
+        @media (max-width: 900px) {
+            .app-details-page .version-page-layout,
+            .app-details-page .version-next-detail-grid,
+            .app-details-page .version-option-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .app-details-page .version-release-flow {
+                grid-template-columns: 1fr;
+            }
+
+            .app-details-page .version-flow-arrow {
+                width: 100%;
+                height: 1.25rem;
+                transform: rotate(90deg);
+            }
+        }
+
+        .app-details-page .version-toggle-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .app-details-page .version-toggle-input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .app-details-page .version-toggle-switch {
+            position: relative;
+            display: inline-flex;
+            width: 3rem;
+            height: 1.65rem;
+            flex: 0 0 3rem;
+            border-radius: 9999px;
+            border: 1px solid #d1d5db;
+            background: #e5e7eb;
+            cursor: pointer;
+            transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .app-details-page .version-toggle-switch::after {
+            content: "";
+            position: absolute;
+            top: 0.17rem;
+            left: 0.2rem;
+            width: 1.2rem;
+            height: 1.2rem;
+            border-radius: 9999px;
+            background: #ffffff;
+            box-shadow: 0 1px 2px rgba(17, 24, 39, 0.18);
+            transition: transform 0.2s ease;
+        }
+
+        .app-details-page .version-toggle-input:checked + .version-toggle-switch {
+            border-color: #f59e0b;
+            background: #facc15;
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.14);
+        }
+
+        .app-details-page .version-toggle-input:checked + .version-toggle-switch::after {
+            transform: translateX(1.3rem);
+        }
+
+        .app-details-page .version-toggle-input:focus-visible + .version-toggle-switch {
+            outline: 2px solid #f59e0b;
+            outline-offset: 2px;
+        }
+
+        .app-details-page .version-script-box {
+            min-height: 5.5rem;
+            border: 1px solid #374151;
+            border-radius: 0.5rem;
+            background: #111827;
+            color: #f9fafb;
+            padding: 0.85rem 3.25rem 0.85rem 0.85rem;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 0.8125rem;
+            line-height: 1.5;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .app-details-page .version-script-command {
+            color: #ffffff;
+            font-weight: 800;
+        }
+
+        .app-details-page .version-script-flag {
+            color: #fbbf24;
+            font-weight: 700;
+        }
+
+        .app-details-page .version-script-value {
+            color: #93c5fd;
+        }
+
+        .app-details-page .version-script-secret {
+            color: #fca5a5;
+            font-weight: 700;
+        }
+
+        .app-details-page .version-script-empty {
+            color: #d1d5db;
+        }
+
+        .app-details-page .version-script-copy-button {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            z-index: 2;
+            display: inline-flex;
+            width: 2.25rem;
+            height: 2.25rem;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.375rem;
+            color: #d1d5db;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .app-details-page .version-script-copy-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+
+        .app-details-page .version-script-copy-button svg {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        .app-details-page .version-script-copy-button.is-copied {
+            color: #fbbf24;
+        }
+
+        .app-details-page .version-part-button.is-active {
+            background-color: #fef3c7;
+            border-color: #fde68a;
+            color: #b45309;
+        }
+
         .app-details-page .access-admin-button {
             border: 1px solid #bfdbfe;
             background: #eff6ff;
@@ -1055,6 +1379,68 @@
             color: #e5e7eb;
         }
 
+        html[data-theme="dark"] .app-details-page .version-option-card {
+            background: #111827;
+            border-color: #4b5563;
+        }
+
+        html[data-theme="dark"] .app-details-page .version-panel,
+        html[data-theme="dark"] .app-details-page .version-flow-node,
+        html[data-theme="dark"] .app-details-page .version-part-selector {
+            background: #111827;
+            border-color: #4b5563;
+        }
+
+        html[data-theme="dark"] .app-details-page .version-panel-muted {
+            background: #1f2937;
+        }
+
+        html[data-theme="dark"] .app-details-page .version-number-display,
+        html[data-theme="dark"] .app-details-page .version-flow-value {
+            color: #f3f4f6;
+        }
+
+        html[data-theme="dark"] .app-details-page .version-panel .text-gray-600,
+        html[data-theme="dark"] .app-details-page .version-panel .text-gray-700 {
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] .app-details-page .version-option-card .text-gray-700,
+        html[data-theme="dark"] .app-details-page .version-option-card .text-gray-500,
+        html[data-theme="dark"] .app-details-page .version-option-card label {
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] .app-details-page .version-option-card input[type="text"] {
+            background-color: #1f2937 !important;
+            border-color: #4b5563 !important;
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] .app-details-page .version-option-card input[type="number"],
+        html[data-theme="dark"] .app-details-page .version-option-card select {
+            background-color: #1f2937 !important;
+            border-color: #4b5563 !important;
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] .app-details-page .version-toggle-switch {
+            border-color: #4b5563;
+            background: #374151;
+        }
+
+        html[data-theme="dark"] .app-details-page .version-script-box {
+            border-color: #4b5563;
+            background: #020617;
+            color: #e5e7eb;
+        }
+
+        html[data-theme="dark"] .app-details-page .version-part-button.is-active {
+            background-color: #f59e0b;
+            border-color: #f59e0b;
+            color: #111827;
+        }
+
         html[data-theme="dark"] .app-details-page .deployment-status-dot {
             background-color: #6b7280;
             box-shadow: 0 0 0 2px rgba(107, 114, 128, 0.2), 0 0 7px rgba(107, 114, 128, 0.32);
@@ -1618,45 +2004,164 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <section class="lg:col-span-3 space-y-6">
             <section id="versionDetailsSection" class="detail-tile app-details-view hidden" data-app-details-view="versions">
-                <div class="flex flex-col gap-5">
-                    <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                        <div class="detail-heading flex-1">
-                            <span class="detail-icon" aria-hidden="true">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="m7.875 14.25 1.214 1.942a2.25 2.25 0 0 0 1.908 1.058h2.006c.776 0 1.497-.4 1.908-1.058l1.214-1.942M2.41 9h4.636a2.25 2.25 0 0 1 1.872 1.002l.164.246a2.25 2.25 0 0 0 1.872 1.002h2.092a2.25 2.25 0 0 0 1.872-1.002l.164-.246A2.25 2.25 0 0 1 16.954 9h4.636M2.41 9a2.25 2.25 0 0 0-.16.832V12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 12V9.832c0-.287-.055-.57-.16-.832M2.41 9a2.25 2.25 0 0 1 .382-.632l3.285-3.832a2.25 2.25 0 0 1 1.708-.786h8.43c.657 0 1.281.287 1.709.786l3.284 3.832c.163.19.291.404.382.632M4.5 20.25h15A2.25 2.25 0 0 0 21.75 18v-2.625c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125V18a2.25 2.25 0 0 0 2.25 2.25Z" />
-                                </svg>
-                            </span>
-                            <div class="detail-heading-content">
-                                <div class="flex flex-wrap items-center gap-2">
-                                    <p class="detail-label">Version</p>
-                                    <span class="details-chip">{{ version_count }} {{ 'release' if version_count == 1 else 'releases' }}</span>
+                <div class="version-page-layout {{ 'is-read-only' if not can_edit_application else '' }}">
+                    <div class="flex flex-col gap-4">
+                        <div class="version-panel">
+                            <div class="version-panel-heading">
+                                <div class="min-w-0">
+                                    <p class="detail-label">Latest Release</p>
+                                    <h2 class="version-number-display mt-1">{{ latest_version.number if latest_version else 'No versions available' }}</h2>
+                                    <p class="date-time-text mt-1 text-sm text-gray-600">{{ latest_version_display if latest_version else 'N/A' }}</p>
                                 </div>
-                                <h2 class="mt-1 font-bold text-gray-900">
-                                    {{ latest_version.number if latest_version else 'No versions available' }}
-                                </h2>
-                                <p class="mt-1 text-sm text-gray-600">{{ latest_version_display if latest_version else 'N/A' }}</p>
-                                <p class="mt-3 text-sm text-gray-700">{{ latest_version_notes or 'No release notes available.' }}</p>
+                                <button type="button" id="printVersionHistory" class="btn btn-secondary release-action-button flex-shrink-0" data-app-id="{{ app.id }}">
+                                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0 1 10.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0 .229 2.523a1.125 1.125 0 0 1-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0 0 21 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 0 0-1.913-.247M6.34 18H5.25A2.25 2.25 0 0 1 3 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 0 1 1.913-.247m10.5 0a48.536 48.536 0 0 0-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5Zm-3 0h.008v.008H15V10.5Z" />
+                                    </svg>
+                                    Print
+                                </button>
+                            </div>
+                            <div class="mt-4 flex flex-wrap gap-2">
+                                <span class="details-chip">{{ version_count }} {{ 'release' if version_count == 1 else 'releases' }}</span>
+                                <span class="details-chip">{{ latest_version_type_short_label }}</span>
+                                {% if latest_uses_prerelease %}
+                                    <span class="details-chip">Pre-release Label {{ latest_prerelease_identifier or 'not set' }}</span>
+                                {% endif %}
+                                {% if latest_uses_build %}
+                                    <span class="details-chip">Build {{ latest_build_number if latest_build_number is not none else '0' }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="section-divider">
+                                <p class="detail-label">Release Notes</p>
+                                <p class="mt-1 text-sm text-gray-700">{{ latest_version_notes or 'No release notes available.' }}</p>
                             </div>
                         </div>
-                        <div class="toolbar-actions flex flex-wrap items-center">
-                            <button type="button" id="printVersionHistory" class="btn btn-secondary release-action-button" data-app-id="{{ app.id }}">
-                                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0 1 10.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0 .229 2.523a1.125 1.125 0 0 1-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0 0 21 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 0 0-1.913-.247M6.34 18H5.25A2.25 2.25 0 0 1 3 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 0 1 1.913-.247m10.5 0a48.536 48.536 0 0 0-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5Zm-3 0h.008v.008H15V10.5Z" />
-                                </svg>
-                                Print
-                            </button>
-                        </div>
+
+                        {% if can_edit_application %}
+                            <div class="version-panel version-panel-muted">
+                                <div class="version-panel-heading">
+                                    <div class="min-w-0">
+                                        <p class="detail-label">Next Release Preview</p>
+                                        <p id="versionOptionsMessage" class="hidden mt-1 text-sm font-medium text-yellow-700"></p>
+                                    </div>
+                                    <button type="button" id="saveVersionOptions" class="btn btn-primary flex-shrink-0">Save Options</button>
+                                </div>
+                                <div class="version-release-flow mt-4" id="versionNextPreview">
+                                    <div class="version-flow-node">
+                                        <p class="detail-label">Current release</p>
+                                        <p id="versionCurrentPreview" class="version-flow-value">{{ latest_version.number if latest_version else 'N/A' }}</p>
+                                    </div>
+                                    <span class="version-flow-arrow" aria-hidden="true">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                                        </svg>
+                                    </span>
+                                    <div class="version-flow-node">
+                                        <p class="detail-label">Release created by script</p>
+                                        <p id="versionNextPreviewValue" class="version-flow-value">{{ latest_version.number if latest_version else 'N/A' }}</p>
+                                    </div>
+                                </div>
+                                <div class="version-next-detail-grid mt-3">
+                                    <div class="version-next-detail-card">
+                                        <p class="detail-label">Release part</p>
+                                        <p id="versionNextPartValue" class="version-next-detail-value">Major</p>
+                                    </div>
+                                    <div class="version-next-detail-card">
+                                        <p class="detail-label">Pre-release Label</p>
+                                        <p id="versionNextLabelValue" class="version-next-detail-value">Not enabled</p>
+                                    </div>
+                                    <div class="version-next-detail-card">
+                                        <p class="detail-label">Build number</p>
+                                        <p id="versionNextBuildValue" class="version-next-detail-value">Not enabled</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
                     </div>
+
                     {% if can_edit_application %}
-                        <div class="section-divider">
-                            <p class="detail-label">Version Controls</p>
-                            <pre id="curl-major-{{ app.id }}" class="hidden">curl -X POST -H "Content-Type: application/json" -d "{\"version_part\":\"major\",\"releasenotes\":\"${RELEASE_NOTES:-${CI_COMMIT_MESSAGE:-${GITHUB_EVENT_HEAD_COMMIT_MESSAGE:-${GITEA_COMMIT_MESSAGE:-No release notes available.}}}}\"}" http://localhost:8000/app/{{ app.id }}/update_version</pre>
-                            <pre id="curl-minor-{{ app.id }}" class="hidden">curl -X POST -H "Content-Type: application/json" -d "{\"version_part\":\"minor\",\"releasenotes\":\"${RELEASE_NOTES:-${CI_COMMIT_MESSAGE:-${GITHUB_EVENT_HEAD_COMMIT_MESSAGE:-${GITEA_COMMIT_MESSAGE:-No release notes available.}}}}\"}" http://localhost:8000/app/{{ app.id }}/update_version</pre>
-                            <pre id="curl-patch-{{ app.id }}" class="hidden">curl -X POST -H "Content-Type: application/json" -d "{\"version_part\":\"patch\",\"releasenotes\":\"${RELEASE_NOTES:-${CI_COMMIT_MESSAGE:-${GITHUB_EVENT_HEAD_COMMIT_MESSAGE:-${GITEA_COMMIT_MESSAGE:-No release notes available.}}}}\"}" http://localhost:8000/app/{{ app.id }}/update_version</pre>
-                            <div class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
-                                <button type="button" onclick="copyToClipboard('curl-major-{{ app.id }}')" class="btn btn-secondary px-2">Major</button>
-                                <button type="button" onclick="copyToClipboard('curl-minor-{{ app.id }}')" class="btn btn-secondary px-2">Minor</button>
-                                <button type="button" onclick="copyToClipboard('curl-patch-{{ app.id }}')" class="btn btn-secondary px-2">Patch</button>
+                        <div class="flex flex-col gap-4">
+                            <div class="version-panel">
+                                <div class="version-panel-heading">
+                                    <div class="min-w-0">
+                                        <p class="detail-label">Version Strategy</p>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <p class="detail-label mb-2">Release Part</p>
+                                    <div class="version-part-selector">
+                                        <button type="button" class="btn btn-secondary version-part-button is-active" data-version-part="MAJOR">Major</button>
+                                        <button type="button" class="btn btn-secondary version-part-button" data-version-part="MINOR">Minor</button>
+                                        <button type="button" class="btn btn-secondary version-part-button" data-version-part="PATCH">Patch</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="version-option-grid">
+                                <div class="version-option-card">
+                                    <label class="version-toggle-row text-sm text-gray-700">
+                                        <span class="min-w-0">
+                                            <span class="block font-medium">Pre-release Label</span>
+                                        </span>
+                                        <span class="relative inline-flex flex-shrink-0">
+                                            <input type="checkbox" id="versionPrereleaseEnabled" class="version-toggle-input" {% if latest_uses_prerelease %}checked{% endif %}>
+                                            <span class="version-toggle-switch" aria-hidden="true"></span>
+                                        </span>
+                                    </label>
+                                    <div id="versionPrereleaseInputWrap" class="mt-3">
+                                        <label for="versionPrereleaseDropdownButton" class="block text-sm font-medium text-gray-700">Pre-release Label</label>
+                                        <input type="hidden" id="versionPrereleasePreset" value="alpha" data-current-prerelease="{{ latest_prerelease_identifier or '' }}">
+                                        <div class="relative mt-1">
+                                            <button type="button" id="versionPrereleaseDropdownButton" class="version-dropdown-button" aria-haspopup="listbox" aria-expanded="false">
+                                                <span id="versionPrereleaseDropdownSelected" class="truncate">alpha</span>
+                                                <svg class="h-4 w-4 flex-shrink-0 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" aria-hidden="true">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                                                </svg>
+                                            </button>
+                                            <div id="versionPrereleaseDropdownPanel" class="version-dropdown-panel hidden" role="listbox" aria-labelledby="versionPrereleaseDropdownButton">
+                                                <ul id="versionPrereleaseList" class="max-h-56 overflow-auto py-1 text-base sm:text-sm"></ul>
+                                            </div>
+                                        </div>
+                                        <input type="text" id="versionPrereleaseIdentifier" class="form-input mt-2 hidden block w-full focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500" value="{{ latest_prerelease_identifier or '' }}" placeholder="Custom label" disabled>
+                                    </div>
+                                </div>
+                                <div class="version-option-card">
+                                    <label class="version-toggle-row text-sm text-gray-700">
+                                        <span class="min-w-0">
+                                            <span class="block font-medium">Build Number</span>
+                                        </span>
+                                        <span class="relative inline-flex flex-shrink-0">
+                                            <input type="checkbox" id="versionBuildEnabled" class="version-toggle-input" {% if latest_uses_build %}checked{% endif %}>
+                                            <span class="version-toggle-switch" aria-hidden="true"></span>
+                                        </span>
+                                    </label>
+                                    <div id="versionBuildInputWrap" class="mt-3">
+                                        <label for="versionBuildNumber" class="block text-sm font-medium text-gray-700">Build Number</label>
+                                        <div class="mt-1 flex items-center gap-2">
+                                            <input type="number" id="versionBuildNumber" class="form-input version-build-number-input block w-full focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500" value="{{ latest_build_number if latest_build_number is not none else 0 }}" min="0" step="1" disabled>
+                                            <button type="button" id="editVersionBuildNumber" class="inline-icon-button flex-shrink-0" aria-label="Edit build number" title="Edit build number">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="version-panel">
+                                <div class="version-panel-heading mb-3">
+                                    <div class="min-w-0">
+                                        <p class="detail-label">Release Script</p>
+                                    </div>
+                                </div>
+                                <div class="relative">
+                                    <pre id="versionScriptBox" class="version-script-box"></pre>
+                                    <button type="button" id="copyVersionScript" class="version-script-copy-button" aria-label="Copy script" title="Copy script">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 7.5V6.108c0-1.135.845-2.098 1.976-2.192.373-.03.748-.057 1.123-.08M15.75 18H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08M15.75 18.75v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5A3.375 3.375 0 0 0 6.375 7.5H5.25m11.9-3.664A2.251 2.251 0 0 0 15 2.25h-1.5a2.251 2.251 0 0 0-2.15 1.586m5.8 0c.065.21.1.433.1.664v.75h-6V4.5c0-.231.035-.454.1-.664M6.75 7.5H4.875c-.621 0-1.125.504-1.125 1.125v12c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V16.5a9 9 0 0 0-9-9Z" />
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     {% endif %}
@@ -2165,6 +2670,7 @@
         const currentAppId = $('#app-details').data('app-id');
         const activeTabStorageKey = `applicationDetailsActiveTab:${currentAppId}`;
         const canEditApplication = {{ 'true' if can_edit_application else 'false' }};
+        const scriptUsername = {{ (script_username or 'USERNAME')|tojson }};
         const currentApplicationName = {{ app.name|tojson }};
         const currentApplicationLink = {{ (app.link or '')|tojson }};
         const currentApplicationLabelValue = {{ (app.label or '')|tojson }};
@@ -2202,7 +2708,19 @@
             labels: currentApplicationLabels,
             latestVersion: {{ (latest_version.number if latest_version else 'No versions available')|tojson }},
             latestReleaseDate: {{ (latest_version_display if latest_version else 'N/A')|tojson }},
-            latestReleaseNotes: {{ (latest_version_notes or 'No release notes available.')|tojson }}
+            latestReleaseNotes: {{ (latest_version_notes or 'No release notes available.')|tojson }},
+            versioningType: {{ latest_version_type_label|tojson }},
+            prereleaseIdentifier: {{ (latest_prerelease_identifier or 'N/A')|tojson }}
+        };
+        const versionOptions = {
+            appId: currentAppId,
+            username: scriptUsername || 'USERNAME',
+            currentVersion: {{ (latest_version.number if latest_version else '0.0.0')|tojson }},
+            usesPrerelease: {{ 'true' if latest_uses_prerelease else 'false' }},
+            usesBuild: {{ 'true' if latest_uses_build else 'false' }},
+            prereleaseIdentifier: {{ (latest_prerelease_identifier or '')|tojson }},
+            buildNumber: {{ latest_build_number if latest_build_number is not none else 0 }},
+            selectedPart: 'MAJOR'
         };
         const currentProjectId = {{ project_id|tojson }};
         const currentProjectName = {{ (project_name or '')|tojson }};
@@ -3348,6 +3866,316 @@
             openApplicationAccessModal(userId);
         }
 
+        const prereleasePresetOptions = [
+            { value: 'alpha', label: 'alpha' },
+            { value: 'beta', label: 'beta' },
+            { value: 'rc', label: 'rc' },
+            { value: 'nightly', label: 'nightly' },
+            { value: 'dev', label: 'dev' },
+            { value: 'custom', label: 'Custom label' }
+        ];
+
+        function currentPrereleaseInputValue() {
+            if (!$('#versionPrereleaseEnabled').is(':checked')) return '';
+            const preset = $('#versionPrereleasePreset').val() || 'alpha';
+            if (preset === 'custom') {
+                return ($('#versionPrereleaseIdentifier').val() || '').trim();
+            }
+            return preset;
+        }
+
+        function prereleasePresetLabel(value) {
+            const option = prereleasePresetOptions.find(function(item) {
+                return item.value === value;
+            });
+            return option ? option.label : value;
+        }
+
+        function renderPrereleaseDropdownOptions() {
+            const selectedValue = $('#versionPrereleasePreset').val() || 'alpha';
+            const optionsHtml = prereleasePresetOptions.map(function(option) {
+                const activeClass = option.value === selectedValue ? ' is-active' : '';
+                return `<li class="version-dropdown-option${activeClass}" data-value="${escapeAttribute(option.value)}" role="option" aria-selected="${option.value === selectedValue ? 'true' : 'false'}">${escapeHtml(option.label)}</li>`;
+            }).join('');
+            $('#versionPrereleaseList').html(optionsHtml);
+            $('#versionPrereleaseDropdownSelected').text(prereleasePresetLabel(selectedValue));
+        }
+
+        const versionScriptCopyIcon = `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 7.5V6.108c0-1.135.845-2.098 1.976-2.192.373-.03.748-.057 1.123-.08M15.75 18H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08M15.75 18.75v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5A3.375 3.375 0 0 0 6.375 7.5H5.25m11.9-3.664A2.251 2.251 0 0 0 15 2.25h-1.5a2.251 2.251 0 0 0-2.15 1.586m5.8 0c.065.21.1.433.1.664v.75h-6V4.5c0-.231.035-.454.1-.664M6.75 7.5H4.875c-.621 0-1.125.504-1.125 1.125v12c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V16.5a9 9 0 0 0-9-9Z" />
+            </svg>`;
+        const versionScriptCopiedIcon = `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75" />
+            </svg>`;
+
+        function parseVersionParts(versionNumber) {
+            const rawVersion = String(versionNumber || '0.0.0');
+            const pieces = rawVersion.split('-', 2);
+            const coreParts = pieces[0].split('.').map(function(part) {
+                const value = Number.parseInt(part, 10);
+                return Number.isFinite(value) ? value : 0;
+            });
+            return {
+                major: coreParts[0] || 0,
+                minor: coreParts[1] || 0,
+                patch: coreParts[2] || 0,
+                build: Number.isFinite(coreParts[3]) ? coreParts[3] : null
+            };
+        }
+
+        function selectedBuildNumber() {
+            const buildNumber = Number.parseInt($('#versionBuildNumber').val(), 10);
+            return Number.isFinite(buildNumber) && buildNumber >= 0 ? buildNumber : 0;
+        }
+
+        function nextVersionNumber() {
+            const parts = parseVersionParts(versionOptions.currentVersion);
+            if (versionOptions.selectedPart === 'MAJOR') {
+                parts.major += 1;
+                parts.minor = 0;
+                parts.patch = 0;
+            } else if (versionOptions.selectedPart === 'MINOR') {
+                parts.minor += 1;
+                parts.patch = 0;
+            } else {
+                parts.patch += 1;
+            }
+
+            let nextVersion = `${parts.major}.${parts.minor}.${parts.patch}`;
+            if ($('#versionBuildEnabled').is(':checked')) {
+                nextVersion += `.${selectedBuildNumber() + 1}`;
+            }
+            const prereleaseIdentifier = currentPrereleaseInputValue();
+            if ($('#versionPrereleaseEnabled').is(':checked') && prereleaseIdentifier) {
+                nextVersion += `-${prereleaseIdentifier}`;
+            }
+            return nextVersion;
+        }
+
+        function renderNextVersionPreview() {
+            $('#versionCurrentPreview').text(versionOptions.currentVersion || 'N/A');
+            $('#versionNextPreviewValue').text(nextVersionNumber());
+            const partLabel = {
+                MAJOR: 'Major',
+                MINOR: 'Minor',
+                PATCH: 'Patch'
+            }[versionOptions.selectedPart] || 'Major';
+            $('#versionNextPartValue').text(partLabel);
+            const prereleaseIdentifier = currentPrereleaseInputValue();
+            $('#versionNextLabelValue').text($('#versionPrereleaseEnabled').is(':checked') ? (prereleaseIdentifier || 'Required') : 'Not enabled');
+            $('#versionNextBuildValue').text($('#versionBuildEnabled').is(':checked') ? String(selectedBuildNumber() + 1) : 'Not enabled');
+        }
+
+        function applyPrereleasePreset() {
+            const currentValue = ($('#versionPrereleasePreset').data('current-prerelease') || '').trim();
+            const value = currentValue || versionOptions.prereleaseIdentifier || 'alpha';
+            const presetValues = prereleasePresetOptions.map(function(option) {
+                return option.value;
+            });
+            if (presetValues.includes(value)) {
+                $('#versionPrereleasePreset').val(value);
+                $('#versionPrereleaseIdentifier').val(value).addClass('hidden');
+            } else {
+                $('#versionPrereleasePreset').val('custom');
+                $('#versionPrereleaseIdentifier').val(value).removeClass('hidden');
+            }
+            renderPrereleaseDropdownOptions();
+        }
+
+        function applyPrereleaseCustomVisibility() {
+            const isCustom = $('#versionPrereleasePreset').val() === 'custom';
+            const prereleaseEnabled = $('#versionPrereleaseEnabled').is(':checked');
+            $('#versionPrereleaseIdentifier').toggleClass('hidden', !isCustom);
+            $('#versionPrereleaseIdentifier').prop('disabled', !prereleaseEnabled || !isCustom);
+            if (!isCustom && prereleaseEnabled) {
+                $('#versionPrereleaseIdentifier').val($('#versionPrereleasePreset').val() || 'alpha');
+            }
+            $('#versionPrereleaseDropdownButton')
+                .prop('disabled', !prereleaseEnabled)
+                .attr('aria-disabled', prereleaseEnabled ? 'false' : 'true');
+            if (!prereleaseEnabled) {
+                $('#versionPrereleaseDropdownPanel').addClass('hidden');
+                $('#versionPrereleaseDropdownButton').attr('aria-expanded', 'false');
+            }
+            renderPrereleaseDropdownOptions();
+        }
+
+        function scriptTokenHtml(type, value) {
+            return `<span class="version-script-${type}">${escapeHtml(value)}</span>`;
+        }
+
+        function renderScriptTokens(tokens) {
+            return tokens.map(function(token) {
+                return scriptTokenHtml(token.type, token.value);
+            }).join(' ');
+        }
+
+        function renderVersionScript() {
+            const prereleaseEnabled = $('#versionPrereleaseEnabled').is(':checked');
+            const prereleaseIdentifier = currentPrereleaseInputValue();
+            versionOptions.usesPrerelease = prereleaseEnabled;
+            versionOptions.usesBuild = $('#versionBuildEnabled').is(':checked');
+            versionOptions.prereleaseIdentifier = prereleaseIdentifier;
+            versionOptions.buildNumber = selectedBuildNumber();
+            const tokens = [
+                { type: 'command', value: './update.sh' },
+                { type: 'flag', value: '--version' },
+                { type: 'value', value: versionOptions.selectedPart },
+                { type: 'flag', value: '--appid' },
+                { type: 'value', value: String(versionOptions.appId) },
+                { type: 'flag', value: '--username' },
+                { type: 'value', value: versionOptions.username },
+                { type: 'flag', value: '--password' },
+                { type: 'secret', value: '****' },
+                { type: 'flag', value: '--url' },
+                { type: 'value', value: 'http://0.0.0.0:8000' },
+                { type: 'flag', value: '--releasenotes' },
+                { type: 'empty', value: '""' }
+            ];
+            if (prereleaseEnabled && prereleaseIdentifier) {
+                tokens.push({ type: 'flag', value: '--prerelease' });
+                tokens.push({ type: 'value', value: prereleaseIdentifier });
+            }
+            const command = tokens.map(function(token) {
+                return token.value;
+            }).join(' ');
+            $('#versionScriptBox')
+                .html(renderScriptTokens(tokens))
+                .attr('data-script', command);
+            renderNextVersionPreview();
+            $('#copyVersionScript')
+                .removeClass('is-copied')
+                .attr('aria-label', 'Copy script')
+                .attr('title', 'Copy script')
+                .html(versionScriptCopyIcon);
+        }
+
+        function setVersionScriptPart(part) {
+            versionOptions.selectedPart = ['MAJOR', 'MINOR', 'PATCH'].includes(part) ? part : 'MAJOR';
+            $('.version-part-button').each(function() {
+                $(this).toggleClass('is-active', $(this).data('version-part') === versionOptions.selectedPart);
+            });
+            renderVersionScript();
+        }
+
+        function applyVersionOptionVisibility() {
+            const prereleaseEnabled = $('#versionPrereleaseEnabled').is(':checked');
+            const buildEnabled = $('#versionBuildEnabled').is(':checked');
+            $('#versionPrereleaseInputWrap').toggleClass('opacity-60', !prereleaseEnabled);
+            $('#versionBuildInputWrap').toggleClass('opacity-60', !buildEnabled);
+            if (buildEnabled && !$('#versionBuildNumber').val()) {
+                $('#versionBuildNumber').val('0');
+            }
+            if (!buildEnabled) {
+                $('#versionBuildNumber').data('is-editing', false);
+            }
+            $('#versionBuildNumber').prop('disabled', !buildEnabled || !$('#versionBuildNumber').data('is-editing'));
+            $('#editVersionBuildNumber')
+                .prop('disabled', !buildEnabled)
+                .toggleClass('opacity-50 cursor-not-allowed', !buildEnabled);
+            applyPrereleaseCustomVisibility();
+            renderVersionScript();
+        }
+
+        function copyTextToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                return navigator.clipboard.writeText(text);
+            }
+            return new Promise(function(resolve, reject) {
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.setAttribute('readonly', '');
+                textArea.style.position = 'fixed';
+                textArea.style.top = '-9999px';
+                textArea.style.left = '-9999px';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    const copied = document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    copied ? resolve() : reject(new Error('Copy command was not accepted.'));
+                } catch (error) {
+                    document.body.removeChild(textArea);
+                    reject(error);
+                }
+            });
+        }
+
+        function showVersionScriptCopied() {
+            const button = $('#copyVersionScript');
+            button
+                .addClass('is-copied')
+                .attr('aria-label', 'Script copied')
+                .attr('title', 'Script copied')
+                .html(versionScriptCopiedIcon);
+            setTimeout(function() {
+                button
+                    .removeClass('is-copied')
+                    .attr('aria-label', 'Copy script')
+                    .attr('title', 'Copy script')
+                    .html(versionScriptCopyIcon);
+            }, 900);
+        }
+
+        function saveVersionOptions() {
+            if (!canEditApplication) return;
+            const prereleaseEnabled = $('#versionPrereleaseEnabled').is(':checked');
+            const buildEnabled = $('#versionBuildEnabled').is(':checked');
+            const prereleaseIdentifier = currentPrereleaseInputValue();
+            if (prereleaseEnabled && !/^[A-Za-z][A-Za-z0-9]*$/.test(prereleaseIdentifier)) {
+                showAppAlert({
+                    title: 'Pre-release Label required',
+                    text: 'Enter a Pre-release Label that starts with a letter and contains only letters and numbers.',
+                    icon: 'warning'
+                });
+                return;
+            }
+            const buildNumber = selectedBuildNumber();
+            if (buildEnabled && String($('#versionBuildNumber').val()).trim() !== String(buildNumber)) {
+                showAppAlert({
+                    title: 'Build number required',
+                    text: 'Enter a build number that is zero or greater.',
+                    icon: 'warning'
+                });
+                return;
+            }
+            $('#versionOptionsMessage').addClass('hidden').text('');
+            $.ajax({
+                url: `/app/${currentAppId}/versioning`,
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    enable_prerelease: prereleaseEnabled,
+                    enable_build: buildEnabled,
+                    prerelease_identifier: prereleaseIdentifier,
+                    build_number: buildNumber
+                }),
+                success: function(response) {
+                    versionOptions.usesPrerelease = Boolean(response.latest_uses_prerelease);
+                    versionOptions.usesBuild = Boolean(response.latest_uses_build);
+                    versionOptions.prereleaseIdentifier = response.latest_prerelease_identifier || '';
+                    versionOptions.buildNumber = response.latest_build_number || 0;
+                    currentApplicationInfo.versioningType = response.latest_version_type_label || currentApplicationInfo.versioningType;
+                    currentApplicationInfo.prereleaseIdentifier = versionOptions.prereleaseIdentifier || 'N/A';
+                    if (response.latest_version && response.latest_version.number) {
+                        versionOptions.currentVersion = response.latest_version.number;
+                        currentApplicationInfo.latestVersion = response.latest_version.number;
+                    }
+                    $('#versionOptionsMessage').text(response.message || 'Version options saved.').removeClass('hidden');
+                    renderVersionScript();
+                    sessionStorage.setItem(activeTabStorageKey, 'versions');
+                    window.loadPage('application_details', currentAppId);
+                },
+                error: function(xhr) {
+                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error saving version options.';
+                    showAppAlert({ title: 'Error', text: error, icon: 'error' });
+                }
+            });
+        }
+
         // Variables for version history
         let versionsData = [];
         let currentPage = 1;
@@ -3365,6 +4193,18 @@
                     showAppAlert({ title: 'Error', text: 'Error loading version history.', icon: 'error' });
                 }
             });
+        }
+
+        function versionMetadataHtml(version) {
+            const chips = [
+                version.version_type_short_label || version.version_type_label || 'SemVer'
+            ];
+            if (version.prerelease_identifier) {
+                chips.push(`Pre-release Label ${version.prerelease_identifier}`);
+            }
+            return chips.map(function(chip) {
+                return `<span class="details-chip">${escapeHtml(chip)}</span>`;
+            }).join('');
         }
 
         // Event handler for opening version history modal
@@ -3410,9 +4250,14 @@
             versionsToShow.forEach(function(version) {
                     versionList += `
                         <div class="bg-gray-50 border border-gray-200 rounded p-4">
-                            <h4 class="font-bold text-gray-800">Version ${version.number}</h4>
-                            <p class="date-time-text text-sm text-gray-600">Released on: ${version.change_date}</p>
-                            <p class="text-sm text-gray-600">${version.notes || 'No release notes available.'}</p>
+                            <div class="flex flex-wrap items-start justify-between gap-3">
+                                <div>
+                                    <h4 class="font-bold text-gray-800">Version ${escapeHtml(version.number || 'N/A')}</h4>
+                                    <p class="date-time-text text-sm text-gray-600">Released on: ${escapeHtml(version.change_date || 'N/A')}</p>
+                                </div>
+                                <div class="flex flex-wrap gap-2">${versionMetadataHtml(version)}</div>
+                            </div>
+                            <p class="mt-3 text-sm text-gray-600">${escapeHtml(version.notes || 'No release notes available.')}</p>
                         </div>`;
                 });
                 
@@ -3502,12 +4347,14 @@
 
         function versionPrintRows(versions) {
             if (!versions.length) {
-                return '<tr><td colspan="3">No versions available.</td></tr>';
+                return '<tr><td colspan="5">No versions available.</td></tr>';
             }
             return versions.map(function(version) {
                 return `
                     <tr>
                         <td>${escapeHtml(version.number || 'N/A')}</td>
+                        <td>${escapeHtml(version.version_type_label || 'Semantic Versioning (Major.Minor.Patch)')}</td>
+                        <td>${escapeHtml(version.prerelease_identifier || 'N/A')}</td>
                         <td>${escapeHtml(version.change_date || 'N/A')}</td>
                         <td>${escapeHtml(version.notes || 'No release notes available.')}</td>
                     </tr>
@@ -3598,6 +4445,8 @@
                                 { label: 'Labels', value: labels },
                                 { label: 'Created', value: currentApplicationInfo.created },
                                 { label: 'Updated', value: currentApplicationInfo.updated },
+                                { label: 'Versioning Type', value: currentApplicationInfo.versioningType },
+                                { label: 'Pre-release Label', value: currentApplicationInfo.prereleaseIdentifier },
                                 { label: 'Latest Release', value: currentApplicationInfo.latestVersion },
                                 { label: 'Latest Release Date', value: currentApplicationInfo.latestReleaseDate },
                                 { label: 'Latest Release Notes', value: currentApplicationInfo.latestReleaseNotes }
@@ -3610,6 +4459,8 @@
                         <thead>
                             <tr>
                                 <th>Version</th>
+                                <th>Versioning Type</th>
+                                <th>Pre-release Label</th>
                                 <th>Date</th>
                                 <th>Release Notes</th>
                             </tr>
@@ -3788,8 +4639,48 @@
                 if (!$(event.target).closest('#accessUserDropdownButton, #accessUserDropdownPanel').length) {
                     $('#accessUserDropdownPanel').addClass('hidden');
                 }
+                if (!$(event.target).closest('#versionPrereleaseDropdownButton, #versionPrereleaseDropdownPanel').length) {
+                    $('#versionPrereleaseDropdownPanel').addClass('hidden');
+                    $('#versionPrereleaseDropdownButton').attr('aria-expanded', 'false');
+                }
             });
             $('#deploymentForm').on('submit', upsertDeployment);
+            $('#versionPrereleaseEnabled, #versionBuildEnabled').on('change', applyVersionOptionVisibility);
+            $('#versionPrereleaseDropdownButton').on('click', function(event) {
+                event.stopPropagation();
+                if ($(this).prop('disabled')) return;
+                const isHidden = $('#versionPrereleaseDropdownPanel').hasClass('hidden');
+                $('#versionPrereleaseDropdownPanel').toggleClass('hidden', !isHidden);
+                $(this).attr('aria-expanded', isHidden ? 'true' : 'false');
+            });
+            $('#versionPrereleaseList').on('click', 'li[data-value]', function() {
+                $('#versionPrereleasePreset').val($(this).data('value'));
+                $('#versionPrereleaseDropdownPanel').addClass('hidden');
+                $('#versionPrereleaseDropdownButton').attr('aria-expanded', 'false');
+                applyPrereleaseCustomVisibility();
+                renderVersionScript();
+            });
+            $('#versionPrereleaseIdentifier, #versionBuildNumber').on('input', renderVersionScript);
+            $('#editVersionBuildNumber').on('click', function() {
+                if ($(this).prop('disabled')) return;
+                $('#versionBuildNumber').data('is-editing', true);
+                $('#versionBuildNumber').prop('disabled', false).focus().select();
+            });
+            $('.version-part-button').on('click', function() {
+                setVersionScriptPart($(this).data('version-part'));
+            });
+            $('#saveVersionOptions').on('click', saveVersionOptions);
+            $('#copyVersionScript').on('click', function() {
+                const script = $('#versionScriptBox').attr('data-script') || $('#versionScriptBox').text();
+                copyTextToClipboard(script).then(function() {
+                    showVersionScriptCopied();
+                }).catch(function(error) {
+                    console.error('Could not copy script: ', error);
+                    showAppAlert({ title: 'Copy failed', text: 'Could not copy the script to the clipboard.', icon: 'error' });
+                });
+            });
+            applyPrereleasePreset();
+            applyVersionOptionVisibility();
             showApplicationDetailsView(sessionStorage.getItem(activeTabStorageKey) || 'overview');
             if (!currentRepositoryBranches.length) {
                 refreshRepositoryMetadata({ silent: true });

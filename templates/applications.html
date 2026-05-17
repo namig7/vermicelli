@@ -1,6 +1,70 @@
 <!-- applications.html -->
 <div class="resource-page">
     {% include '_resource_page_styles.html' %}
+    <style>
+        html[data-theme="dark"] .resource-page #myModal .bg-white {
+            background-color: #1f2937 !important;
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] .resource-page #myModal .bg-gray-100,
+        html[data-theme="dark"] .resource-page #myModal .bg-gray-50 {
+            background-color: #111827 !important;
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] .resource-page #myModal .border-gray-200 {
+            border-color: #374151 !important;
+        }
+
+        html[data-theme="dark"] .resource-page #myModal .text-gray-700,
+        html[data-theme="dark"] .resource-page #myModal .text-gray-500 {
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] .resource-page #myModal input,
+        html[data-theme="dark"] .resource-page #myModal select,
+        html[data-theme="dark"] .resource-page #myModal button[aria-haspopup="listbox"] {
+            border-color: #4b5563 !important;
+            background-color: #111827 !important;
+            color: #f9fafb !important;
+        }
+
+        html[data-theme="dark"] .resource-page #myModal input:focus,
+        html[data-theme="dark"] .resource-page #myModal select:focus,
+        html[data-theme="dark"] .resource-page #myModal button[aria-haspopup="listbox"]:focus {
+            border-color: #f59e0b !important;
+            box-shadow: 0 0 0 1px #f59e0b !important;
+        }
+
+        html[data-theme="dark"] .resource-page #projectDropdownPanel,
+        html[data-theme="dark"] .resource-page #versioningTypeDropdownPanel {
+            background-color: #111827 !important;
+            border: 1px solid #374151;
+            color: #e5e7eb;
+        }
+
+        html[data-theme="dark"] .resource-page #projectList li,
+        html[data-theme="dark"] .resource-page #versioningTypeList li {
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] .resource-page #projectList li:hover,
+        html[data-theme="dark"] .resource-page #versioningTypeList li:hover {
+            background-color: #374151 !important;
+        }
+
+        html[data-theme="dark"] .resource-page #myModalCreateButton {
+            background-color: #f59e0b !important;
+            color: #111827 !important;
+            box-shadow: 0 1px 2px rgba(245, 158, 11, 0.18) !important;
+        }
+
+        html[data-theme="dark"] .resource-page #myModalCreateButton:hover {
+            background-color: #fbbf24 !important;
+            color: #111827 !important;
+        }
+    </style>
     <!-- Header for Applications -->
     <header class="page-toolbar flex justify-between items-center mb-4">
         <!-- Navigation Tabs -->
@@ -101,11 +165,11 @@
     <!-- New Application Modal -->
     <div
         id="myModal"
-        class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center"
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center p-4"
     >
-        <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-hidden">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto max-h-[calc(100vh-2rem)] overflow-y-auto relative">
             <!-- Modal Header -->
-            <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
+            <div class="rounded-t-md shadow-sm flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
                 <h3 class="text-lg font-bold text-gray-800">Create Application</h3>
                 <button
                     class="close-modal text-gray-400 hover:text-gray-600 focus:outline-none"
@@ -255,6 +319,134 @@
                     </div>
                     <div class="mb-4">
                         <label
+                            id="versioningTypeDropdownLabel"
+                            class="block text-sm font-medium text-gray-700"
+                        >
+                            Versioning Type
+                        </label>
+                        <div class="relative mt-1">
+                            <button
+                                type="button"
+                                id="versioningTypeDropdownButton"
+                                class="relative w-full cursor-default rounded-md border
+                                       border-gray-300 bg-white py-2 pl-3 pr-10 text-left
+                                       shadow-sm focus:border-yellow-500 focus:outline-none
+                                       focus:ring-1 focus:ring-yellow-500 sm:text-sm"
+                                aria-haspopup="listbox"
+                                aria-expanded="false"
+                            >
+                                <span
+                                    class="block truncate"
+                                    id="versioningTypeDropdownSelected"
+                                >
+                                    Semantic Versioning (Major.Minor.Patch)
+                                </span>
+                                <span
+                                    class="pointer-events-none absolute inset-y-0 right-0 flex
+                                           items-center pr-2"
+                                >
+                                    <svg
+                                        class="h-5 w-5 text-gray-400"
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            fill-rule="evenodd"
+                                            d="M5.23 7.21a.75.75
+                                               0 011.06.02L10 10.94l3.71-3.71a.75.75
+                                               0 111.06
+                                               1.06l-4.24
+                                               4.24a.75.75
+                                               0
+                                               01-1.06
+                                               0L5.23
+                                               8.27a.75.75
+                                               0
+                                               01.02-1.06z"
+                                            clip-rule="evenodd"
+                                        />
+                                    </svg>
+                                </span>
+                            </button>
+                            <div
+                                id="versioningTypeDropdownPanel"
+                                class="absolute z-50 mt-1 w-full hidden rounded-md bg-white
+                                       shadow-lg ring-1 ring-black ring-opacity-5
+                                       focus:outline-none"
+                                role="listbox"
+                                aria-labelledby="versioningTypeDropdownLabel"
+                            >
+                                <ul
+                                    id="versioningTypeList"
+                                    class="max-h-48 overflow-auto py-1 text-base sm:text-sm"
+                                >
+                                    <li class="cursor-pointer hover:bg-yellow-100 px-3 py-2 text-sm text-gray-700" data-value="semver" data-label="Semantic Versioning (Major.Minor.Patch)">Semantic Versioning (Major.Minor.Patch)</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <input
+                            type="hidden"
+                            name="versioning_type"
+                            id="versioningType"
+                            value="semver"
+                        />
+                    </div>
+                    <div class="mb-4 space-y-3 rounded-lg border border-gray-200 bg-gray-50 p-4">
+                        <label class="flex items-start gap-3 text-sm text-gray-700">
+                            <input
+                                type="checkbox"
+                                id="enablePrerelease"
+                                class="mt-1 h-4 w-4 rounded border-gray-300 text-yellow-500 focus:ring-yellow-500"
+                            />
+                            <span class="min-w-0">
+                                <span class="block font-medium">Pre-release Label</span>
+                                <span class="block text-xs text-gray-500">Adds an identifier like beta, alpha, or nightly after the version.</span>
+                            </span>
+                        </label>
+                        <div id="prereleaseIdentifierGroup" class="hidden pl-7">
+                            <label for="prereleaseIdentifier" class="block text-sm font-medium text-gray-700">Pre-release Label</label>
+                            <input
+                                type="text"
+                                name="prerelease_identifier"
+                                id="prereleaseIdentifier"
+                                class="form-input mt-1 block w-full focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500"
+                                placeholder="beta"
+                            />
+                        </div>
+                        <label class="flex items-start gap-3 text-sm text-gray-700">
+                            <input
+                                type="checkbox"
+                                id="enableBuildNumber"
+                                class="mt-1 h-4 w-4 rounded border-gray-300 text-yellow-500 focus:ring-yellow-500"
+                            />
+                            <span class="min-w-0">
+                                <span class="block font-medium">Build Number</span>
+                                <span class="block text-xs text-gray-500">Adds a fourth numeric segment that increments with each update.</span>
+                            </span>
+                        </label>
+                    </div>
+                    <div class="mb-4">
+                        <label
+                            for="initialVersion"
+                            class="block text-sm font-medium text-gray-700"
+                        >
+                            Initial Version
+                        </label>
+                        <input
+                            type="text"
+                            name="initial_version"
+                            id="initialVersion"
+                            class="form-input mt-1 block w-full focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500"
+                            value="0.0.0"
+                            required
+                        />
+                        <p id="initialVersionHint" class="mt-2 text-xs text-gray-500">
+                            Use numbers as Major.Minor.Patch, for example 32.12.34.
+                        </p>
+                    </div>
+                    <div class="mb-4">
+                        <label
                             for="label"
                             class="block text-sm font-medium text-gray-700"
                         >
@@ -270,14 +462,15 @@
                 </form>
             </div>
 
-            <!-- Modal Footer (gray bottom, akin to newProjectModal style) -->
+            <!-- Modal Footer -->
             <div class="p-4 border-t border-gray-200 bg-gray-100 text-right rounded-b-lg">
                 <button
                     type="submit"
                     form="createForm"
+                    id="myModalCreateButton"
                     class="btn btn-primary"
                 >
-                    Create Application
+                    Create
                 </button>
             </div>
         </div>
@@ -293,6 +486,36 @@
     const appsPerPage = 5;
     let appSortKey = 'id';
     let appSortDirection = 'asc';
+    const versioningOptions = {
+        semver: {
+            label: 'Semantic Versioning (Major.Minor.Patch)',
+            defaultValue: '0.0.0',
+            pattern: /^\d+\.\d+\.\d+$/,
+            hint: 'Use numbers as Major.Minor.Patch, for example 32.12.34.',
+            error: 'Initial version must use Major.Minor.Patch, for example 0.0.0.'
+        },
+        semver_prerelease: {
+            label: 'Semantic Versioning (Major.Minor.Patch)',
+            defaultValue: '0.0.0',
+            pattern: /^\d+\.\d+\.\d+(?:-[A-Za-z][A-Za-z0-9]*)?$/,
+            hint: 'Use Major.Minor.Patch or Major.Minor.Patch-id, for example 32.12.34 or 4.1.2-rc1.',
+            error: 'Initial version must use Major.Minor.Patch or Major.Minor.Patch-id, for example 0.0.0 or 4.1.2-rc1.'
+        },
+        semver_build: {
+            label: 'Semantic Versioning (Major.Minor.Patch)',
+            defaultValue: '0.0.0.0',
+            pattern: /^\d+\.\d+\.\d+\.\d+$/,
+            hint: 'Use numbers as Major.Minor.Patch.Build, for example 32.12.34.154.',
+            error: 'Initial version must use Major.Minor.Patch.Build, for example 0.0.0.0.'
+        },
+        semver_pre_build: {
+            label: 'Semantic Versioning (Major.Minor.Patch)',
+            defaultValue: '0.0.0.0',
+            pattern: /^\d+\.\d+\.\d+\.\d+(?:-[A-Za-z][A-Za-z0-9]*)?$/,
+            hint: 'Use Major.Minor.Patch.Build or Major.Minor.Patch.Build-id, for example 32.12.34.154 or 3.2.1.45-rc1.',
+            error: 'Initial version must use Major.Minor.Patch.Build or Major.Minor.Patch.Build-id, for example 0.0.0.0 or 3.2.1.45-rc1.'
+        }
+    };
 
     // ================== SweetAlert Helpers ==================
     function getButtonClass(icon, type) {
@@ -729,18 +952,54 @@
 
     // =============== Open/Close Modal =================
     window.openModal = function() {
+        syncInitialVersionForType(true);
         $('#myModal').removeClass('hidden');
         loadProjectsSingleSelect();
     };
     window.closeModal = function() {
         $('#myModal').addClass('hidden');
         $('#createForm')[0].reset();
+        syncInitialVersionForType(true);
         // reset the single select
         $('#projectDropdownSelected').text('Select Project');
         $('#selectedProjectId').val('');
         $('#projectList').empty();
         $('#projectSearchInput').val('');
+        $('#versioningTypeDropdownPanel').addClass('hidden');
+        $('#versioningTypeDropdownButton').attr('aria-expanded', 'false');
     };
+
+    function selectedVersioningType() {
+        const prereleaseEnabled = $('#enablePrerelease').is(':checked');
+        const buildEnabled = $('#enableBuildNumber').is(':checked');
+        if (prereleaseEnabled && buildEnabled) return 'semver_pre_build';
+        if (prereleaseEnabled) return 'semver_prerelease';
+        if (buildEnabled) return 'semver_build';
+        return 'semver';
+    }
+
+    function selectedVersioningOption() {
+        const selectedType = selectedVersioningType();
+        return versioningOptions[selectedType] || versioningOptions.semver;
+    }
+
+    function syncInitialVersionForType(forceDefault) {
+        $('#versioningType').val(selectedVersioningType());
+        const option = selectedVersioningOption();
+        $('#versioningTypeDropdownSelected').text(option.label);
+        $('#prereleaseIdentifierGroup').toggleClass('hidden', !$('#enablePrerelease').is(':checked'));
+        if (forceDefault) {
+            $('#initialVersion').val(option.defaultValue);
+        }
+        $('#initialVersionHint').text(option.hint);
+    }
+
+    function setVersioningType(value) {
+        $('#versioningType').val('semver');
+        $('#versioningTypeDropdownPanel').addClass('hidden');
+        $('#versioningTypeDropdownButton').attr('aria-expanded', 'false');
+        syncInitialVersionForType(false);
+    }
 
     // Close modal if user clicks outside the content
     $(document).ready(function() {
@@ -768,6 +1027,33 @@
             loadAppsData(searchQuery);
         });
 
+        $('#versioningTypeDropdownButton').on('click', function(e) {
+            e.stopPropagation();
+            $('#projectDropdownPanel').addClass('hidden');
+            $('#versioningTypeDropdownPanel').toggleClass('hidden');
+            $(this).attr('aria-expanded', $('#versioningTypeDropdownPanel').hasClass('hidden') ? 'false' : 'true');
+        });
+
+        $('#versioningTypeList').on('click', 'li[data-value]', function() {
+            setVersioningType($(this).data('value'));
+        });
+
+        $('#enablePrerelease, #enableBuildNumber').on('change', function() {
+            syncInitialVersionForType(true);
+        });
+
+        $(document).on('click.versioningTypeSelect', function(event) {
+            const panel = $('#versioningTypeDropdownPanel');
+            if (!panel.is(event.target)
+                && panel.has(event.target).length === 0
+                && !$('#versioningTypeDropdownButton').is(event.target)
+                && $('#versioningTypeDropdownButton').has(event.target).length === 0
+            ) {
+                panel.addClass('hidden');
+                $('#versioningTypeDropdownButton').attr('aria-expanded', 'false');
+            }
+        });
+
         // 3) Submit create form
         $('#createForm').submit(function(e) {
             e.preventDefault();
@@ -785,11 +1071,40 @@
                 return;
             }
 
+            const versioningType = selectedVersioningType();
+            $('#versioningType').val(versioningType);
+            const versioningOption = selectedVersioningOption();
+            const initialVersion = $('#initialVersion').val().trim();
+            if (!versioningOption.pattern.test(initialVersion)) {
+                showSwalModal({
+                    title: 'Validation Error',
+                    text: versioningOption.error,
+                    icon: 'error',
+                    confirmText: 'OK'
+                });
+                return;
+            }
+            const prereleaseIdentifier = $('#prereleaseIdentifier').val().trim();
+            if ($('#enablePrerelease').is(':checked')
+                && !prereleaseIdentifier
+                && !/-[A-Za-z][A-Za-z0-9]*$/.test(initialVersion)) {
+                showSwalModal({
+                    title: 'Validation Error',
+                    text: 'Pre-release Label is required when Pre-release Label is enabled.',
+                    icon: 'error',
+                    confirmText: 'OK'
+                });
+                return;
+            }
+
             const formData = {
                 name: $('#name').val().trim(),
                 project_ids: [ projectChoice ], // single pick => array if needed
                 link: $('#link').val().trim(),
-                label: $('#label').val().trim()
+                label: $('#label').val().trim(),
+                versioning_type: versioningType,
+                initial_version: initialVersion,
+                prerelease_identifier: prereleaseIdentifier
             };
 
             $.ajax({
@@ -871,6 +1186,8 @@
                   .off('click')
                   .on('click', function(e) {
                       e.stopPropagation();
+                      $('#versioningTypeDropdownPanel').addClass('hidden');
+                      $('#versioningTypeDropdownButton').attr('aria-expanded', 'false');
                       $('#projectDropdownPanel').toggleClass('hidden');
                   });
 
