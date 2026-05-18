@@ -14,8 +14,8 @@
     }
 
     .system-settings-page .logs-box {
-        max-height: 32rem;
-        overflow: auto;
+        min-height: 24rem;
+        overflow: visible;
     }
 
     .system-settings-page .log-entry {
@@ -51,8 +51,8 @@
     <header class="page-toolbar flex justify-between items-center mb-4">
         <nav class="flex flex-wrap gap-3 text-gray-700" aria-label="System settings sections">
             <a href="/applications" data-page="applications" onclick="if (window.loadPage) { window.loadPage('applications'); return false; }" class="tab-link primary-action btn btn-secondary group justify-start py-3 text-left">
-                <svg class="h-5 w-5 flex-shrink-0 text-yellow-500 group-hover:text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
                 </svg>
                 Dashboard
             </a>
@@ -92,7 +92,7 @@
         </div>
     </header>
 
-    <section id="backupTab" class="system-tab-panel bg-white border border-gray-200 rounded-lg shadow-md p-6">
+    <section id="backupTab" class="system-tab-panel bg-white border border-gray-200 rounded-lg shadow-md p-6" style="margin-top: 40px !important;">
         <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
             <div>
                 <h2 class="text-xl font-bold text-gray-800">Encrypted Backups</h2>
@@ -135,15 +135,17 @@
         </div>
     </section>
 
-    <section id="logsTab" class="system-tab-panel hidden bg-white border border-gray-200 rounded-lg shadow-md p-6">
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-                <h2 class="text-xl font-bold text-gray-800">Change Logs</h2>
-                <p class="mt-2 text-sm text-gray-500">Project, application, user, access, version, deployment, and backup changes.</p>
+    <div id="logsTab" class="system-tab-panel hidden">
+        <section class="bg-white border border-gray-200 rounded-lg shadow-md p-6" style="margin-top: 40px !important;">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-800">Change Logs</h2>
+                    <p class="mt-2 text-sm text-gray-500">Project, application, user, access, version, deployment, and backup changes.</p>
+                </div>
+                <p id="systemLogsMessage" class="text-sm text-gray-600"></p>
             </div>
-            <p id="systemLogsMessage" class="text-sm text-gray-600"></p>
-        </div>
-        <div id="systemLogsList" class="logs-box mt-6 divide-y divide-gray-200 rounded-lg border border-gray-200 bg-gray-50"></div>
+            <div id="systemLogsList" class="logs-box mt-6 divide-y divide-gray-200 rounded-lg border border-gray-200 bg-gray-50"></div>
+        </section>
         <div id="logsPaginationControls" class="flex flex-wrap justify-between items-center mt-4">
             <button id="logsPrevPage" class="pagination-button btn btn-secondary">
                 &larr; Previous
@@ -153,14 +155,14 @@
                 Next &rarr;
             </button>
         </div>
-    </section>
+    </div>
 </div>
 
 <script>
 (function() {
     let logsCurrentPage = 1;
     let logsTotalPages = 1;
-    const logsPerPage = 10;
+    const logsPerPage = 5;
 
     function escapeHtml(value) {
         return String(value || '')
