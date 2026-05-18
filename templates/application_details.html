@@ -361,6 +361,55 @@
             stroke-width: 1.75;
         }
 
+        .app-details-page .edit-project-dropdown-panel {
+            overflow: visible;
+        }
+
+        .app-details-page .project-card-actions {
+            display: flex;
+            flex: 0 0 auto;
+            align-items: center;
+            align-self: stretch;
+            gap: 0.25rem;
+            border-left: 1px solid #e5e7eb;
+            padding-left: 0.75rem;
+        }
+
+        .app-details-page .project-card-action-separator {
+            display: none;
+        }
+
+        #projectEditList {
+            max-height: 12rem;
+            overflow-y: auto;
+        }
+
+        #projectEditDropdownPanel,
+        #accessProjectDropdownPanel,
+        #accessApplicationDropdownPanel,
+        #accessUserDropdownPanel,
+        .app-details-page .version-dropdown-panel {
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            color: #374151;
+            z-index: 70;
+        }
+
+        #projectEditList li,
+        #accessProjectList li,
+        #accessApplicationList li,
+        #accessUserList li,
+        .app-details-page .version-dropdown-option {
+            transition: background-color 0.15s ease, color 0.15s ease;
+        }
+
+        #projectEditList li:hover,
+        #accessProjectList li:hover,
+        #accessApplicationList li:hover,
+        #accessUserList li:hover {
+            background-color: #fef3c7;
+        }
+
         .app-details-page .release-action-button {
             min-height: 2.25rem;
             border-radius: 0.375rem;
@@ -510,7 +559,7 @@
 
         .app-details-page .version-dropdown-panel {
             position: absolute;
-            z-index: 50;
+            z-index: 70;
             margin-top: 0.25rem;
             width: 100%;
             overflow: hidden;
@@ -530,7 +579,7 @@
         .app-details-page .version-dropdown-option:hover,
         .app-details-page .version-dropdown-option.is-active {
             background: #fef3c7;
-            color: #78350f;
+            color: #b45309;
         }
 
         .app-details-page .version-part-selector {
@@ -729,6 +778,11 @@
         .app-details-page .inline-icon-button:hover {
             background: #fef3c7;
             color: #b45309;
+        }
+
+        .app-details-page .inline-icon-button.remove-button:hover {
+            background: #fee2e2;
+            color: #dc2626;
         }
 
         .app-details-page .label-chip {
@@ -953,6 +1007,11 @@
             box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.18), 0 0 10px rgba(245, 158, 11, 0.38);
         }
 
+        .app-details-page .app-access-status-dot {
+            background-color: #facc15;
+            box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.18), 0 0 8px rgba(245, 158, 11, 0.35);
+        }
+
         .app-details-page .deployment-url {
             width: 100%;
         }
@@ -1022,7 +1081,8 @@
             }
 
             .app-details-page .labels-card-actions,
-            .app-details-page .repository-card-actions {
+            .app-details-page .repository-card-actions,
+            .app-details-page .project-card-actions {
                 border-left: 0;
                 border-top: 1px solid #e5e7eb;
                 justify-content: flex-start;
@@ -1138,6 +1198,36 @@
 
         .app-details-page .repository-loading.hidden {
             display: none;
+        }
+
+        .application-details-modal-panel {
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(17, 24, 39, 0.1), 0 4px 6px -4px rgba(17, 24, 39, 0.1);
+            max-height: calc(100vh - 2rem);
+            overflow: visible;
+            position: relative;
+        }
+
+        .application-details-modal-header {
+            border-bottom: 1px solid #e5e7eb;
+            border-top-left-radius: 0.375rem;
+            border-top-right-radius: 0.375rem;
+            background-color: #f3f4f6;
+            box-shadow: 0 1px 2px rgba(17, 24, 39, 0.05);
+        }
+
+        .application-details-modal-body {
+            padding: 1.5rem;
+        }
+
+        .application-details-modal-footer {
+            border-top: 1px solid #e5e7eb;
+            border-bottom-right-radius: 0.5rem;
+            border-bottom-left-radius: 0.5rem;
+            background-color: #f3f4f6;
+            padding: 1rem;
+            text-align: right;
         }
 
         .app-details-page .repository-loading-spinner {
@@ -1304,6 +1394,11 @@
             color: #fffbeb;
         }
 
+        html[data-theme="dark"] .app-details-page .inline-icon-button.remove-button:hover {
+            background: #7f1d1d;
+            color: #fee2e2;
+        }
+
         html[data-theme="dark"] .app-details-page .inline-icon-button {
             color: #cbd5e1;
         }
@@ -1377,7 +1472,8 @@
         }
 
         html[data-theme="dark"] .app-details-page .labels-card-actions,
-        html[data-theme="dark"] .app-details-page .repository-card-actions {
+        html[data-theme="dark"] .app-details-page .repository-card-actions,
+        html[data-theme="dark"] .app-details-page .project-card-actions {
             border-color: #4b5563;
         }
 
@@ -1659,14 +1755,105 @@
 
         html[data-theme="dark"] #accessProjectList li,
         html[data-theme="dark"] #accessApplicationList li,
+        html[data-theme="dark"] #projectEditList li,
         html[data-theme="dark"] #accessUserList li {
             color: #e5e7eb !important;
         }
 
         html[data-theme="dark"] #accessProjectList li:hover,
         html[data-theme="dark"] #accessApplicationList li:hover,
+        html[data-theme="dark"] #projectEditList li:hover,
         html[data-theme="dark"] #accessUserList li:hover {
             background-color: #374151 !important;
+            color: #fbbf24 !important;
+        }
+
+        html[data-theme="dark"] #editAppModal .bg-white {
+            background-color: #1f2937 !important;
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] .application-details-modal-panel {
+            background-color: #1f2937 !important;
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] .application-details-modal-header,
+        html[data-theme="dark"] .application-details-modal-footer {
+            background-color: #111827 !important;
+            border-color: #374151 !important;
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] .application-details-modal-panel .btn-primary {
+            background-color: #f59e0b !important;
+            color: #111827 !important;
+            box-shadow: 0 1px 2px rgba(245, 158, 11, 0.18) !important;
+        }
+
+        html[data-theme="dark"] .application-details-modal-panel .btn-primary:hover {
+            background-color: #fbbf24 !important;
+            color: #111827 !important;
+        }
+
+        html[data-theme="dark"] #editAppModal .bg-gray-100 {
+            background-color: #111827 !important;
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] #editAppModal .bg-gray-50 {
+            background-color: #111827 !important;
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] #editAppModal .border-gray-200,
+        html[data-theme="dark"] #editAppModal .border-gray-300 {
+            border-color: #374151 !important;
+        }
+
+        html[data-theme="dark"] #editAppModal .text-gray-800,
+        html[data-theme="dark"] #editAppModal .text-gray-700,
+        html[data-theme="dark"] #editAppModal .text-gray-600,
+        html[data-theme="dark"] #editAppModal .text-gray-500,
+        html[data-theme="dark"] #editAppModal .text-gray-400 {
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] #editAppModal input,
+        html[data-theme="dark"] #editAppModal button[aria-haspopup="listbox"] {
+            background-color: #111827 !important;
+            border-color: #4b5563 !important;
+            color: #f3f4f6 !important;
+        }
+
+        html[data-theme="dark"] #editAppModal input::placeholder {
+            color: #9ca3af !important;
+        }
+
+        html[data-theme="dark"] #editAppModal input:focus,
+        html[data-theme="dark"] #editAppModal button[aria-haspopup="listbox"]:focus {
+            border-color: #f59e0b !important;
+            box-shadow: 0 0 0 1px #f59e0b !important;
+        }
+
+        html[data-theme="dark"] #projectEditDropdownPanel,
+        html[data-theme="dark"] #accessProjectDropdownPanel,
+        html[data-theme="dark"] #accessApplicationDropdownPanel,
+        html[data-theme="dark"] #accessUserDropdownPanel,
+        html[data-theme="dark"] .version-dropdown-panel {
+            background-color: #111827 !important;
+            border: 1px solid #374151;
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] .version-dropdown-option {
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] .version-dropdown-option:hover,
+        html[data-theme="dark"] .version-dropdown-option.is-active {
+            background-color: #374151 !important;
+            color: #fbbf24 !important;
         }
 
         html[data-theme="dark"] #accessUserList li[aria-disabled="true"],
@@ -1717,6 +1904,65 @@
 
         html[data-theme="dark"] #accessModalMessage {
             color: #fbbf24 !important;
+        }
+
+        html[data-theme="dark"] #deploymentModal .bg-white,
+        html[data-theme="dark"] #deploymentResultModal .bg-white,
+        html[data-theme="dark"] #versionModal .bg-white {
+            background-color: #1f2937 !important;
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] #deploymentModal .bg-gray-100,
+        html[data-theme="dark"] #deploymentModal .bg-gray-50,
+        html[data-theme="dark"] #deploymentResultModal .bg-gray-100,
+        html[data-theme="dark"] #deploymentResultModal .bg-gray-50,
+        html[data-theme="dark"] #versionModal .bg-gray-100,
+        html[data-theme="dark"] #versionModal .bg-gray-50 {
+            background-color: #111827 !important;
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] #deploymentModal .border-gray-200,
+        html[data-theme="dark"] #deploymentModal .border-gray-300,
+        html[data-theme="dark"] #deploymentResultModal .border-gray-200,
+        html[data-theme="dark"] #deploymentResultModal .border-gray-300,
+        html[data-theme="dark"] #versionModal .border-gray-200,
+        html[data-theme="dark"] #versionModal .border-gray-300 {
+            border-color: #374151 !important;
+        }
+
+        html[data-theme="dark"] #deploymentModal .text-gray-800,
+        html[data-theme="dark"] #deploymentModal .text-gray-700,
+        html[data-theme="dark"] #deploymentModal .text-gray-600,
+        html[data-theme="dark"] #deploymentModal .text-gray-500,
+        html[data-theme="dark"] #deploymentModal .text-gray-400,
+        html[data-theme="dark"] #deploymentResultModal .text-gray-800,
+        html[data-theme="dark"] #deploymentResultModal .text-gray-700,
+        html[data-theme="dark"] #deploymentResultModal .text-gray-600,
+        html[data-theme="dark"] #deploymentResultModal .text-gray-500,
+        html[data-theme="dark"] #deploymentResultModal .text-gray-400,
+        html[data-theme="dark"] #versionModal .text-gray-800,
+        html[data-theme="dark"] #versionModal .text-gray-700,
+        html[data-theme="dark"] #versionModal .text-gray-600,
+        html[data-theme="dark"] #versionModal .text-gray-500,
+        html[data-theme="dark"] #versionModal .text-gray-400 {
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] #deploymentModal input,
+        html[data-theme="dark"] #deploymentModal select,
+        html[data-theme="dark"] #deploymentModal textarea {
+            border-color: #4b5563 !important;
+            background-color: #111827 !important;
+            color: #f9fafb !important;
+        }
+
+        html[data-theme="dark"] #deploymentModal input:focus,
+        html[data-theme="dark"] #deploymentModal select:focus,
+        html[data-theme="dark"] #deploymentModal textarea:focus {
+            border-color: #f59e0b !important;
+            box-shadow: 0 0 0 1px #f59e0b !important;
         }
 
         html[data-theme="dark"] #applicationAccessEnabledToggle.bg-gray-100,
@@ -1892,7 +2138,7 @@
                     <div class="hero-detail-box">
                         <span class="detail-icon" aria-hidden="true">
                             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V6.75A2.25 2.25 0 0 1 4.5 4.5h4.628c.597 0 1.17.237 1.591.659l1.122 1.122c.422.422.994.659 1.591.659H19.5a2.25 2.25 0 0 1 2.25 2.25v3.56M2.25 12.75 4.03 18.09A2.25 2.25 0 0 0 6.164 19.5h11.672a2.25 2.25 0 0 0 2.134-1.41l1.78-5.34H2.25Z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 9.776c.112-.017.227-.026.344-.026h15.812c.117 0 .232.009.344.026m-16.5 0a2.25 2.25 0 0 0-1.883 2.542l.857 6a2.25 2.25 0 0 0 2.227 1.932H19.05a2.25 2.25 0 0 0 2.227-1.932l.857-6a2.25 2.25 0 0 0-1.883-2.542m-16.5 0V6A2.25 2.25 0 0 1 6 3.75h3.879a1.5 1.5 0 0 1 1.06.44l2.122 2.12a1.5 1.5 0 0 0 1.06.44H18A2.25 2.25 0 0 1 20.25 9v.776" />
                             </svg>
                         </span>
                         <div class="min-w-0 flex-1">
@@ -1908,11 +2154,20 @@
                             </p>
                         </div>
                         {% if can_change_project %}
-                            <button type="button" onclick="openEditAppModal({{ app.id }}, 'project'); return false;" class="inline-icon-button flex-shrink-0" aria-label="Edit project" title="Edit project">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
-                                </svg>
-                            </button>
+                            <div class="project-card-actions">
+                                <button type="button" onclick="openEditAppModal({{ app.id }}, 'project'); return false;" class="inline-icon-button flex-shrink-0" aria-label="Edit project" title="Edit project">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                                    </svg>
+                                </button>
+                                {% if project_id %}
+                                    <button type="button" onclick="removeApplicationProject(); return false;" class="inline-icon-button remove-button flex-shrink-0" aria-label="Remove project" title="Remove project">
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166M19.228 5.79 18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                        </svg>
+                                    </button>
+                                {% endif %}
+                            </div>
                         {% endif %}
                     </div>
                     <div class="hero-detail-box">
@@ -2201,7 +2456,7 @@
 
                     <div class="platform-admin-card mt-4">
                         <p class="detail-label">Platform Admins</p>
-                        <p class="access-person-meta mt-1">Admins have access to every project and application, so they are listed once here and not repeated below.</p>
+                        <p class="access-person-meta mt-1">Admins have access to every project and application.</p>
                         {% if access_summary.show_platform_admin_names and access_summary.platform_admins %}
                             <div class="mt-4 flex flex-wrap gap-2">
                                 {% for member in access_summary.platform_admins %}
@@ -2282,7 +2537,7 @@
                             </svg>
                         </span>
                         <div class="min-w-0 flex-1">
-                            <p class="detail-label">Repository</p>
+                            <p class="detail-label">Repository URL</p>
                             <p class="access-person-meta mt-1">Branch metadata is synced from the configured repository URL.</p>
                         </div>
                     </div>
@@ -2297,19 +2552,18 @@
                                 </svg>
                             </span>
                             <span class="min-w-0">
-                                <span class="block text-sm font-bold truncate">{{ app.link.replace('https://', '').replace('http://', '').rstrip('/') }}</span>
-                                <span class="block text-xs text-gray-500 truncate">Open repository</span>
+                                <span class="block text-sm font-bold truncate">{{ app.link }}</span>
                             </span>
                         </a>
                     {% else %}
                         <div class="repository-card-link">
                             <span class="repository-card-icon" aria-hidden="true">
                                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 4.5v15m7.5-7.5h-15" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
                                 </svg>
                             </span>
                             <span class="min-w-0">
-                                <span class="block text-sm font-bold text-gray-700">No repository link</span>
+                                <span class="block text-sm font-bold text-gray-700">No repository URL</span>
                                 <span class="block text-xs text-gray-500">Add a repository URL to sync branch data.</span>
                             </span>
                         </div>
@@ -2334,9 +2588,6 @@
                                 </button>
                             {% else %}
                                 <button type="button" onclick="openEditAppModal({{ app.id }}, 'repository'); return false;" class="btn btn-primary" aria-label="Add repository link" title="Add repository link">
-                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.5v15m7.5-7.5h-15" />
-                                    </svg>
                                     Add Repository
                                 </button>
                             {% endif %}
@@ -2426,31 +2677,44 @@
 
 <!-- Modal for editing application -->
 {% if can_edit_application %}
-<div id="editAppModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center">
-<div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-hidden">
+<div id="editAppModal" class="application-details-modal hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center p-4">
+<div class="application-details-modal-panel bg-white rounded-lg shadow-lg w-full max-w-md mx-auto max-h-[calc(100vh-2rem)] overflow-y-auto relative">
     <!-- Header of the modal -->
-    <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
+    <div class="application-details-modal-header rounded-t-md shadow-sm flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
         <h3 id="modalTitle" class="text-lg font-bold text-gray-800">Edit Application</h3>
-        <button onclick="closeEditAppModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+        <button onclick="closeEditAppModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none" aria-label="Close edit application modal">
             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
         </button>
     </div>
     <!-- Modal content -->
-    <div class="p-6 space-y-4">
+    <div class="application-details-modal-body p-6 space-y-4">
         <form id="editAppForm">
             <div class="edit-field-group" data-edit-section="name">
                 <label for="appNameInput" class="block text-sm font-medium text-gray-700">Application Name</label>
                 <input type="text" id="appNameInput" name="name" class="form-input block w-full mt-1" required>
             </div>
             <div class="edit-field-group" data-edit-section="project">
-                <label for="projectSelect" class="block text-sm font-medium text-gray-700">Project</label>
+                <label id="projectEditDropdownLabel" class="block text-sm font-medium text-gray-700">Project</label>
                 <p id="projectDisplay" class="mt-1 text-sm text-gray-600"></p>
-                <select id="projectSelect" name="project" class="form-select block w-full mt-1">
-                    <!-- Options will be dynamically loaded via AJAX -->
-                    <option value="">No project</option>
-                </select>
+                <div id="projectEditDropdownWrap" class="relative mt-1">
+                    <button type="button" id="projectEditDropdownButton" class="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500 sm:text-sm" aria-haspopup="listbox" aria-expanded="false">
+                        <span class="block truncate" id="projectEditDropdownSelected">No project</span>
+                        <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                            <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.23 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                            </svg>
+                        </span>
+                    </button>
+                    <div id="projectEditDropdownPanel" class="edit-project-dropdown-panel absolute z-50 mt-1 hidden w-full rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="listbox" aria-labelledby="projectEditDropdownLabel">
+                        <div class="border-b border-gray-200 p-2">
+                            <input type="text" id="projectEditSearchInput" class="w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500" placeholder="Type to filter..." />
+                        </div>
+                        <ul id="projectEditList" class="max-h-48 overflow-auto py-1 text-base sm:text-sm"></ul>
+                    </div>
+                </div>
+                <input type="hidden" id="projectSelect" name="project" value="">
             </div>
             <div class="edit-field-group" data-edit-section="repository">
                 <label for="appLinkInput" class="block text-sm font-medium text-gray-700">Git Repository Link</label>
@@ -2464,7 +2728,7 @@
         </form>
     </div>
     <!-- Footer with action buttons -->
-    <div class="p-4 border-t border-gray-200 bg-gray-100 text-right rounded-b-lg space-x-2">
+    <div class="application-details-modal-footer p-4 border-t border-gray-200 bg-gray-100 text-right rounded-b-lg space-x-2">
         <button onclick="saveEditApp()" class="btn btn-primary">Save</button>
         <button onclick="closeEditAppModal()" class="btn btn-secondary">Cancel</button>
     </div>
@@ -2474,9 +2738,9 @@
 
 <!-- Modal for deployment configuration -->
 {% if can_edit_application %}
-<div id="deploymentModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center">
-<div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-hidden">
-    <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
+<div id="deploymentModal" class="application-details-modal hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center p-4">
+<div class="application-details-modal-panel bg-white rounded-lg shadow-lg w-full max-w-md mx-auto max-h-[calc(100vh-2rem)] overflow-y-auto relative">
+    <div class="application-details-modal-header rounded-t-md shadow-sm flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
         <h3 id="deploymentModalTitle" class="text-lg font-bold text-gray-800">New Deployment</h3>
         <button onclick="closeDeploymentModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none" aria-label="Close deployment modal">
             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -2485,7 +2749,7 @@
         </button>
     </div>
     <form id="deploymentForm">
-        <div class="p-6 space-y-4">
+        <div class="application-details-modal-body p-6 space-y-4">
             <input type="hidden" id="deploymentIdInput">
             <div>
                 <label for="deploymentNameInput" class="block text-sm font-medium text-gray-700">Application Name</label>
@@ -2497,7 +2761,7 @@
                 <p class="mt-2 text-xs text-gray-500">Vermicelli checks the URL, /version, and /health. Deployment type is detected from /version.</p>
             </div>
         </div>
-        <div class="p-4 border-t border-gray-200 bg-gray-100 text-right rounded-b-lg space-x-2">
+        <div class="application-details-modal-footer p-4 border-t border-gray-200 bg-gray-100 text-right rounded-b-lg space-x-2">
             <button type="submit" id="saveDeploymentButton" class="btn btn-primary">Add</button>
             <button type="button" onclick="closeDeploymentModal()" class="btn btn-secondary">Cancel</button>
         </div>
@@ -2507,9 +2771,9 @@
 {% endif %}
 
 <!-- Modal for deployment check result -->
-<div id="deploymentResultModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center">
-<div class="bg-white rounded-lg shadow-lg w-full max-w-3xl mx-auto overflow-hidden">
-    <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
+<div id="deploymentResultModal" class="application-details-modal hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center p-4">
+<div class="application-details-modal-panel bg-white rounded-lg shadow-lg w-full max-w-3xl mx-auto max-h-[calc(100vh-2rem)] overflow-y-auto relative">
+    <div class="application-details-modal-header rounded-t-md shadow-sm flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
         <h3 id="deploymentResultTitle" class="text-lg font-bold text-gray-800">Deployment Result</h3>
         <button onclick="closeDeploymentResultModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none" aria-label="Close deployment result">
             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -2517,14 +2781,14 @@
             </svg>
         </button>
     </div>
-    <div id="deploymentResultContent" class="p-6 space-y-4 text-gray-700"></div>
+    <div id="deploymentResultContent" class="application-details-modal-body p-6 space-y-4 text-gray-700"></div>
 </div>
 </div>
 
 <!-- Version History Modal -->
-<div id="versionModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center">
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-hidden">
-        <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
+<div id="versionModal" class="application-details-modal hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center p-4">
+    <div class="application-details-modal-panel bg-white rounded-lg shadow-lg w-full max-w-md mx-auto max-h-[calc(100vh-2rem)] overflow-y-auto relative">
+        <div class="application-details-modal-header rounded-t-md shadow-sm flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
             <h3 class="text-lg font-bold text-gray-800">Version History</h3>
             <button onclick="closeVersionModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -2532,7 +2796,7 @@
                 </svg>
             </button>
         </div>
-        <div class="p-6">
+        <div class="application-details-modal-body p-6">
             <div id="versionContent" class="text-gray-700 space-y-4"></div>
             <div id="paginationControls" class="flex justify-between items-center mt-4">
                 <button id="prevPage" class="text-gray-500 hover:text-yellow-500 focus:outline-none invisible">Previous</button>
@@ -2543,9 +2807,9 @@
     </div>
 </div>
 
-<div id="accessModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center p-4">
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto max-h-[calc(100vh-2rem)] overflow-y-auto relative">
-        <div class="rounded-t-md shadow-sm flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
+<div id="accessModal" class="application-details-modal hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center p-4">
+    <div class="application-details-modal-panel bg-white rounded-lg shadow-lg w-full max-w-md mx-auto max-h-[calc(100vh-2rem)] overflow-y-auto relative">
+        <div class="application-details-modal-header rounded-t-md shadow-sm flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
             <h3 id="accessModalTitle" class="text-lg font-bold text-gray-800">New Access</h3>
             <button type="button" onclick="closeAccessModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none" aria-label="Close access editor">
                 <svg class="w-6 h-6 my-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -2553,7 +2817,7 @@
                 </svg>
             </button>
         </div>
-        <div class="p-6">
+        <div class="application-details-modal-body p-6">
             <form id="membershipForm" class="space-y-4">
                 <input type="hidden" id="accessMode" value="application">
                 <input type="hidden" id="membershipProject" value="{{ project_id or '' }}">
@@ -2663,12 +2927,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex flex-wrap justify-end gap-3 pt-2">
-                    <p id="accessModalMessage" class="mr-auto hidden self-center text-sm font-medium text-yellow-700">Access saved.</p>
-                    <button type="button" id="cancelAccessModal" class="btn btn-secondary">Close</button>
-                    <button type="submit" id="saveAccessButton" class="hidden btn btn-primary">Save</button>
-                </div>
             </form>
+        </div>
+        <div class="application-details-modal-footer flex flex-wrap justify-end gap-3 p-4 border-t border-gray-200 bg-gray-100 text-right rounded-b-lg">
+            <p id="accessModalMessage" class="mr-auto hidden self-center text-sm font-medium text-yellow-700">Access saved.</p>
+            <button type="button" id="cancelAccessModal" class="btn btn-secondary">Close</button>
+            <button type="submit" form="membershipForm" id="saveAccessButton" class="hidden btn btn-primary">Save</button>
         </div>
     </div>
 </div>
@@ -2734,6 +2998,7 @@
         const currentProjectName = {{ (project_name or '')|tojson }};
         const accessProjects = currentProjectId ? [{ id: currentProjectId, name: currentProjectName || 'Selected Project' }] : [];
         const accessApplications = [{ id: currentAppId, name: currentApplicationName, project_id: currentProjectId }];
+        let editProjectOptions = [];
         let accessUsers = [];
         let accessProjectMemberships = [];
         let accessApplicationMemberships = [];
@@ -2819,7 +3084,7 @@
             }
             $('#projectDisplay').text((data && data.project_name) || 'No project');
             $('#projectDisplay').toggleClass('hidden', shouldShowProjectSelect);
-            $('#projectSelect').toggleClass('hidden', !shouldShowProjectSelect);
+            $('#projectEditDropdownWrap, #projectSelect').toggleClass('hidden', !shouldShowProjectSelect);
             if (shouldShowProjectSelect) {
                 loadProjects(data.project_id);
             }
@@ -2847,17 +3112,49 @@
             });            
         }
 
+        function selectedEditProjectId() {
+            return $('#projectSelect').val();
+        }
+
+        function selectedEditProject() {
+            const projectId = selectedEditProjectId();
+            return editProjectOptions.find(project => String(project.id) === String(projectId)) || null;
+        }
+
+        function setEditProjectSelection(projectId, projectName) {
+            $('#projectSelect').val(projectId || '');
+            $('#projectEditDropdownSelected').text(projectName || 'No project');
+        }
+
+        function renderEditProjectOptions() {
+            const term = ($('#projectEditSearchInput').val() || '').trim().toLowerCase();
+            const filteredProjects = editProjectOptions.filter(project => {
+                return !term || String(project.name || '').toLowerCase().includes(term);
+            });
+            const noProjectItem = !term ? `
+                <li class="cursor-pointer px-3 py-2 text-sm text-gray-700 hover:bg-yellow-100" data-id="" data-name="No project">
+                    <span class="block truncate">No project</span>
+                </li>
+            ` : '';
+            const projectItems = filteredProjects.map(project => `
+                <li class="cursor-pointer px-3 py-2 text-sm text-gray-700 hover:bg-yellow-100" data-id="${project.id}" data-name="${escapeAttribute(project.name)}">
+                    <span class="block truncate">${escapeHtml(project.name)}</span>
+                </li>
+            `).join('');
+            $('#projectEditList').html(noProjectItem + (projectItems || (!noProjectItem ? '<li class="px-3 py-2 text-sm text-gray-500">No projects found.</li>' : '')));
+        }
+
         // Function to load projects
         function loadProjects(selectedProjectId) {
             $.ajax({
                 url: '/get_projects',
                 type: 'GET',
                 success: function(projects) {
-                    $('#projectSelect').empty().append('<option value="">No project</option>');
-                    projects.forEach(function(project) {
-                        const selected = project.id === selectedProjectId ? 'selected' : '';
-                        $('#projectSelect').append(`<option value="${project.id}" ${selected}>${project.name}</option>`);
-                    });
+                    editProjectOptions = projects || [];
+                    const selectedProject = editProjectOptions.find(project => Number(project.id) === Number(selectedProjectId));
+                    setEditProjectSelection(selectedProject ? selectedProject.id : '', selectedProject ? selectedProject.name : 'No project');
+                    $('#projectEditSearchInput').val('');
+                    renderEditProjectOptions();
                 },
                 error: function() {
                     showAppAlert({ title: 'Error', text: 'Error loading projects', icon: 'error' });
@@ -2873,6 +3170,8 @@
             $('#modalTitle').text('Edit Application');
             activeEditMode = 'all';
             $('#editAppForm')[0].reset();
+            $('#projectEditDropdownPanel').addClass('hidden');
+            $('#projectEditDropdownButton').attr('aria-expanded', 'false');
         }
 
         function saveApplicationData(appData, onSuccess) {
@@ -3205,7 +3504,7 @@
                 return !term || haystack.includes(term);
             });
             $('#accessUserList').html(filteredUsers.map(user => {
-                const statusDotClass = 'bg-yellow-400 shadow-[0_0_0_2px_rgba(250,204,21,0.18),0_0_8px_rgba(245,158,11,0.35)]';
+                const statusDotClass = 'app-access-status-dot';
                 const managerBadge = userIsProjectManager(user.id)
                     ? `<span class="inline-flex flex-shrink-0 items-center text-yellow-600" title="Manager" aria-label="Manager">${managerAccessIcon}</span>`
                     : '';
@@ -3712,7 +4011,7 @@
             if (activeEditMode === 'all' || activeEditMode === 'labels') {
                 appData.label = $('#appLabelInput').val().trim();
             }
-            if ((activeEditMode === 'all' || activeEditMode === 'project') && !$('#projectSelect').hasClass('hidden')) {
+            if ((activeEditMode === 'all' || activeEditMode === 'project') && !$('#projectEditDropdownWrap').hasClass('hidden')) {
                 appData.project_id = $('#projectSelect').val();
             }
 
@@ -3729,6 +4028,24 @@
                     return;
                 }
                 reloadApplicationDetails();
+            });
+        }
+
+        function removeApplicationProject() {
+            if (!canEditApplication || !{{ 'true' if can_change_project else 'false' }} || !currentProjectId) return;
+            confirmAppAction({
+                title: 'Remove project?',
+                text: 'This application will no longer be linked to the current project.',
+                confirmButtonText: 'Remove',
+                danger: true
+            }).then(function(confirmed) {
+                if (!confirmed) return;
+                saveApplicationData({
+                    name: currentApplicationName,
+                    link: currentApplicationLink,
+                    label: currentApplicationLabelValue,
+                    project_id: ''
+                }, reloadApplicationDetails);
             });
         }
 
@@ -4547,6 +4864,7 @@
         window.confirmAppAction = confirmAppAction;
         window.showPermissionNotice = showPermissionNotice;
         window.removeRepositoryLink = removeRepositoryLink;
+        window.removeApplicationProject = removeApplicationProject;
         window.openAccessManagement = openAccessManagement;
         window.openApplicationAccessUser = openApplicationAccessUser;
         window.closeAccessModal = closeAccessModal;
@@ -4569,6 +4887,21 @@
         $(function() {
             renderDeployments(currentDeployments);
             resetAccessModal();
+            $('#projectEditDropdownButton').on('click', function(event) {
+                event.stopPropagation();
+                const willOpen = $('#projectEditDropdownPanel').hasClass('hidden');
+                $('#projectEditDropdownPanel').toggleClass('hidden', !willOpen);
+                $(this).attr('aria-expanded', willOpen ? 'true' : 'false');
+            });
+            $('#projectEditDropdownPanel').on('click', function(event) {
+                event.stopPropagation();
+            });
+            $('#projectEditSearchInput').on('input', renderEditProjectOptions);
+            $('#projectEditList').on('click', 'li', function() {
+                setEditProjectSelection($(this).data('id'), $(this).data('name'));
+                $('#projectEditDropdownPanel').addClass('hidden');
+                $('#projectEditDropdownButton').attr('aria-expanded', 'false');
+            });
             $('#membershipForm').on('submit', saveAccess);
             $('#cancelAccessModal').on('click', closeAccessModal);
             $('.access-mode-button').on('click', function() {
@@ -4647,6 +4980,10 @@
                 if (!$(event.target).closest('#accessUserDropdownButton, #accessUserDropdownPanel').length) {
                     $('#accessUserDropdownPanel').addClass('hidden');
                 }
+                if (!$(event.target).closest('#projectEditDropdownButton, #projectEditDropdownPanel').length) {
+                    $('#projectEditDropdownPanel').addClass('hidden');
+                    $('#projectEditDropdownButton').attr('aria-expanded', 'false');
+                }
                 if (!$(event.target).closest('#versionPrereleaseDropdownButton, #versionPrereleaseDropdownPanel').length) {
                     $('#versionPrereleaseDropdownPanel').addClass('hidden');
                     $('#versionPrereleaseDropdownButton').attr('aria-expanded', 'false');
@@ -4699,109 +5036,15 @@
 
 </script>
 
-<!-- Project Details Modal -->
-<div id="projectModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 items-center justify-center flex">
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-hidden">
-        <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
-            <h3 id="modalProjectName" class="text-lg font-bold text-gray-800">Project Name</h3>
-            <button onclick="closeProjectModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
-                </svg>
-            </button>
-        </div>
-        <div class="p-6 space-y-4">
-            <div>
-                <h4 class="text-sm font-semibold text-gray-600">Project Description:</h4>
-                <p id="modalProjectDescription" class="text-sm text-gray-700">Description of the project will be here...</p>
-            </div>
-            <div>
-                <h4 class="text-sm font-semibold text-gray-600">Created At:</h4>
-                <p id="modalProjectCreatedAt" class="date-time-text text-sm text-gray-700">Project creation date will appear here...</p>
-            </div>
-            <div>
-                <h4 class="text-sm font-semibold text-gray-600">Source Link:</h4>
-                <a id="modalProjectSourceLink" href="#" target="_blank" class="text-sm text-yellow-500 hover:text-yellow-600 hover:underline">Source link will appear here...</a>
-            </div>
-            <div>
-                <h4 class="text-sm font-semibold text-gray-600">Project Status:</h4>
-                <span id="modalProjectStatus" class="px-2 py-1 rounded-full"></span>
-            </div>
-            <div>
-                <h4 class="text-sm font-semibold text-gray-600">Applications:</h4>
-                <ul id="modalProjectApplications" class="list-disc pl-5 text-sm text-gray-700"></ul>
-            </div>
-        </div>
-        <div class="p-4 border-t border-gray-200 bg-gray-100 text-right">
-            <button onclick="closeProjectModal()" class="btn btn-primary">
-                Close
-            </button>
-        </div>
-    </div>
-</div>
-
 <script>
-    function getStatusLabel(status) {
-        let statusClass = '';
-        switch (status) {
-            case 'Draft': statusClass = 'bg-gray-200 text-gray-800'; break;
-            case 'Planned': statusClass = 'bg-blue-200 text-blue-800'; break;
-            case 'In Progress': statusClass = 'bg-yellow-200 text-yellow-800'; break;
-            case 'On Hold': statusClass = 'bg-orange-200 text-orange-800'; break;
-            case 'Completed': statusClass = 'bg-green-200 text-green-800'; break;
-            case 'Cancelled': statusClass = 'bg-red-200 text-red-800'; break;
-            case 'Under Review': statusClass = 'bg-purple-200 text-purple-800'; break;
-            case 'Delayed': statusClass = 'bg-pink-200 text-pink-800'; break;
-            default: statusClass = 'bg-gray-200 text-gray-800';
-        }
-        return `<span class="px-2 py-1 rounded-full text-xs font-semibold ${statusClass}">${status}</span>`;
-    }
-
     function openProjectDetails(projectId) {
-        $.ajax({
-            url: `/project/${projectId}`,
-            type: 'GET',
-            success: function(project) {
-                $('#modalProjectName').text(project.name);
-                $('#modalProjectDescription').text(project.description || 'No description provided.');
-                $('#modalProjectCreatedAt').text(project.created_at);
-                if (project.source_link) {
-                    $('#modalProjectSourceLink').attr('href', project.source_link).text(project.source_link);
-                } else {
-                    $('#modalProjectSourceLink').attr('href', '#').text('No source link provided.');
-                }
-                $('#modalProjectStatus').html(getStatusLabel(project.status));
-
-                $('#modalProjectApplications').empty();
-                if (project.applications && project.applications.length > 0) {
-                    project.applications.forEach(function(app) {
-                        $('#modalProjectApplications').append(
-                            `<li>
-                                <a href="#" class="text-yellow-500 hover:text-yellow-600" 
-                                   onclick="window.loadPage('application_details', ${app.id}); return false;">
-                                    ${app.name}
-                                </a>
-                             </li>`
-                        );
-                    });
-                } else {
-                    $('#modalProjectApplications').append('<li>No applications associated.</li>');
-                }                
-
-                $('#projectModal').removeClass('hidden');
-            },
-            error: function(xhr) {
-                if (window.showAppAlert) {
-                    window.showAppAlert({ title: 'Error', text: 'Error fetching project details.', icon: 'error' });
-                } else {
-                    alert('Error fetching project details.');
-                }
-            }
-        });
-    }
-
-
-    function closeProjectModal() {
-        $('#projectModal').addClass('hidden');
+        const normalizedProjectId = Number(projectId);
+        if (!Number.isFinite(normalizedProjectId) || normalizedProjectId <= 0) return;
+        sessionStorage.setItem('pendingProjectDetailsId', String(normalizedProjectId));
+        if (window.loadPage) {
+            window.loadPage('projects');
+        } else {
+            window.location.href = '/projects';
+        }
     }
 </script>

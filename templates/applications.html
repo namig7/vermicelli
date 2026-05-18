@@ -2,6 +2,27 @@
 <div class="resource-page">
     {% include '_resource_page_styles.html' %}
     <style>
+        .resource-page .app-details-link.table-action-button .size-6 {
+            width: 1.5rem;
+            height: 1.5rem;
+            flex: 0 0 1.5rem;
+        }
+
+        .resource-page .app-row .app-row-name,
+        .resource-page .app-row .app-row-version {
+            transition: color 0.2s ease;
+        }
+
+        .resource-page .app-row:hover .app-row-name,
+        .resource-page .app-row:hover .app-row-version {
+            color: #b45309;
+        }
+
+        html[data-theme="dark"] .resource-page .app-row:hover .app-row-name,
+        html[data-theme="dark"] .resource-page .app-row:hover .app-row-version {
+            color: #fbbf24 !important;
+        }
+
         html[data-theme="dark"] .resource-page #myModal .bg-white {
             background-color: #1f2937 !important;
             color: #e5e7eb !important;
@@ -705,7 +726,7 @@
                     <td class="text-base text-gray-600 py-4 px-6 border-b border-gray-200">
                         <a
                             href="#"
-                            class="app-details-link responsive-name-link text-gray-800 hover:text-yellow-700 hover:underline"
+                            class="app-details-link responsive-name-link app-row-name text-gray-800 font-medium hover:text-yellow-700"
                             data-id="${app.id}"
                             title="${appName}"
                         >
@@ -713,7 +734,7 @@
                         </a>
                     </td>
                     <td class="hide-sm whitespace-nowrap text-base py-4 px-6 border-b border-gray-200">
-                        <span>${app.version_info || 'N/A'}</span>
+                        <span class="app-row-version text-gray-800 font-medium">${app.version_info || 'N/A'}</span>
                     </td>
                     <td class="date-time-text hide-sm whitespace-nowrap text-sm text-gray-600 py-4 px-5 border-b border-gray-200" title="${dateTitle}">
                         ${dateStr}
@@ -731,19 +752,8 @@
                                 data-id="${app.id}"
                                 aria-label="View Application Details"
                             >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                    class="w-6 h-6"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
-                                    />
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-2.25-1.313M21 7.5v2.25m0-2.25-2.25 1.313M3 7.5l2.25-1.313M3 7.5l2.25 1.313M3 7.5v2.25m9 3 2.25-1.313M12 12.75l-2.25-1.313M12 12.75V15m0 6.75 2.25-1.313M12 21.75V19.5m0 2.25-2.25-1.313m0-16.875L12 2.25l2.25 1.313M21 14.25v2.25l-2.25 1.313m-13.5 0L3 16.5v-2.25" />
                                 </svg>
                             </button>
 
