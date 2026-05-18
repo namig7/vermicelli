@@ -17,6 +17,12 @@
     </svg>
 {%- endmacro %}
 
+{% macro user_access_icon() -%}
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+    </svg>
+{%- endmacro %}
+
 {% macro admin_access_chip(member) -%}
     {% set is_current_user = member.user_id == session.get('user_id') %}
     <span class="admin-access-summary-chip inline-flex items-center rounded-full border px-3 py-1 text-sm {{ 'current-admin-access-chip border-blue-300 bg-blue-100 text-blue-900' if is_current_user else 'border-blue-200 bg-blue-50 text-blue-800' }}">
@@ -31,6 +37,8 @@
         <button type="button" class="open-access-user-details min-w-0 truncate text-left font-medium transition hover:text-yellow-700 {{ 'text-yellow-900' if is_current_user else 'text-gray-700' }}" data-user-id="{{ member.user_id }}" onclick="openApplicationAccessUser({{ member.user_id }}); return false;">{{ member.username }}</button>
         {% if manager %}
             <span class="ml-2 inline-flex items-center text-yellow-600" title="Manager" aria-label="Manager">{{ manager_access_icon() }}</span>
+        {% else %}
+            <span class="ml-2 inline-flex items-center text-gray-500" title="User" aria-label="User">{{ user_access_icon() }}</span>
         {% endif %}
         {% if can_remove and remove_scope == 'application' and manager and member.project_membership_id %}
             <button type="button" class="ml-2 inline-flex h-4 w-4 items-center justify-center text-gray-400 transition hover:text-red-600 delete-project-access" data-membership-id="{{ member.project_membership_id }}" onclick="deleteProjectAccess({{ member.project_membership_id }}); return false;" aria-label="Delete access">{{ access_remove_icon() }}</button>

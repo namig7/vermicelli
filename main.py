@@ -170,6 +170,7 @@ def utc_now():
 
 _USER_SCHEMA_READY = False
 _REPOSITORY_BRANCH_SCHEMA_READY = False
+_PROJECT_SCHEMA_READY = False
 _DATABASE_SCHEMA_READY_URI = None
 BACKUP_FORMAT = 'vermicelli-backup'
 BACKUP_VERSION = 1
@@ -324,6 +325,31 @@ def ensure_repository_branch_schema():
         logging.warning("Could not verify repository metadata schema: %s", error)
 
 
+def ensure_project_schema():
+    """Adds project metadata columns for existing local databases."""
+    global _PROJECT_SCHEMA_READY
+    if _PROJECT_SCHEMA_READY:
+        return
+    try:
+        inspector = inspect(db.engine)
+        if 'project' not in inspector.get_table_names():
+            return
+        existing_columns = {column['name'] for column in inspector.get_columns('project')}
+        datetime_column_type = 'TIMESTAMP' if db.engine.dialect.name == 'postgresql' else 'DATETIME'
+        if 'updated_at' not in existing_columns:
+            db.session.execute(text(
+                f"ALTER TABLE project ADD COLUMN updated_at {datetime_column_type}"
+            ))
+            db.session.execute(text(
+                "UPDATE project SET updated_at = COALESCE(created_at, start_date)"
+            ))
+            db.session.commit()
+        _PROJECT_SCHEMA_READY = True
+    except Exception as error:
+        db.session.rollback()
+        logging.warning("Could not verify project metadata schema: %s", error)
+
+
 def ensure_database_schema():
     """Creates missing tables once for the active database URI."""
     global _DATABASE_SCHEMA_READY_URI
@@ -343,6 +369,7 @@ def ensure_runtime_schema():
     ensure_database_schema()
     ensure_user_schema()
     ensure_repository_branch_schema()
+    ensure_project_schema()
 
 
 def json_error(message, status_code=403):
@@ -889,7 +916,7 @@ def apply_setup_runtime_config(values):
     if not database_config:
         return
 
-    global _USER_SCHEMA_READY, _REPOSITORY_BRANCH_SCHEMA_READY, _DATABASE_SCHEMA_READY_URI
+    global _USER_SCHEMA_READY, _REPOSITORY_BRANCH_SCHEMA_READY, _PROJECT_SCHEMA_READY, _DATABASE_SCHEMA_READY_URI
     database_uri = database_uri_from_setup_config(database_config)
     db.session.remove()
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
@@ -912,6 +939,7 @@ def apply_setup_runtime_config(values):
     engines[None] = db._make_engine(None, engine_options, app)
     _USER_SCHEMA_READY = False
     _REPOSITORY_BRANCH_SCHEMA_READY = False
+    _PROJECT_SCHEMA_READY = False
     _DATABASE_SCHEMA_READY_URI = None
 
 
@@ -1443,9 +1471,20 @@ class Project(db.Model):
     source_link = db.Column(db.String(255))
     status = db.Column(db.String(50), nullable=False, default='Draft')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     start_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     applications = db.relationship('Application', secondary=project_applications, back_populates='projects')
     memberships = db.relationship('ProjectMembership', back_populates='project', cascade='all, delete-orphan')
+
+
+def touch_project(project):
+    if project is not None:
+        project.updated_at = datetime.utcnow()
+
+
+def touch_projects(projects):
+    for project in projects or []:
+        touch_project(project)
 
 ### Helper: basic URL validation
 def is_valid_url(url: str) -> bool:
@@ -2029,6 +2068,7 @@ def serialize_backup_payload():
                     'source_link': project.source_link or '',
                     'status': project.status,
                     'created_at': backup_datetime(project.created_at),
+                    'updated_at': backup_datetime(project.updated_at),
                     'start_date': backup_datetime(project.start_date),
                 }
                 for project in Project.query.order_by(Project.id).all()
@@ -2326,6 +2366,7 @@ def import_backup_payload(payload):
                 source_link=row.get('source_link') or '',
                 status=row.get('status') or 'Draft',
                 created_at=parse_backup_datetime(row.get('created_at')) or datetime.utcnow(),
+                updated_at=parse_backup_datetime(row.get('updated_at')) or parse_backup_datetime(row.get('created_at')) or datetime.utcnow(),
                 start_date=parse_backup_datetime(row.get('start_date')) or datetime.utcnow(),
             ))
 
@@ -2807,6 +2848,7 @@ def edit_application(app_id):
     if not can_write_application(current, app_obj):
         return json_error('You do not have permission to update this application.', 403)
 
+    previous_projects = list(app_obj.projects)
     app_obj.name = data.get('name').strip()
     app_obj.link = data.get('link', '').strip()
     app_obj.label = data.get('label', '').strip()
@@ -2828,6 +2870,7 @@ def edit_application(app_id):
         return jsonify({'error': 'Application name cannot be empty'}), 400
 
     try:
+        touch_projects({project.id: project for project in previous_projects + list(app_obj.projects)}.values())
         db.session.commit()
         return jsonify({'message': 'Application updated successfully'})
     except IntegrityError:
@@ -2873,6 +2916,7 @@ def create_application():
 
         db.session.add(new_app)
         db.session.flush()
+        touch_projects(projects)
 
         initial_version = Version(
             application_id=new_app.id,
@@ -3208,12 +3252,18 @@ def get_project_details(project_id):
     if not has_project_access(current, project_id, ACCESS_VIEW_ONLY):
         return json_error('You do not have access to this project.', 403)
     project_access_level = project_access_level_for_user(current, project_id)
+
+    def latest_application_version_number(app_obj):
+        latest_version = Version.query.filter_by(application_id=app_obj.id).order_by(Version.change_date.desc()).first()
+        return latest_version.number if latest_version else 'No versions available'
+
     return jsonify({
         'id': project.id,
         'name': project.name,
         'description': project.description,
         'source_link': project.source_link,
-        'created_at': format_date_for_user(project.created_at, current),
+        'created_at': format_datetime_for_user(project.created_at, current),
+        'updated_at': format_datetime_for_user(project.updated_at or project.created_at, current),
         'status': project.status,
         'access_level': project_access_level,
         'access_label': access_label(project_access_level),
@@ -3221,6 +3271,7 @@ def get_project_details(project_id):
         'project_role_label': project_role_display_label(current, project_id),
         'project_role_code': project_role_display_code(current, project_id),
         'can_edit': can_manage_project_resource(current, project_id),
+        'access_summary': serialize_project_access_summary(project, current),
         'applications': [
             {
                 'id': app.id,
@@ -3229,6 +3280,7 @@ def get_project_details(project_id):
                 'access_label': access_label(application_access_level_for_user(current, app)),
                 'access_code': access_code(application_access_level_for_user(current, app)),
                 'can_view': can_view_application(current, app),
+                'current_version': latest_application_version_number(app),
             }
             for app in project.applications
             if is_project_admin(current, project_id) or has_platform_role(current, PLATFORM_ADMIN) or can_view_application(current, app)
@@ -3251,6 +3303,73 @@ def search_applications():
     applications = applications_query.all()
     result = [{'id': app.id, 'name': app.name} for app in applications]
     return jsonify(result)
+
+
+def serialize_project_application_option(app_obj, current):
+    latest_version = Version.query.filter_by(application_id=app_obj.id).order_by(Version.change_date.desc()).first()
+    return {
+        'id': app_obj.id,
+        'name': app_obj.name,
+        'current_version': latest_version.number if latest_version else 'No versions available',
+        'access_label': access_label(application_access_level_for_user(current, app_obj)),
+        'access_code': access_code(application_access_level_for_user(current, app_obj)),
+    }
+
+
+@app.route('/api/projects/<int:project_id>/available_applications')
+@login_required
+def available_project_applications(project_id):
+    project = Project.query.get_or_404(project_id)
+    current = get_current_user()
+    if not can_manage_project_resource(current, project_id):
+        return json_error('You do not have permission to link applications to this project.', 403)
+
+    query = Application.query.filter(~Application.projects.any())
+    applications = [
+        app_obj for app_obj in query.order_by(Application.name).all()
+        if can_write_application(current, app_obj)
+    ]
+    return jsonify([serialize_project_application_option(app_obj, current) for app_obj in applications])
+
+
+@app.route('/api/projects/<int:project_id>/applications', methods=['POST'])
+@login_required
+def link_project_application(project_id):
+    project = Project.query.get_or_404(project_id)
+    current = get_current_user()
+    if not can_manage_project_resource(current, project_id):
+        return json_error('You do not have permission to link applications to this project.', 403)
+
+    data = request.get_json(silent=True) or {}
+    application_id = data.get('application_id')
+    app_obj = Application.query.get_or_404(application_id)
+    if not can_write_application(current, app_obj):
+        return json_error('You do not have permission to link this application.', 403)
+    if app_obj.projects and project not in app_obj.projects:
+        return json_error('This application is already linked to another project.', 400)
+
+    if app_obj not in project.applications:
+        project.applications.append(app_obj)
+        touch_project(project)
+        db.session.commit()
+    return jsonify({'message': 'Application linked successfully.'})
+
+
+@app.route('/api/projects/<int:project_id>/applications/<int:application_id>', methods=['DELETE'])
+@login_required
+def unlink_project_application(project_id, application_id):
+    project = Project.query.get_or_404(project_id)
+    current = get_current_user()
+    if not can_manage_project_resource(current, project_id):
+        return json_error('You do not have permission to remove applications from this project.', 403)
+
+    app_obj = Application.query.get_or_404(application_id)
+    if app_obj in project.applications:
+        project.applications.remove(app_obj)
+        touch_project(project)
+        db.session.commit()
+    return jsonify({'message': 'Application removed from project.'})
+
 
 @app.route('/edit_project/<int:project_id>', methods=['POST'])
 @login_required
@@ -3285,6 +3404,7 @@ def edit_project(project_id):
     project.description = description
     project.source_link = source_link
     project.status = status or project.status
+    touch_project(project)
 
     try:
         db.session.commit()
@@ -3537,6 +3657,53 @@ def serialize_application_access_summary(app_obj, viewer=None):
         'project_operators': project_operators,
         'application_read_write': effective_read_write,
         'application_read_only': effective_read_only,
+    }
+
+
+def serialize_project_access_summary(project, viewer=None):
+    project_memberships = ProjectMembership.query.join(User).filter(
+        ProjectMembership.project_id == project.id,
+        User.is_active.is_(True)
+    ).order_by(User.username).all()
+
+    managers = []
+    operators = []
+    for membership in project_memberships:
+        user_data = {
+            'membership_id': membership.id,
+            'can_remove_access': can_manage_project_membership(viewer, project.id, membership.user),
+            'user_id': membership.user_id,
+            'username': membership.user.username,
+            'full_name': membership.user.full_name or '',
+            'project_role': membership.project_role,
+            'project_role_label': project_role_label(membership.project_role),
+            'access_level': membership.access_level,
+            'access_label': access_label(membership.access_level),
+        }
+        if membership.project_role == PROJECT_ADMIN:
+            managers.append(user_data)
+        elif membership.project_role == PROJECT_USER:
+            operators.append(user_data)
+
+    include_platform_admins = has_platform_role(viewer, PLATFORM_ADMIN)
+    platform_admins = []
+    if include_platform_admins:
+        platform_admins = [
+            {
+                'user_id': user.id,
+                'username': user.username,
+                'full_name': user.full_name or '',
+                'platform_role': user.platform_role,
+                'platform_role_label': PLATFORM_ROLE_LABELS.get(user.platform_role, user.platform_role),
+            }
+            for user in User.query.filter_by(is_active=True, platform_role=PLATFORM_ADMIN).order_by(User.username).all()
+        ]
+
+    return {
+        'platform_admins': platform_admins,
+        'show_platform_admin_names': include_platform_admins,
+        'managers': managers,
+        'operators': operators,
     }
 
 
@@ -4001,6 +4168,7 @@ def create_project_membership():
     db.session.add(membership)
     if project_role == PROJECT_ADMIN:
         ensure_project_applications_read_write_access(user_id, project)
+    touch_project(project)
     db.session.commit()
     return jsonify(serialize_membership(membership)), 201
 
@@ -4024,6 +4192,7 @@ def update_project_membership(membership_id):
     membership.access_level = ACCESS_READ_WRITE if project_role == PROJECT_ADMIN else ACCESS_VIEW_ONLY
     if project_role == PROJECT_ADMIN:
         ensure_project_applications_read_write_access(membership.user_id, membership.project)
+    touch_project(membership.project)
     db.session.commit()
     return jsonify(serialize_membership(membership))
 
@@ -4108,6 +4277,7 @@ def delete_project_membership(membership_id):
     elif membership.project_role == PROJECT_ADMIN:
         ensure_project_applications_read_write_access(membership.user_id, membership.project)
 
+    touch_project(membership.project)
     db.session.delete(membership)
     db.session.commit()
     return jsonify({
@@ -4179,6 +4349,10 @@ def create_application_membership():
         access_level=access_level
     )
     db.session.add(membership)
+    if project_id:
+        touch_project(project)
+    else:
+        touch_projects(app_obj.projects)
     db.session.commit()
     return jsonify(serialize_application_membership(membership)), 201
 
@@ -4204,6 +4378,10 @@ def update_application_membership(membership_id):
         return json_error('You do not have permission to update this application membership.', 403)
 
     membership.access_level = access_level
+    if project_id:
+        touch_project(project)
+    else:
+        touch_projects(membership.application.projects)
     db.session.commit()
     return jsonify(serialize_application_membership(membership))
 
@@ -4216,7 +4394,9 @@ def delete_application_membership(membership_id):
     if not can_manage_application_membership(current, membership.application, membership.user):
         return json_error('You do not have permission to delete this application membership.', 403)
 
+    touched_projects = list(membership.application.projects)
     db.session.delete(membership)
+    touch_projects(touched_projects)
     db.session.commit()
     return jsonify({'message': 'Application membership deleted successfully'})
 
@@ -4255,6 +4435,7 @@ def bulk_update_application_memberships():
         access_by_application[int(application_id)] = access_level
 
     updated = []
+    touched_projects = {project.id: project}
     for user_id in user_ids:
         target_user = User.query.get_or_404(user_id)
         if not can_manage_project_membership(current, project_id, target_user):
@@ -4304,6 +4485,7 @@ def bulk_update_application_memberships():
                 db.session.add(app_membership)
             updated.append(app_membership)
 
+    touch_projects(touched_projects.values())
     db.session.commit()
     return jsonify({
         'message': 'Application access updated successfully.',

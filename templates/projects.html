@@ -30,6 +30,244 @@
             color: #b45309;
         }
 
+        .resource-page .membership-role-button {
+            border-radius: 9999px;
+        }
+
+        .resource-page .membership-role-button.is-active {
+            background-color: #fcd34d;
+            color: #78350f;
+            box-shadow: 0 1px 2px rgba(180, 83, 9, 0.12);
+        }
+
+        .resource-page .membership-role-button:not(.is-active) {
+            color: #4b5563;
+        }
+
+        .resource-page .membership-role-button:not(.is-active):not(:disabled):hover {
+            background-color: #fef3c7;
+            color: #b45309;
+        }
+
+        .resource-page .project-access-locked-select {
+            background-color: #f3f4f6 !important;
+            color: #6b7280 !important;
+            opacity: 0.72;
+        }
+
+        .resource-page .project-status-options li,
+        .resource-page #projectAccessUserList li {
+            transition: background-color 0.15s ease, color 0.15s ease;
+        }
+
+        .resource-page .project-title-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.6rem;
+            height: 1.6rem;
+            flex: 0 0 1.6rem;
+            color: #6b7280;
+        }
+
+        .resource-page .project-title-icon svg {
+            width: 1.35rem;
+            height: 1.35rem;
+            stroke-width: 1.75;
+        }
+
+        .resource-page .project-detail-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.75rem;
+            height: 1.75rem;
+            flex: 0 0 1.75rem;
+            color: #6b7280;
+        }
+
+        .resource-page .project-detail-icon svg {
+            width: 1.5rem;
+            height: 1.5rem;
+            stroke-width: 1.75;
+        }
+
+        .resource-page .project-section-heading {
+            display: flex;
+            min-width: 0;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .resource-page .project-repository-card {
+            display: flex;
+            align-items: stretch;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-top: 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            background: #f9fafb;
+            padding: 0.75rem;
+        }
+
+        .resource-page .project-repository-card-link {
+            display: flex;
+            min-width: 0;
+            flex: 1 1 auto;
+            align-items: center;
+            gap: 0.75rem;
+            border-radius: 0.5rem;
+            padding: 0.45rem 0.5rem;
+            color: #111827;
+        }
+
+        .resource-page .project-repository-input {
+            min-height: 2.1rem;
+            width: 100%;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            padding: 0.35rem 0.55rem;
+            font-size: 0.875rem;
+            color: #111827;
+        }
+
+        .resource-page .project-description-content {
+            height: 5.5rem;
+            min-height: 5.5rem;
+            max-height: 5.5rem;
+            overflow-y: auto;
+        }
+
+        .resource-page #modalProjectDescriptionDisplay {
+            overflow-y: auto;
+        }
+
+        .resource-page #modalProjectDescription {
+            resize: none;
+        }
+
+        .resource-page .project-repository-input:focus {
+            border-color: #f59e0b;
+            outline: none;
+            box-shadow: 0 0 0 1px #f59e0b;
+        }
+
+        .resource-page .project-access-remove-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1rem;
+            height: 1rem;
+            flex: 0 0 auto;
+            border-radius: 9999px;
+            color: #9ca3af;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .resource-page .project-access-remove-button:hover {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .resource-page .project-detail-tile {
+            min-width: 0;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: #ffffff;
+            padding: 1rem;
+        }
+
+        .resource-page .project-detail-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0;
+            text-transform: uppercase;
+            color: #6b7280;
+        }
+
+        .resource-page .project-detail-value {
+            margin-top: 0.35rem;
+            color: #111827;
+            font-size: 0.875rem;
+            overflow-wrap: anywhere;
+        }
+
+        .resource-page a.project-repository-card-link:hover {
+            background: #fffbeb;
+            color: #92400e;
+        }
+
+        .resource-page .project-repository-card-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.25rem;
+            height: 2.25rem;
+            flex: 0 0 2.25rem;
+            border-radius: 0.5rem;
+            background: transparent;
+            color: #6b7280;
+        }
+
+        .resource-page .project-repository-card-icon svg {
+            width: 1.2rem;
+            height: 1.2rem;
+        }
+
+        .resource-page .project-repository-card-actions {
+            display: flex;
+            flex: 0 0 auto;
+            align-items: center;
+            gap: 0.25rem;
+            border-left: 1px solid #e5e7eb;
+            padding-left: 0.75rem;
+        }
+
+        .resource-page .project-application-card {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto auto auto;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .resource-page .project-application-remove {
+            justify-self: end;
+        }
+
+        .resource-page .project-application-separator {
+            color: #d1d5db;
+            font-size: 0.875rem;
+            line-height: 1;
+        }
+
+        .resource-page .new-project-fieldset {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: #f9fafb;
+            padding: 1rem;
+        }
+
+        .resource-page .new-project-fieldset textarea {
+            resize: none;
+        }
+
+        .swal2-popup.resource-page-swal {
+            background: #ffffff !important;
+            color: #374151 !important;
+        }
+
+        .swal2-popup.resource-page-swal .swal2-title,
+        .swal2-popup.resource-page-swal .swal2-html-container {
+            color: #1f2937 !important;
+        }
+
+        .swal2-popup.resource-page-swal .swal2-input {
+            color: #111827 !important;
+            background: #ffffff !important;
+            border-color: #d1d5db !important;
+        }
+
         html[data-theme="dark"] .resource-page .project-inline-icon-button {
             color: #cbd5e1;
         }
@@ -39,15 +277,264 @@
             color: #fffbeb;
         }
 
+        html[data-theme="dark"] .swal2-popup.resource-page-swal {
+            background: #1f2937 !important;
+            color: #e5e7eb !important;
+            border: 1px solid #374151;
+        }
+
+        html[data-theme="dark"] .swal2-popup.resource-page-swal .swal2-title,
+        html[data-theme="dark"] .swal2-popup.resource-page-swal .swal2-html-container,
+        html[data-theme="dark"] .swal2-popup.resource-page-swal .swal2-validation-message {
+            color: #f9fafb !important;
+        }
+
+        html[data-theme="dark"] .swal2-popup.resource-page-swal .swal2-input {
+            background: #111827 !important;
+            border-color: #4b5563 !important;
+            color: #f9fafb !important;
+        }
+
+        html[data-theme="dark"] .swal2-popup.resource-page-swal .swal2-input:focus {
+            border-color: #f59e0b !important;
+            box-shadow: 0 0 0 1px #f59e0b !important;
+        }
+
+        html[data-theme="dark"] .swal2-popup.resource-page-swal .btn-primary,
+        html[data-theme="dark"] .swal2-popup.resource-page-swal .btn-success,
+        html[data-theme="dark"] .swal2-popup.resource-page-swal .btn-info {
+            background-color: #f59e0b !important;
+            color: #111827 !important;
+        }
+
+        html[data-theme="dark"] .swal2-popup.resource-page-swal .btn-secondary {
+            background-color: #111827 !important;
+            border-color: #4b5563 !important;
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] .swal2-popup.resource-page-swal .btn-danger {
+            background-color: #7f1d1d !important;
+            color: #fee2e2 !important;
+        }
+
+        html[data-theme="dark"] .resource-page #projectModal .bg-white,
+        html[data-theme="dark"] .resource-page #newProjectModal .bg-white,
+        html[data-theme="dark"] .resource-page #projectAccessModal .bg-white,
+        html[data-theme="dark"] .resource-page #projectApplicationModal .bg-white {
+            background-color: #1f2937 !important;
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] .resource-page #projectModal .bg-gray-100,
+        html[data-theme="dark"] .resource-page #projectModal .bg-gray-50,
+        html[data-theme="dark"] .resource-page #newProjectModal .bg-gray-100,
+        html[data-theme="dark"] .resource-page #newProjectModal .bg-gray-50,
+        html[data-theme="dark"] .resource-page #projectAccessModal .bg-gray-100,
+        html[data-theme="dark"] .resource-page #projectAccessModal .bg-gray-50,
+        html[data-theme="dark"] .resource-page #projectApplicationModal .bg-gray-100,
+        html[data-theme="dark"] .resource-page #projectApplicationModal .bg-gray-50 {
+            background-color: #111827 !important;
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] .resource-page #projectModal .border-gray-200,
+        html[data-theme="dark"] .resource-page #newProjectModal .border-gray-200,
+        html[data-theme="dark"] .resource-page #projectAccessModal .border-gray-200,
+        html[data-theme="dark"] .resource-page #projectApplicationModal .border-gray-200 {
+            border-color: #374151 !important;
+        }
+
+        html[data-theme="dark"] .resource-page #projectModal input,
+        html[data-theme="dark"] .resource-page #projectModal textarea,
+        html[data-theme="dark"] .resource-page #projectModal button[aria-haspopup="listbox"],
+        html[data-theme="dark"] .resource-page #newProjectModal input,
+        html[data-theme="dark"] .resource-page #newProjectModal textarea,
+        html[data-theme="dark"] .resource-page #newProjectModal button[aria-haspopup="listbox"],
+        html[data-theme="dark"] .resource-page #projectAccessModal input,
+        html[data-theme="dark"] .resource-page #projectAccessModal button[aria-haspopup="listbox"],
+        html[data-theme="dark"] .resource-page #projectApplicationModal input,
+        html[data-theme="dark"] .resource-page #projectApplicationModal button[aria-haspopup="listbox"] {
+            border-color: #4b5563 !important;
+            background-color: #111827 !important;
+            color: #f9fafb !important;
+        }
+
+        html[data-theme="dark"] .resource-page #projectModal input:focus,
+        html[data-theme="dark"] .resource-page #projectModal textarea:focus,
+        html[data-theme="dark"] .resource-page #projectModal button[aria-haspopup="listbox"]:focus,
+        html[data-theme="dark"] .resource-page #newProjectModal input:focus,
+        html[data-theme="dark"] .resource-page #newProjectModal textarea:focus,
+        html[data-theme="dark"] .resource-page #newProjectModal button[aria-haspopup="listbox"]:focus,
+        html[data-theme="dark"] .resource-page #projectAccessModal input:focus,
+        html[data-theme="dark"] .resource-page #projectAccessModal button[aria-haspopup="listbox"]:focus,
+        html[data-theme="dark"] .resource-page #projectApplicationModal input:focus,
+        html[data-theme="dark"] .resource-page #projectApplicationModal button[aria-haspopup="listbox"]:focus {
+            border-color: #f59e0b !important;
+            box-shadow: 0 0 0 1px #f59e0b !important;
+        }
+
+        html[data-theme="dark"] .resource-page .membership-role-button:not(.is-active) {
+            color: #d1d5db !important;
+        }
+
+        html[data-theme="dark"] .resource-page .membership-role-button.is-active {
+            background-color: #f59e0b !important;
+            color: #111827 !important;
+        }
+
+        html[data-theme="dark"] .resource-page .membership-role-button:not(.is-active):not(:disabled):hover {
+            background-color: #374151 !important;
+            color: #fbbf24 !important;
+        }
+
+        html[data-theme="dark"] .resource-page .project-status-options,
+        html[data-theme="dark"] .resource-page #projectAccessUserDropdownPanel,
+        html[data-theme="dark"] .resource-page #projectApplicationDropdownPanel {
+            background-color: #111827 !important;
+            border: 1px solid #374151;
+            color: #e5e7eb;
+        }
+
+        html[data-theme="dark"] .resource-page .project-status-options li,
+        html[data-theme="dark"] .resource-page #projectAccessUserList li,
+        html[data-theme="dark"] .resource-page #projectApplicationList li {
+            color: #e5e7eb !important;
+        }
+
+        html[data-theme="dark"] .resource-page .project-status-options li:hover,
+        html[data-theme="dark"] .resource-page #projectAccessUserList li:hover,
+        html[data-theme="dark"] .resource-page #projectApplicationList li:hover {
+            background-color: #374151 !important;
+            color: #fbbf24 !important;
+        }
+
+        html[data-theme="dark"] .resource-page #projectAccessUserList li[aria-disabled="true"],
+        html[data-theme="dark"] .resource-page #projectAccessUserList li[aria-disabled="true"]:hover {
+            background-color: transparent !important;
+            color: #9ca3af !important;
+        }
+
+        html[data-theme="dark"] .resource-page .project-access-locked-select {
+            background-color: #111827 !important;
+            color: #9ca3af !important;
+            border-color: #4b5563 !important;
+        }
+
+        html[data-theme="dark"] .resource-page .project-repository-card {
+            background: #111827;
+            border-color: #4b5563;
+        }
+
+        html[data-theme="dark"] .resource-page .project-repository-card-link {
+            color: #f3f4f6;
+        }
+
+        html[data-theme="dark"] .resource-page .project-repository-input {
+            background: #111827;
+            border-color: #4b5563;
+            color: #f3f4f6;
+        }
+
+        html[data-theme="dark"] .resource-page .project-detail-tile {
+            background: #111827;
+            border-color: #4b5563;
+        }
+
+        html[data-theme="dark"] .resource-page .project-detail-value {
+            color: #f3f4f6;
+        }
+
+        html[data-theme="dark"] .resource-page a.project-repository-card-link:hover {
+            background: #451a03;
+            color: #fde68a;
+        }
+
+        html[data-theme="dark"] .resource-page .project-repository-card-icon,
+        html[data-theme="dark"] .resource-page .project-detail-icon,
+        html[data-theme="dark"] .resource-page .project-title-icon {
+            color: #cbd5e1;
+        }
+
+        html[data-theme="dark"] .resource-page .project-repository-card-actions {
+            border-color: #4b5563;
+        }
+
+        html[data-theme="dark"] .resource-page .new-project-fieldset {
+            background: #111827;
+            border-color: #4b5563;
+        }
+
+        @media (max-width: 640px) {
+            .resource-page .project-application-card {
+                grid-template-columns: minmax(0, 1fr) auto auto;
+            }
+
+            .resource-page .project-application-card .project-application-access {
+                grid-column: 1 / 2;
+                justify-self: start;
+            }
+
+            .resource-page .project-application-separator {
+                grid-column: 2 / 3;
+                grid-row: 1 / 3;
+                align-self: center;
+            }
+
+            .resource-page .project-application-remove {
+                grid-column: 3 / 4;
+                grid-row: 1 / 3;
+                align-self: center;
+            }
+        }
+
         .resource-page .project-admin-access-badge {
             border-color: var(--projects-coral-border) !important;
             background-color: var(--projects-coral-chip) !important;
             color: var(--projects-coral-text) !important;
         }
 
+        .resource-page .project-admin-access-badge .admin-access-summary-icon {
+            color: var(--projects-coral-text) !important;
+        }
+
+        .resource-page .project-platform-admin-card {
+            border: 1px solid var(--projects-coral-border);
+            border-radius: 0.75rem;
+            background: #fff1ed;
+            padding: 1rem;
+        }
+
+        .resource-page .project-platform-admin-card .project-platform-admin-title {
+            color: var(--projects-coral-text);
+        }
+
+        .resource-page .project-platform-admin-card .project-platform-admin-copy {
+            color: #374151;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
         html[data-theme="dark"] .resource-page .project-admin-access-badge {
             border-color: #f28b73 !important;
             background-color: #e76f51 !important;
+            color: #fed7cc !important;
+        }
+
+        html[data-theme="dark"] .resource-page .project-platform-admin-card {
+            border-color: #f28b73;
+            background: rgba(231, 111, 81, 0.18);
+        }
+
+        html[data-theme="dark"] .resource-page .project-platform-admin-card .project-platform-admin-title {
+            color: #fed7cc;
+        }
+
+        html[data-theme="dark"] .resource-page .project-platform-admin-card .project-platform-admin-copy {
+            color: #f3f4f6;
+        }
+
+        html[data-theme="dark"] .resource-page .project-admin-access-badge .admin-access-summary-icon {
             color: #fed7cc !important;
         }
     </style>
@@ -100,83 +587,70 @@
         </div>
     </div>
 
-    <div id="newProjectModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center">
+    <div id="newProjectModal" class="hidden fixed inset-0 z-50 overflow-visible bg-gray-800 bg-opacity-75 flex justify-center items-center p-4">
         <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-visible relative">
             <div class="rounded-t-md shadow-sm flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
                 <h3 class="text-lg font-bold text-gray-800">Create Project</h3>
-                <button onclick="closeNewProjectModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
-                    <svg class="w-6 h-6 my-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <button onclick="closeNewProjectModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none" aria-label="Close project creator">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
             <div class="p-6 space-y-4">
-                <form id="newProjectForm">
-                    <div>
-                        <h4 class="text-sm font-semibold text-gray-600 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6 mr-2 my-1">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 10.5v6m3-3H9m4.06-7.19-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
-                            </svg>
-                            <label for="projectName" class="text-sm font-semibold text-gray-600 flex items-center">
-                                Name<span class="text-red-500">*</span>
-                            </label>
-                        </h4>
+                <form id="newProjectForm" class="space-y-4">
+                    <div class="new-project-fieldset">
+                        <label for="projectName" class="block text-sm font-medium text-gray-700">
+                            Project Name <span class="text-red-500">*</span>
+                        </label>
                         <input type="text" id="projectName" name="projectName"
-                               class="form-input block w-full mt-1 border border-gray-300 rounded-md shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500" required>
+                               class="form-input mt-1 block w-full focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500"
+                               autocomplete="off"
+                               required>
                     </div>
                     <div>
-                        <h4 class="text-sm font-semibold text-gray-600 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6 mr-2 my-1">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
-                            </svg>
-                            <label for="projectDescription" class="flex items-center text-sm font-medium text-gray-700">
-                                Description:
-                            </label>
-                        </h4>
+                        <label for="projectDescription" class="block text-sm font-medium text-gray-700">
+                            Description
+                        </label>
                         <textarea id="projectDescription" name="projectDescription" rows="3"
-                                  class="form-textarea block w-full mt-1 border border-gray-300 rounded-md shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500"></textarea>
+                                  class="form-textarea mt-1 block w-full focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500"
+                                  placeholder="Short project context"></textarea>
                     </div>
                     <div>
-                        <h4 class="text-sm font-semibold text-gray-600 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6 mr-2 my-1">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
-                            </svg>
-                            <label for="projectSourceLink" class="flex items-center text-sm font-medium text-gray-700">
-                                URL:
-                            </label>
-                        </h4>
+                        <label for="projectSourceLink" class="block text-sm font-medium text-gray-700">
+                            Project URL
+                        </label>
                         <input type="url" id="projectSourceLink" name="projectSourceLink"
-                               class="form-input block w-full mt-1 border border-gray-300 rounded-md shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500"
-                               placeholder="https://">
+                               class="form-input mt-1 block w-full focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500"
+                               placeholder="https://github.com/username/repo"
+                               inputmode="url"
+                               autocomplete="off"
+                               autocapitalize="none"
+                               spellcheck="false">
                     </div>
                     <div>
-                        <h4 class="text-sm font-semibold text-gray-600 flex items-center mb-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6 mr-2 my-1">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605" />
-                            </svg>
-                            <label id="projectStatus-label" class="block text-sm font-medium text-gray-700">
-                            </label>
-                            Status:<span class="text-red-500">*</span>
-                        </h4>
+                        <label id="projectStatus-label" class="block text-sm font-medium text-gray-700">
+                            Status <span class="text-red-500">*</span>
+                        </label>
                         <div class="relative mt-1">
                             <button type="button"
                                     id="projectStatus-button"
                                     class="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500 sm:text-sm"
                                     aria-haspopup="listbox" aria-expanded="false" aria-labelledby="projectStatus-label">
-                                <span class="block truncate" id="projectStatus-selected">Select Status</span>
+                                <span class="block truncate text-yellow-600" id="projectStatus-selected">Draft</span>
                                 <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                                     <svg class="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                                         <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.23 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
                                     </svg>
                                 </span>
                             </button>
-                            <ul class="absolute z-30 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm hidden"
+                            <ul class="project-status-options absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm hidden"
                                 id="projectStatus-options"
                                 role="listbox"
                                 aria-labelledby="projectStatus-label"
                                 aria-activedescendant="">
-                                <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-200 hover:text-yellow-800"
+                                <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-100 hover:text-yellow-800"
                                     data-value="Draft">
                                     <span class="block truncate">Draft</span>
                                     <span class="absolute inset-y-0 right-0 flex items-center pr-4 hidden">
@@ -187,7 +661,7 @@
                                         </svg>
                                     </span>
                                 </li>
-                                <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-200 hover:text-yellow-800"
+                                <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-100 hover:text-yellow-800"
                                     data-value="Planned">
                                     <span class="block truncate">Planned</span>
                                     <span class="absolute inset-y-0 right-0 flex items-center pr-4 hidden">
@@ -198,7 +672,7 @@
                                         </svg>
                                     </span>
                                 </li>
-                                <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-200 hover:text-yellow-800"
+                                <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-100 hover:text-yellow-800"
                                     data-value="In Progress">
                                     <span class="block truncate">In Progress</span>
                                     <span class="absolute inset-y-0 right-0 flex items-center pr-4 hidden">
@@ -209,7 +683,7 @@
                                         </svg>
                                     </span>
                                 </li>
-                                <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-200 hover:text-yellow-800"
+                                <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-100 hover:text-yellow-800"
                                     data-value="Completed">
                                     <span class="block truncate">Completed</span>
                                     <span class="absolute inset-y-0 right-0 flex items-center pr-4 hidden">
@@ -222,6 +696,7 @@
                                 </li>
                             </ul>
                         </div>
+                        <input type="hidden" id="projectStatus-hidden" name="projectStatus" value="Draft">
                     </div>
                 </form>
             </div>
@@ -237,19 +712,22 @@
 
     <div id="projectModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 px-4 py-6 sm:px-6">
         <div class="flex min-h-full items-center justify-center">
-            <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl mx-auto overflow-hidden relative">
+            <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[calc(100vh-3rem)] mx-auto overflow-y-auto relative">
                 <div class="border-b border-gray-200 bg-gray-100 px-5 py-4">
                     <div class="flex items-start justify-between gap-4">
                         <div class="min-w-0 flex-1">
                             <div class="flex min-w-0 flex-wrap items-center gap-2 pr-8">
+                                <span class="project-title-icon" aria-hidden="true">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 9.776c.112-.017.227-.026.344-.026h15.812c.117 0 .232.009.344.026m-16.5 0a2.25 2.25 0 0 0-1.883 2.542l.857 6a2.25 2.25 0 0 0 2.227 1.932H19.05a2.25 2.25 0 0 0 2.227-1.932l.857-6a2.25 2.25 0 0 0-1.883-2.542m-16.5 0V6A2.25 2.25 0 0 1 6 3.75h3.879a1.5 1.5 0 0 1 1.06.44l2.122 2.12a1.5 1.5 0 0 0 1.06.44H18A2.25 2.25 0 0 1 20.25 9v.776" />
+                                    </svg>
+                                </span>
                                 <span id="modalProjectNameDisplay" class="min-w-0 break-words text-xl font-bold text-gray-800"></span>
                                 <input type="text" id="modalProjectNameInput" class="hidden min-w-0 flex-1 rounded-md border border-gray-300 p-2 focus:outline-none focus:ring-1 focus:ring-yellow-500" />
                                 <button id="editNameBtn" class="project-inline-icon-button flex-shrink-0 focus:outline-none" aria-label="Edit project name" title="Edit project name"></button>
                             </div>
                             <div class="mt-2 flex flex-wrap items-center gap-2 text-sm text-gray-500">
                                 <span id="modalProjectIdDisplay" class="inline-flex items-center rounded-md border border-gray-200 bg-white px-2.5 py-1 text-xs font-semibold text-gray-600"></span>
-                                <span id="modalProjectStatusBadge"></span>
-                                <span class="date-time-text" id="modalProjectCreatedAt">Date*</span>
                                 <span id="modalProjectAccessLevel" class="inline-flex items-center rounded-md border border-gray-200 bg-white px-2.5 py-1 text-xs font-semibold text-gray-600"></span>
                             </div>
                         </div>
@@ -265,7 +743,14 @@
                     <div class="space-y-4 lg:col-span-3">
                         <section class="rounded-lg border border-gray-200 bg-white p-4">
                             <div class="mb-3 flex items-center justify-between gap-3">
-                                <h4 class="text-sm font-semibold text-gray-800">Overview</h4>
+                                <div class="project-section-heading">
+                                    <span class="project-detail-icon" aria-hidden="true">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
+                                        </svg>
+                                    </span>
+                                    <h4 class="text-sm font-semibold text-gray-800">Overview</h4>
+                                </div>
                                 <div class="relative w-44">
                                     <button type="button"
                                             id="editProjectStatus-button"
@@ -281,10 +766,10 @@
                                         </span>
                                     </button>
                                     <span id="editProjectStatus-display" class="text-sm text-gray-600"></span>
-                                    <ul class="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm hidden"
+                                    <ul class="project-status-options absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm hidden"
                                         id="editProjectStatus-options"
                                         role="listbox">
-                            <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-200 hover:text-yellow-800"
+                            <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-100 hover:text-yellow-800"
                                 data-value="Draft">
                                 <span class="block truncate">Draft</span>
                                 <span class="absolute inset-y-0 right-0 flex items-center pr-4 hidden">
@@ -295,7 +780,7 @@
                                     </svg>
                                 </span>
                             </li>
-                            <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-200 hover:text-yellow-800"
+                            <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-100 hover:text-yellow-800"
                                 data-value="Planned">
                                 <span class="block truncate">Planned</span>
                                 <span class="absolute inset-y-0 right-0 flex items-center pr-4 hidden">
@@ -306,7 +791,7 @@
                                     </svg>
                                 </span>
                             </li>
-                            <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-200 hover:text-yellow-800"
+                            <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-100 hover:text-yellow-800"
                                 data-value="In Progress">
                                 <span class="block truncate">In Progress</span>
                                 <span class="absolute inset-y-0 right-0 flex items-center pr-4 hidden">
@@ -317,7 +802,7 @@
                                     </svg>
                                 </span>
                             </li>
-                            <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-200 hover:text-yellow-800"
+                            <li class="relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-yellow-100 hover:text-yellow-800"
                                 data-value="Completed">
                                 <span class="block truncate">Completed</span>
                                 <span class="absolute inset-y-0 right-0 flex items-center pr-4 hidden">
@@ -331,28 +816,45 @@
                                     </ul>
                                 </div>
                             </div>
-                            <p id="modalProjectDescriptionDisplay" class="min-h-16 text-sm leading-6 text-gray-600 whitespace-pre-wrap"></p>
-                            <textarea id="modalProjectDescription" rows="5"
-                                      class="w-full mt-1 p-2 border border-gray-300 rounded-md focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500"></textarea>
-                            <div class="mt-4 border-t border-gray-200 pt-4">
-                                <div class="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-500">URL</div>
-                                <div class="relative">
-                                    <span id="modalProjectSourceLinkDisplay" class="block pr-10 text-sm break-all text-gray-700"></span>
-                                    <input type="url" id="modalProjectSourceLinkInput"
-                                           class="hidden w-full mt-1 p-2 pr-10 border border-gray-300 rounded-md focus:ring-1 focus:outline-none focus:ring-yellow-500"
-                                           placeholder="https://github.com/username/repo" />
-                                    <button id="editLinkBtn" class="project-inline-icon-button absolute right-0 top-1/2 -translate-y-1/2 focus:outline-none" aria-label="Edit project URL" title="Edit project URL">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
-                                        </svg>
-                                    </button>
+                            <div class="mb-3 grid gap-3 sm:grid-cols-2">
+                                <div class="project-detail-tile">
+                                    <p class="project-detail-label">Created</p>
+                                    <p id="modalProjectCreatedAt" class="project-detail-value date-time-text"></p>
                                 </div>
+                                <div class="project-detail-tile">
+                                    <p class="project-detail-label">Changed</p>
+                                    <p id="modalProjectUpdatedAt" class="project-detail-value date-time-text"></p>
+                                </div>
+                            </div>
+                            <div class="mb-2 flex items-center justify-between gap-3">
+                                <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Description</p>
+                                <button id="editDescriptionBtn" class="project-inline-icon-button flex-shrink-0 focus:outline-none" aria-label="Edit project description" title="Edit project description"></button>
+                            </div>
+                            <p id="modalProjectDescriptionDisplay" class="project-description-content text-sm leading-6 text-gray-600 whitespace-pre-wrap"></p>
+                            <textarea id="modalProjectDescription" rows="5"
+                                      class="project-description-content w-full mt-1 p-2 border border-gray-300 rounded-md focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500"></textarea>
+                            <div class="mt-4 border-t border-gray-200 pt-4">
+                                <div id="modalProjectSourceLinkDisplay"></div>
                             </div>
                         </section>
                         <section class="rounded-lg border border-gray-200 bg-gray-50 p-4">
                             <div class="mb-3 flex items-center justify-between gap-3">
-                                <h4 class="text-sm font-semibold text-gray-800">Applications</h4>
-                                <span id="modalProjectApplicationsCount" class="text-xs font-semibold uppercase tracking-wide text-gray-500"></span>
+                                <div class="project-section-heading">
+                                    <span class="project-detail-icon" aria-hidden="true">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-2.25-1.313M21 7.5v2.25m0-2.25-2.25 1.313M3 7.5l2.25-1.313M3 7.5l2.25 1.313M3 7.5v2.25m9 3 2.25-1.313M12 12.75l-2.25-1.313M12 12.75V15m0 6.75 2.25-1.313M12 21.75V19.5m0 2.25-2.25-1.313m0-16.875L12 2.25l2.25 1.313M21 14.25v2.25l-2.25 1.313m-13.5 0L3 16.5v-2.25" />
+                                        </svg>
+                                    </span>
+                                    <h4 class="text-sm font-semibold text-gray-800">Applications</h4>
+                                </div>
+                                <div class="flex flex-shrink-0 items-center gap-2">
+                                    <span id="modalProjectApplicationsCount" class="text-xs font-semibold uppercase tracking-wide text-gray-500"></span>
+                                    <button id="openProjectApplicationModalButton" class="project-inline-icon-button focus:outline-none" aria-label="Link application" title="Link application">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                             <div id="modalProjectApplications" class="space-y-2"></div>
                         </section>
@@ -360,8 +862,19 @@
                     <aside class="space-y-4 lg:col-span-2">
                         <section class="rounded-lg border border-gray-200 bg-white p-4">
                             <div class="mb-3 flex items-center justify-between gap-3">
-                                <h4 class="text-sm font-semibold text-gray-800">Access</h4>
-                                <span id="modalProjectAccessCount" class="text-xs font-semibold uppercase tracking-wide text-gray-500"></span>
+                                <div class="project-section-heading">
+                                    <span class="project-detail-icon" aria-hidden="true">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                                        </svg>
+                                    </span>
+                                    <h4 class="text-sm font-semibold text-gray-800">Access</h4>
+                                </div>
+                                <button id="openProjectAccessModalButton" class="project-inline-icon-button flex-shrink-0 focus:outline-none" aria-label="New Access" title="New Access">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                    </svg>
+                                </button>
                             </div>
                             <div id="modalProjectAccessSummary" class="space-y-4"></div>
                         </section>
@@ -382,54 +895,130 @@
         </div>
     </div>
 
-    <div id="assignUsersModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex items-center justify-center">
-        <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl mx-auto overflow-hidden">
-            <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
-                <h3 class="text-lg font-bold text-gray-800">Assign Users</h3>
-                <button onclick="closeAssignUsersModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M6 18L18 6M6 6l12 12" />
+    <div id="projectApplicationModal" class="hidden fixed inset-0 z-50 overflow-visible bg-gray-800 bg-opacity-75 flex justify-center items-center p-4">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-visible relative">
+            <div class="rounded-t-md shadow-sm flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
+                <h3 class="text-lg font-bold text-gray-800">Link Application</h3>
+                <button type="button" onclick="closeProjectApplicationModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none" aria-label="Close application linker">
+                    <svg class="w-6 h-6 my-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
-            <div class="p-6 space-y-5">
-                <input type="hidden" id="assignProjectId">
-                <input type="hidden" id="assignProjectRole" value="project_user">
-                <div>
-                    <h4 class="text-sm font-semibold text-gray-800">Assign users</h4>
-                    <p class="mb-2 text-xs text-gray-500">Select one or more users, choose whether they join the project as a manager or an operator, then define application access.</p>
-                    <div class="mb-4">
-                        <span class="block text-sm font-medium text-gray-700">Project role</span>
-                        <div class="mt-2 inline-flex rounded-md border border-gray-300 bg-white p-1">
-                            <button type="button" class="assign-project-role-button rounded-md px-3 py-1.5 text-sm font-medium" data-role="project_admin">Manager</button>
-                            <button type="button" class="assign-project-role-button rounded-md px-3 py-1.5 text-sm font-medium" data-role="project_user">Operator</button>
+            <div class="p-6 space-y-4">
+                <form id="projectApplicationForm">
+                    <input type="hidden" id="projectApplicationProjectId" value="">
+                    <input type="hidden" id="projectApplicationId" value="">
+                    <div>
+                        <label id="projectApplicationDropdownLabel" class="block text-sm font-medium text-gray-700">Application</label>
+                        <div class="relative mt-1">
+                            <button
+                                type="button"
+                                id="projectApplicationDropdownButton"
+                                class="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500 sm:text-sm"
+                                aria-haspopup="listbox"
+                                aria-expanded="false"
+                            >
+                                <span class="block truncate" id="projectApplicationDropdownSelected">Select Application</span>
+                                <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                    <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.23 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                                    </svg>
+                                </span>
+                            </button>
+                            <div id="projectApplicationDropdownPanel" class="absolute z-50 mt-1 hidden w-full rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="listbox" aria-labelledby="projectApplicationDropdownLabel">
+                                <div class="border-b border-gray-200 p-2">
+                                    <input type="text" id="projectApplicationSearchInput" class="w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500" placeholder="Type to filter..." />
+                                </div>
+                                <ul id="projectApplicationList" class="py-1 text-base sm:text-sm"></ul>
+                            </div>
                         </div>
                     </div>
-                    <label for="assignUserSearch" class="block text-sm font-medium text-gray-700">Username</label>
-                    <input id="assignUserSearch"
-                           class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500"
-                           placeholder="Search users...">
-                    <div id="assignUsersOptions" class="mt-2 max-h-40 overflow-auto rounded-md border border-gray-200 bg-white p-2 space-y-1"></div>
-                    <div id="selectedAssignUsers" class="mt-3 flex flex-wrap gap-2"></div>
-                </div>
-                <div>
-                    <h4 class="text-sm font-semibold text-gray-800">Application access</h4>
-                    <p class="mb-2 text-xs text-gray-500">Saving applies the same project role and application access to every selected user. Managers automatically get RW access to every application in the project.</p>
-                    <table class="w-full text-sm">
-                        <thead>
-                            <tr class="text-left text-gray-600">
-                                <th class="py-2 font-semibold">App Name</th>
-                                <th class="py-2 font-semibold w-56">Access Level</th>
-                            </tr>
-                        </thead>
-                        <tbody id="assignApplicationsTable" class="text-gray-700"></tbody>
-                    </table>
-                </div>
+                </form>
             </div>
-            <div class="p-4 border-t border-gray-200 bg-gray-100 text-right rounded-b-lg space-x-2">
-                <button onclick="saveAssignedUsers()" class="btn btn-primary">Save</button>
-                <button onclick="closeAssignUsersModal()" class="btn btn-secondary">Cancel</button>
+            <div class="relative p-4 border-t border-gray-200 bg-gray-100 text-right rounded-b-lg">
+                <p id="projectApplicationModalMessage" class="pointer-events-none absolute left-4 top-1/2 hidden -translate-y-1/2 text-sm font-medium text-yellow-700">Application linked.</p>
+                <button type="button" id="cancelProjectApplicationModal" class="btn btn-secondary">Close</button>
+                <button type="submit" form="projectApplicationForm" id="saveProjectApplicationButton" class="hidden btn btn-primary">Link</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="projectAccessModal" class="hidden fixed inset-0 z-50 overflow-visible bg-gray-800 bg-opacity-75 flex justify-center items-center p-4">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-visible relative">
+            <div class="rounded-t-md shadow-sm flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
+                <h3 id="projectAccessModalTitle" class="text-lg font-bold text-gray-800">New Access</h3>
+                <button type="button" onclick="closeProjectAccessModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none" aria-label="Close access editor">
+                    <svg class="w-6 h-6 my-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <form id="projectAccessForm" class="space-y-4">
+                    <input type="hidden" id="projectAccessProjectId" value="">
+                    <input type="hidden" id="projectAccessUserId" value="">
+                    <input type="hidden" id="projectAccessRole" value="none">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Project</label>
+                        <div class="relative mt-1">
+                            <button
+                                type="button"
+                                id="projectAccessProjectButton"
+                                class="project-access-locked-select relative w-full cursor-not-allowed rounded-md border border-gray-300 bg-gray-100 py-2 pl-3 pr-10 text-left shadow-sm sm:text-sm"
+                                aria-haspopup="listbox"
+                                aria-expanded="false"
+                                aria-disabled="true"
+                                disabled
+                            >
+                                <span class="block truncate" id="projectAccessProjectSelected">Select Project</span>
+                                <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                    <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.23 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                                    </svg>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label id="projectAccessUserDropdownLabel" class="block text-sm font-medium text-gray-700">User</label>
+                        <div class="relative mt-1">
+                            <button
+                                type="button"
+                                id="projectAccessUserDropdownButton"
+                                class="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500 sm:text-sm"
+                                aria-haspopup="listbox"
+                                aria-expanded="false"
+                            >
+                                <span class="block truncate" id="projectAccessUserDropdownSelected">Select User</span>
+                                <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                    <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.23 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                                    </svg>
+                                </span>
+                            </button>
+                            <div id="projectAccessUserDropdownPanel" class="absolute z-50 mt-1 hidden w-full rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="listbox" aria-labelledby="projectAccessUserDropdownLabel">
+                                <div class="border-b border-gray-200 p-2">
+                                    <input type="text" id="projectAccessUserSearchInput" class="w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500" placeholder="Type to filter..." />
+                                </div>
+                                <ul id="projectAccessUserList" class="py-1 text-base sm:text-sm"></ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Project Role</label>
+                        <div class="mt-1 inline-flex flex-wrap items-center gap-2 rounded-full border border-gray-200 bg-white p-1" role="group" aria-label="Project role">
+                            <button type="button" class="membership-role-button rounded-full px-4 py-2 text-sm font-medium transition" data-role="none" aria-pressed="true">None</button>
+                            <button type="button" class="membership-role-button rounded-full px-4 py-2 text-sm font-medium transition" data-role="project_admin" aria-pressed="false">Manager</button>
+                            <button type="button" class="membership-role-button rounded-full px-4 py-2 text-sm font-medium transition" data-role="project_user" aria-pressed="false">Operator</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="relative p-4 border-t border-gray-200 bg-gray-100 text-right rounded-b-lg">
+                <p id="projectAccessModalMessage" class="pointer-events-none absolute left-4 top-1/2 hidden -translate-y-1/2 text-sm font-medium text-yellow-700">Access saved.</p>
+                <button type="button" id="cancelProjectAccessModal" class="btn btn-secondary">Close</button>
+                <button type="submit" form="projectAccessForm" id="saveProjectAccessButton" class="hidden btn btn-primary">Save</button>
             </div>
         </div>
     </div>
@@ -440,11 +1029,29 @@
 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
   <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
 </svg>`;
-            const cancelIcon = `
-<svg xmlns="http://www.w3.org/2000/svg" fill="none"
-     viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-  <path stroke-linecap="round" stroke-linejoin="round"
-        d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            const addIcon = `
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+</svg>`;
+            const saveIcon = `
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+</svg>`;
+            const removeAccessIcon = `
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-3.5 w-3.5">
+  <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+</svg>`;
+            const adminAccessIcon = `
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
+</svg>`;
+            const managerAccessIcon = `
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0M12 12.75h.008v.008H12v-.008Z" />
+</svg>`;
+            const userAccessIcon = `
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
 </svg>`;
 
             let projectsData = [];
@@ -460,37 +1067,63 @@
                 status: ''
             };
             let currentEditingProjectId = null;
+            let currentProjectDetails = null;
             let inEditModeName = false;
+            let inEditModeDescription = false;
             let inEditModeLink = false;
-            let assignUsers = [];
-            let assignMemberships = [];
-            let assignApplicationMemberships = [];
-            let selectedAssignUsers = new Map();
-            let currentAssignProjectRole = 'project_user';
+            let projectAccessUsers = [];
+            let projectAccessMemberships = [];
+            let projectApplicationOptions = [];
 
             function setSourceLinkDisplay(link) {
-                if (!link) {
-                    $('#modalProjectSourceLinkDisplay').html('<span class="text-sm text-gray-400">No URL provided.</span>');
-                    return;
-                }
+                const hasLink = Boolean(link);
+                const actionIcon = inEditModeLink ? saveIcon : (hasLink ? editIcon : addIcon);
+                const actionLabel = inEditModeLink ? 'Save project URL' : (hasLink ? 'Edit project URL' : 'Add project URL');
+                const bodyHtml = inEditModeLink
+                    ? `<input type="text" id="modalProjectSourceLinkInput" name="project_source_link_edit" class="project-repository-input" value="${escapeAttribute(link || '')}" placeholder="https://github.com/username/repo" inputmode="url" autocomplete="off" autocapitalize="none" spellcheck="false" data-lpignore="true" data-1p-ignore="true" />`
+                    : hasLink
+                        ? `<span class="min-w-0">
+                                <span class="block truncate text-sm font-bold">${escapeHtml(String(link).replace(/^https?:\/\//, '').replace(/\/$/, ''))}</span>
+                                <span class="block truncate text-xs text-gray-500">Open URL</span>
+                            </span>`
+                        : `<span class="min-w-0">
+                                <span class="block text-sm font-bold text-gray-700">No URL provided</span>
+                                <span class="block text-xs text-gray-500">Add a project URL.</span>
+                            </span>`;
+                const actions = `
+                    <div class="project-repository-card-actions">
+                        <button id="${inEditModeLink ? 'saveLinkEditBtn' : 'editLinkBtn'}" class="project-inline-icon-button focus:outline-none" aria-label="${actionLabel}" title="${actionLabel}">
+                            ${actionIcon}
+                        </button>
+                    </div>
+                `;
                 const safeLink = escapeHtml(link);
-                const anchor = `
-                  <a href="${safeLink}" target="_blank" rel="noopener noreferrer"
-                     class="text-yellow-600 hover:underline hover:text-yellow-700">
-                    ${safeLink}
-                  </a>`;
-                $('#modalProjectSourceLinkDisplay').html(anchor);
+                const contentTag = hasLink && !inEditModeLink ? 'a' : 'div';
+                const linkAttributes = hasLink && !inEditModeLink
+                    ? `href="${safeLink}" target="_blank" rel="noopener noreferrer" title="${safeLink}"`
+                    : '';
+                $('#modalProjectSourceLinkDisplay').html(`
+                    <div class="project-repository-card">
+                        <${contentTag} ${linkAttributes} class="project-repository-card-link">
+                            <span class="project-repository-card-icon" aria-hidden="true">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
+                                </svg>
+                            </span>
+                            ${bodyHtml}
+                        </${contentTag}>
+                        ${actions}
+                    </div>
+                `);
             }
 
             function applyProjectEditState(canEdit) {
-                $('#modalProjectDescriptionDisplay').toggleClass('hidden', canEdit);
-                $('#modalProjectDescription').toggleClass('hidden', !canEdit).prop('readonly', !canEdit);
-                $('#editNameBtn, #editLinkBtn').toggleClass('hidden', !canEdit);
+                $('#editNameBtn, #editDescriptionBtn, #modalProjectSourceLinkDisplay .project-repository-card-actions').toggleClass('hidden', !canEdit);
                 $('#editProjectStatus-button').toggleClass('hidden', !canEdit);
                 $('#editProjectStatus-display').toggleClass('hidden', canEdit);
                 if (!canEdit) {
-                    $('#modalProjectNameInput, #modalProjectSourceLinkInput, #saveChangesBtn').addClass('hidden');
-                    $('#modalProjectNameDisplay, #modalProjectSourceLinkDisplay').removeClass('hidden');
+                    $('#modalProjectNameInput, #modalProjectDescription, #saveChangesBtn').addClass('hidden');
+                    $('#modalProjectNameDisplay, #modalProjectDescriptionDisplay, #modalProjectSourceLinkDisplay').removeClass('hidden');
                     $('#editProjectStatus-options').addClass('hidden');
                 }
             }
@@ -576,16 +1209,32 @@
                 return $('<div>').text(value == null ? '' : String(value)).html();
             }
 
+            function escapeAttribute(value) {
+                return escapeHtml(value).replace(/"/g, '&quot;');
+            }
+
+            function projectAccessUserDisplayName(user) {
+                if (!user) return '';
+                return user.full_name ? `${user.username} (${user.full_name})` : user.username;
+            }
+
             function userChipHtml(user, tone) {
-                const toneClass = tone === 'manager'
-                    ? 'border-yellow-200 bg-yellow-50 text-yellow-800'
-                    : tone === 'admin'
-                        ? 'border-blue-200 bg-blue-50 text-blue-800'
-                        : 'border-gray-200 bg-white text-gray-700';
-                const fullName = user.full_name ? `<span class="ml-1 text-gray-500">${escapeHtml(user.full_name)}</span>` : '';
+                const isAdmin = tone === 'admin';
+                const isManager = tone === 'manager';
+                const toneClass = isAdmin
+                    ? 'admin-access-summary-chip project-admin-access-badge'
+                    : 'border-gray-200 bg-white text-gray-700';
+                const icon = isAdmin
+                    ? `<span class="admin-access-summary-icon ml-2 inline-flex items-center" title="Platform Admin" aria-label="Platform Admin">${adminAccessIcon}</span>`
+                    : isManager
+                        ? `<span class="ml-2 inline-flex items-center text-yellow-600" title="Manager" aria-label="Manager">${managerAccessIcon}</span>`
+                        : `<span class="ml-2 inline-flex items-center text-gray-500" title="User" aria-label="User">${userAccessIcon}</span>`;
+                const removeButton = !isAdmin && user.can_remove_access && user.membership_id
+                    ? `<button type="button" class="project-access-remove-button ml-2 delete-project-access" data-membership-id="${Number(user.membership_id)}" aria-label="Delete access" title="Delete access">${removeAccessIcon}</button>`
+                    : '';
                 return `
                     <span class="inline-flex min-w-0 items-center rounded-full border px-3 py-1 text-sm ${toneClass}">
-                        <span class="truncate font-medium">${escapeHtml(user.username)}</span>${fullName}
+                        <span class="truncate font-medium">${escapeHtml(user.username)}</span>${icon}${removeButton}
                     </span>
                 `;
             }
@@ -595,10 +1244,23 @@
                     <div>
                         <div class="mb-2 flex items-center justify-between gap-2">
                             <span class="text-xs font-semibold uppercase tracking-wide text-gray-500">${escapeHtml(title)}</span>
-                            <span class="text-xs font-semibold text-gray-400">${members.length}</span>
                         </div>
                         <div class="flex flex-wrap gap-2">
                             ${members.length ? members.map(member => userChipHtml(member, tone)).join('') : `<span class="text-sm text-gray-400">${escapeHtml(emptyText)}</span>`}
+                        </div>
+                    </div>
+                `;
+            }
+
+            function platformAdminGroupHtml(members) {
+                return `
+                    <div class="project-platform-admin-card">
+                        <div class="mb-2">
+                            <span class="project-platform-admin-title text-xs font-semibold uppercase tracking-wide">Platform Admins</span>
+                            <p class="project-platform-admin-copy mt-1 text-xs">Admins have access to every project and application.</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            ${members.length ? members.map(member => userChipHtml(member, 'admin')).join('') : '<span class="text-sm text-gray-400">No platform admins visible.</span>'}
                         </div>
                     </div>
                 `;
@@ -609,11 +1271,9 @@
                 const platformAdmins = summary.platform_admins || [];
                 const managers = summary.managers || [];
                 const operators = summary.operators || [];
-                const visibleTotal = platformAdmins.length + managers.length + operators.length;
-                $('#modalProjectAccessCount').text(`${visibleTotal} visible`);
                 $('#modalProjectAccessSummary').html([
-                    platformAdmins.length
-                        ? accessGroupHtml('Platform Admins', platformAdmins, 'No platform admins visible.', 'admin')
+                    summary.show_platform_admin_names
+                        ? platformAdminGroupHtml(platformAdmins)
                         : '',
                     accessGroupHtml('Managers', managers, 'No managers assigned.', 'manager'),
                     accessGroupHtml('Operators', operators, 'No operators assigned.', 'operator')
@@ -628,25 +1288,41 @@
                     return;
                 }
                 $('#modalProjectApplications').html(applications.map(function(app) {
+                    const removeButton = project.can_edit ? `
+                        <button type="button" class="table-action-button delete-button remove-project-application project-application-remove h-8 w-8" data-application-id="${app.id}" aria-label="Remove ${escapeAttribute(app.name)} from project" title="Remove from project">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                            </svg>
+                        </button>
+                    ` : '';
                     return `
-                        <div class="flex flex-col gap-2 rounded-md border border-gray-200 bg-white px-3 py-3 sm:flex-row sm:items-center sm:justify-between">
-                            <a href="#" class="min-w-0 truncate text-sm font-medium text-gray-800 hover:text-yellow-700 hover:underline"
-                               onclick="window.loadPage('application_details', ${app.id});return false;">
-                               ${escapeHtml(app.name)}
-                            </a>
-                            <span class="inline-flex flex-shrink-0 items-center rounded-md border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-semibold text-gray-600">
+                        <div class="project-application-card rounded-md border border-gray-200 bg-white px-3 py-3 transition hover:border-yellow-300 hover:bg-yellow-50">
+                            <span class="min-w-0 flex-1">
+                                <span class="block min-w-0">
+                                    <a href="#" class="block truncate text-sm font-medium text-gray-800"
+                                       onclick="window.loadPage('application_details', ${app.id});return false;">${escapeHtml(app.name)}</a>
+                                </span>
+                                <span class="mt-1 block text-xs text-gray-500">Current version: ${escapeHtml(app.current_version || 'No versions available')}</span>
+                            </span>
+                            <span class="project-application-access inline-flex flex-shrink-0 items-center rounded-md border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-semibold text-gray-600">
                                 ${escapeHtml(app.access_code || app.access_label || 'No Access')}
                             </span>
+                            ${project.can_edit ? '<span class="project-application-separator" aria-hidden="true">|</span>' : ''}
+                            ${removeButton}
                         </div>
                     `;
                 }).join(''));
             }
 
             function applyProjectDetails(project) {
+                currentProjectDetails = project;
                 originalProjectData.name = project.name;
                 originalProjectData.description = project.description || '';
                 originalProjectData.source_link = project.source_link || '';
                 originalProjectData.status = project.status || 'Draft';
+                inEditModeName = false;
+                inEditModeDescription = false;
+                inEditModeLink = false;
 
                 $('#modalProjectNameDisplay').text(originalProjectData.name);
                 $('#modalProjectNameInput').val(originalProjectData.name);
@@ -656,9 +1332,9 @@
                 setSourceLinkDisplay(originalProjectData.source_link);
                 $('#modalProjectSourceLinkInput').val(originalProjectData.source_link);
                 $('#modalProjectIdDisplay').text(`ID ${project.id}`);
-                $('#modalProjectCreatedAt').text(project.created_at ? `Created ${project.created_at}` : '');
+                $('#modalProjectCreatedAt').text(project.created_at || 'N/A');
+                $('#modalProjectUpdatedAt').text(project.updated_at || 'N/A');
                 $('#modalProjectAccessLevel').text(project.project_role_label || project.access_label || 'No Access');
-                $('#modalProjectStatusBadge').html(getStatusLabel(originalProjectData.status));
 
                 $('#editProjectStatus-selected').text(originalProjectData.status);
                 $('#editProjectStatus-display').html(getStatusLabel(originalProjectData.status));
@@ -672,8 +1348,6 @@
                 renderProjectApplications(project);
                 renderProjectAccessSummary(project);
 
-                inEditModeName = false;
-                inEditModeLink = false;
                 $('#editNameBtn')
                     .html(editIcon)
                     .removeClass('hover:text-red-500')
@@ -681,15 +1355,21 @@
                 $('#modalProjectNameDisplay').removeClass('hidden');
                 $('#modalProjectNameInput').addClass('hidden');
 
-                $('#editLinkBtn')
+                $('#editDescriptionBtn')
                     .html(editIcon)
-                    .removeClass('hover:text-red-500')
+                    .removeClass('hover:text-red-500 hover:text-green-600')
                     .addClass('hover:text-blue-500');
+                $('#modalProjectDescriptionDisplay').removeClass('hidden');
+                $('#modalProjectDescription').addClass('hidden');
+
                 $('#modalProjectSourceLinkDisplay').removeClass('hidden');
                 $('#modalProjectSourceLinkInput').addClass('hidden');
+                $('#saveLinkEditBtn').addClass('hidden').html(saveIcon);
 
                 $('#saveChangesBtn').addClass('hidden');
                 applyProjectEditState(Boolean(project.can_edit));
+                $('#openProjectAccessModalButton').toggleClass('hidden', !project.can_edit);
+                $('#openProjectApplicationModalButton').toggleClass('hidden', !project.can_edit);
             }
 
             function refreshProjectDetails(projectId) {
@@ -700,261 +1380,6 @@
                     error: function() {
                         console.error('Error reloading project data after save');
                     }
-                });
-            }
-
-            function applyAssignProjectRoleStyles() {
-                $('.assign-project-role-button').each(function() {
-                    const isActive = $(this).data('role') === currentAssignProjectRole;
-                    $(this)
-                        .toggleClass('bg-yellow-100 text-yellow-700', isActive)
-                        .toggleClass('bg-transparent text-gray-600 hover:bg-gray-100', !isActive);
-                });
-                const managerMode = currentAssignProjectRole === 'project_admin';
-                $('#assignApplicationsTable').toggleClass('opacity-70', managerMode);
-                $('.assign-app-option')
-                    .prop('disabled', managerMode);
-                applyAssignApplicationStyles();
-            }
-
-            function applyAssignApplicationStyles() {
-                $('.assign-app-option').each(function() {
-                    const button = $(this);
-                    const applicationId = Number(button.data('application-id'));
-                    const currentValue = $(`.assign-app-access-input[data-application-id="${applicationId}"]`).val();
-                    const isActive = button.data('value') === currentValue;
-                    button.removeClass(
-                        'bg-gray-100 text-gray-700 bg-yellow-100 text-yellow-700 bg-green-100 text-green-700 text-gray-500 hover:bg-gray-100 cursor-not-allowed opacity-70'
-                    );
-
-                    if (isActive && currentValue === 'no_access') {
-                        button.addClass('bg-gray-100 text-gray-700');
-                    } else if (isActive && currentValue === 'view_only') {
-                        button.addClass('bg-yellow-100 text-yellow-700');
-                    } else if (isActive && currentValue === 'read_write') {
-                        button.addClass('bg-green-100 text-green-700');
-                    } else {
-                        button.addClass('text-gray-500 hover:bg-gray-100');
-                    }
-
-                    if (button.prop('disabled')) {
-                        button.addClass('cursor-not-allowed opacity-70');
-                    }
-                });
-            }
-
-            function setAssignProjectRole(role) {
-                currentAssignProjectRole = role === 'project_admin' ? 'project_admin' : 'project_user';
-                $('#assignProjectRole').val(currentAssignProjectRole);
-
-                if (currentAssignProjectRole === 'project_admin') {
-                    $('.assign-app-access-input').val('read_write');
-                }
-
-                renderAssignApplications(assignCurrentProjectData);
-                applyAssignProjectRoleStyles();
-            }
-
-            let assignCurrentProjectData = null;
-
-            function renderAssignUserOptions() {
-                const filter = $('#assignUserSearch').val().trim().toLowerCase();
-                const filteredUsers = assignUsers.filter(function(user) {
-                    const username = (user.username || '').toLowerCase();
-                    const fullName = (user.full_name || '').toLowerCase();
-                    return !filter || username.includes(filter) || fullName.includes(filter);
-                });
-
-                if (filteredUsers.length === 0) {
-                    $('#assignUsersOptions').html('<div class="px-2 py-3 text-sm text-gray-500">No users found.</div>');
-                    return;
-                }
-
-                $('#assignUsersOptions').html(filteredUsers.map(function(user) {
-                    const checked = selectedAssignUsers.has(user.id) ? 'checked' : '';
-                    return `
-                        <label class="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-gray-700 hover:bg-yellow-50">
-                            <input type="checkbox"
-                                   class="assign-user-checkbox rounded border-gray-300 text-yellow-500 focus:ring-yellow-500"
-                                   value="${user.id}"
-                                   ${checked}>
-                            <span class="min-w-0">
-                                <span class="block font-medium">${escapeHtml(user.username)}</span>
-                                <span class="block truncate text-xs text-gray-500">${escapeHtml(user.full_name || '')}</span>
-                            </span>
-                        </label>
-                    `;
-                }).join(''));
-            }
-
-            function renderSelectedAssignUsers() {
-                const selectedUsers = Array.from(selectedAssignUsers.values());
-                if (selectedUsers.length === 0) {
-                    $('#selectedAssignUsers').html('<span class="text-sm text-gray-500">No users selected.</span>');
-                    return;
-                }
-
-                $('#selectedAssignUsers').html(selectedUsers.map(function(user) {
-                    return `
-                        <span class="inline-flex items-center gap-2 rounded-md border border-yellow-200 bg-yellow-50 px-2.5 py-1 text-sm font-medium text-yellow-700">
-                            ${escapeHtml(user.username)}
-                            <button type="button"
-                                    class="remove-assign-user text-yellow-600 hover:text-red-600"
-                                    data-id="${user.id}"
-                                    aria-label="Remove ${escapeHtml(user.username)}">
-                                &times;
-                            </button>
-                        </span>
-                    `;
-                }).join(''));
-            }
-
-            function renderAssignApplications(project) {
-                assignCurrentProjectData = project;
-                const applications = project.applications && project.applications.length > 0
-                    ? project.applications
-                    : [];
-
-                if (applications.length === 0) {
-                    $('#assignApplicationsTable').html(`
-                        <tr>
-                            <td colspan="2" class="py-3 text-sm text-gray-500">No applications are linked to this project yet.</td>
-                        </tr>
-                    `);
-                    return;
-                }
-
-                $('#assignApplicationsTable').html(applications.map(function(app) {
-                    const selectedMemberships = assignApplicationMemberships.filter(function(membership) {
-                        return membership.application_id === app.id && selectedAssignUsers.has(membership.user_id);
-                    });
-                    const uniqueAccessLevels = Array.from(new Set(selectedMemberships.map(function(membership) {
-                        return membership.access_level;
-                    })));
-                    const existingAccess = currentAssignProjectRole === 'project_admin'
-                        ? 'read_write'
-                        : (uniqueAccessLevels.length === 1 ? uniqueAccessLevels[0] : 'no_access');
-                    return `
-                        <tr>
-                            <td class="py-2 pr-4 text-gray-700">${escapeHtml(app.name)}</td>
-                            <td class="py-2">
-                                <input type="hidden" class="assign-app-access-input" data-application-id="${app.id}" value="${existingAccess}">
-                                <div class="inline-flex rounded-md border border-gray-300 bg-white p-1">
-                                    <button type="button" class="assign-app-option rounded-md px-3 py-1.5 text-sm font-medium ${existingAccess === 'no_access' ? 'bg-gray-100 text-gray-700' : 'text-gray-500 hover:bg-gray-100'}" data-application-id="${app.id}" data-value="no_access">No Access</button>
-                                    <button type="button" class="assign-app-option rounded-md px-3 py-1.5 text-sm font-medium ${existingAccess === 'view_only' ? 'bg-yellow-100 text-yellow-700' : 'text-gray-500 hover:bg-gray-100'}" data-application-id="${app.id}" data-value="view_only">RO</button>
-                                    <button type="button" class="assign-app-option rounded-md px-3 py-1.5 text-sm font-medium ${existingAccess === 'read_write' ? 'bg-green-100 text-green-700' : 'text-gray-500 hover:bg-gray-100'}" data-application-id="${app.id}" data-value="read_write">RW</button>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                }).join(''));
-                applyAssignProjectRoleStyles();
-            }
-
-            window.openAssignUsersModal = function(projectId) {
-                $('#assignProjectId').val(projectId);
-                $('#assignUserSearch').val('');
-                $('#assignUsersOptions').html('<div class="px-2 py-3 text-sm text-gray-500">Loading users...</div>');
-                $('#selectedAssignUsers').html('');
-                $('#assignApplicationsTable').html('');
-                selectedAssignUsers = new Map();
-                currentAssignProjectRole = 'project_user';
-                applyAssignProjectRoleStyles();
-
-                $.when(
-                    $.getJSON(`/project/${projectId}`),
-                    $.getJSON('/api/users'),
-                    $.getJSON(`/api/project_memberships?project_id=${projectId}`),
-                    $.getJSON(`/api/application_memberships?project_id=${projectId}`)
-                ).done(function(projectResponse, usersResponse, membershipsResponse, applicationMembershipsResponse) {
-                    const project = projectResponse[0];
-                    assignUsers = usersResponse[0] || [];
-                    assignMemberships = membershipsResponse[0] || [];
-                    assignApplicationMemberships = applicationMembershipsResponse[0] || [];
-                    const membershipUserIds = new Set(assignMemberships.map(function(membership) {
-                        return membership.user_id;
-                    }));
-                    const distinctRoles = Array.from(new Set(assignMemberships.map(function(membership) {
-                        return membership.project_role;
-                    })));
-                    currentAssignProjectRole = distinctRoles.length === 1 ? distinctRoles[0] : 'project_user';
-
-                    assignUsers.forEach(function(user) {
-                        if (membershipUserIds.has(user.id)) {
-                            selectedAssignUsers.set(user.id, user);
-                        }
-                    });
-
-                    renderAssignUserOptions();
-                    renderSelectedAssignUsers();
-                    renderAssignApplications(project);
-                    applyAssignProjectRoleStyles();
-                    $('#assignUsersModal').removeClass('hidden');
-                }).fail(function(xhr) {
-                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Unable to load assignment details.';
-                    showSwalModal({
-                        title: 'Error!',
-                        text: error,
-                        icon: 'error',
-                        confirmText: 'OK'
-                    });
-                });
-            }
-
-            window.closeAssignUsersModal = function() {
-                $('#assignUsersModal').addClass('hidden');
-            }
-
-            window.saveAssignedUsers = function() {
-                const projectId = Number($('#assignProjectId').val());
-                const selectedUsers = Array.from(selectedAssignUsers.values());
-
-                if (selectedUsers.length === 0) {
-                    showSwalModal({
-                        title: 'Validation Error',
-                        text: 'Select at least one user.',
-                        icon: 'error',
-                        confirmText: 'OK'
-                    });
-                    return;
-                }
-
-                const applicationPayload = $('.assign-app-access-input').map(function() {
-                    return {
-                        application_id: Number($(this).data('application-id')),
-                        access_level: $(this).val()
-                    };
-                }).get();
-
-                $.ajax({
-                    url: '/api/application_memberships/bulk',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({
-                        project_id: projectId,
-                        project_role: currentAssignProjectRole,
-                        user_ids: selectedUsers.map(function(user) { return user.id; }),
-                        applications: applicationPayload
-                    })
-                }).done(function() {
-                    closeAssignUsersModal();
-                    showSwalModal({
-                        title: 'Saved!',
-                        text: 'Application access was updated.',
-                        icon: 'success',
-                        confirmText: 'OK',
-                        onConfirm: function() {
-                            loadProjectsData($('#searchForm input[name="search"]').val());
-                        }
-                    });
-                }).fail(function(xhr) {
-                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Unable to save application access.';
-                    showSwalModal({
-                        title: 'Error!',
-                        text: error,
-                        icon: 'error',
-                        confirmText: 'OK'
-                    });
                 });
             }
 
@@ -1031,7 +1456,7 @@
                                 </span>
                             </td>
                             <td class="col-actions text-base text-gray-600 py-4 px-6 border-b border-gray-200">
-                                <div class="table-actions table-actions-three">
+                                <div class="table-actions">
                                     <button class="details-button table-action-button" data-id="${proj.id}" aria-label="View Project Details">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -1044,30 +1469,6 @@
                                                      0 1 1.06.44l2.122 2.12a1.5 1.5
                                                      0 0 0 1.06.44H18A2.25 2.25 0 0 1
                                                      20.25 9v.776"/>
-                                        </svg>
-                                    </button>
-                                    <button class="${proj.can_edit ? '' : 'invisible pointer-events-none'} assign-users-button table-action-button" data-id="${proj.id}" aria-label="Assign Users">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                             stroke="currentColor" class="w-6 h-6">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                  d="M18 18.72a9.094 9.094 0 0 0 3.741-.479
-                                                     3 3 0 0 0-4.682-2.72m.941 3.198
-                                                     .001.031c0 .225-.012.447-.037.666A11.944
-                                                     11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062
-                                                     6.062 0 0 1 6 18.719m12 0a5.971
-                                                     5.971 0 0 0-.941-3.197m0 0A5.995
-                                                     5.995 0 0 0 12 12.75a5.995
-                                                     5.995 0 0 0-5.058 2.772m0 0a3
-                                                     3 0 0 0-4.681 2.72 8.986
-                                                     8.986 0 0 0 3.74.477m.94-3.197a5.971
-                                                     5.971 0 0 0-.94 3.197M15
-                                                     6.75a3 3 0 1 1-6
-                                                     0 3 3 0 0 1 6 0Zm6
-                                                     3a2.25 2.25 0 1 1-4.5
-                                                     0 2.25 2.25 0 0 1 4.5
-                                                     0Zm-13.5 0a2.25 2.25 0 1
-                                                     1-4.5 0 2.25 2.25 0 0 1
-                                                     4.5 0Z"/>
                                         </svg>
                                     </button>
                                     <button class="${proj.can_edit ? '' : 'invisible pointer-events-none'} delete-button table-action-button" data-id="${proj.id}" aria-label="Delete Project">
@@ -1179,20 +1580,24 @@
 
             window.openProjectDetails = function(projectId) {
                 inEditModeName = false;
+                inEditModeDescription = false;
                 inEditModeLink = false;
                 $('#editNameBtn')
                     .html(editIcon)
                     .removeClass('hover:text-red-500')
                     .addClass('hover:text-blue-500');
-                $('#editLinkBtn')
+                $('#editDescriptionBtn')
                     .html(editIcon)
-                    .removeClass('hover:text-red-500')
+                    .removeClass('hover:text-red-500 hover:text-green-600')
                     .addClass('hover:text-blue-500');
 
                 $('#modalProjectNameDisplay').removeClass('hidden');
                 $('#modalProjectNameInput').addClass('hidden');
+                $('#modalProjectDescriptionDisplay').removeClass('hidden');
+                $('#modalProjectDescription').addClass('hidden');
                 $('#modalProjectSourceLinkDisplay').removeClass('hidden');
                 $('#modalProjectSourceLinkInput').addClass('hidden');
+                $('#saveLinkEditBtn').addClass('hidden').html(saveIcon);
 
                 $.ajax({
                     url: `/project/${projectId}`,
@@ -1244,13 +1649,324 @@
                 });
             }
 
+            function selectedProjectApplicationId() {
+                return Number($('#projectApplicationId').val() || 0);
+            }
+
+            function selectedProjectApplication() {
+                const applicationId = selectedProjectApplicationId();
+                return projectApplicationOptions.find(app => Number(app.id) === applicationId) || null;
+            }
+
+            function updateProjectApplicationSaveButton() {
+                const hasSelection = Boolean(selectedProjectApplication());
+                $('#saveProjectApplicationButton').toggleClass('hidden', !hasSelection);
+                if (hasSelection) {
+                    $('#projectApplicationModalMessage').addClass('hidden').text('');
+                }
+            }
+
+            function renderProjectApplicationOptions() {
+                const term = ($('#projectApplicationSearchInput').val() || '').trim().toLowerCase();
+                const filteredApplications = projectApplicationOptions.filter(app => {
+                    return !term || String(app.name || '').toLowerCase().includes(term);
+                });
+                if (!filteredApplications.length) {
+                    $('#projectApplicationList').html('<li class="px-3 py-2 text-sm text-gray-500">No available applications found.</li>');
+                    return;
+                }
+                $('#projectApplicationList').html(filteredApplications.map(app => `
+                    <li class="cursor-pointer px-3 py-2 text-sm text-gray-700 hover:bg-yellow-100" data-id="${app.id}" data-name="${escapeAttribute(app.name)}">
+                        <div class="flex min-w-0 items-center justify-between gap-3">
+                            <span class="min-w-0">
+                                <span class="block truncate font-medium">${escapeHtml(app.name)}</span>
+                                <span class="mt-0.5 block truncate text-xs text-gray-500">Current version: ${escapeHtml(app.current_version || 'No versions available')}</span>
+                            </span>
+                            <span class="inline-flex flex-shrink-0 items-center rounded-md border border-gray-200 bg-gray-50 px-2 py-0.5 text-xs font-semibold text-gray-600">
+                                ${escapeHtml(app.access_code || app.access_label || 'No Access')}
+                            </span>
+                        </div>
+                    </li>
+                `).join(''));
+            }
+
+            function openProjectApplicationModal() {
+                if (!currentProjectDetails || !currentProjectDetails.can_edit) return;
+                const projectId = currentProjectDetails.id;
+                $('#projectApplicationProjectId').val(projectId);
+                $('#projectApplicationId').val('');
+                $('#projectApplicationDropdownSelected').text('Select Application');
+                $('#projectApplicationSearchInput').val('');
+                $('#projectApplicationList').html('<li class="px-3 py-2 text-sm text-gray-500">Loading applications...</li>');
+                $('#projectApplicationModalMessage').addClass('hidden').text('');
+                $('#saveProjectApplicationButton').addClass('hidden');
+                $('#projectApplicationDropdownButton').attr('aria-expanded', 'false');
+                $('#projectApplicationModal').removeClass('hidden');
+
+                $.getJSON(`/api/projects/${projectId}/available_applications`)
+                    .done(function(applications) {
+                        projectApplicationOptions = applications || [];
+                        renderProjectApplicationOptions();
+                    })
+                    .fail(function(xhr) {
+                        const error = xhr.responseJSON ? xhr.responseJSON.error : 'Unable to load applications.';
+                        showSwalModal({ title: 'Error!', text: error, icon: 'error', confirmText: 'OK' });
+                        closeProjectApplicationModal();
+                    });
+            }
+
+            window.closeProjectApplicationModal = function() {
+                $('#projectApplicationModal').addClass('hidden');
+                $('#projectApplicationDropdownPanel').addClass('hidden');
+                $('#projectApplicationDropdownButton').attr('aria-expanded', 'false');
+            }
+
+            function saveProjectApplication(event) {
+                event.preventDefault();
+                const projectId = Number($('#projectApplicationProjectId').val() || 0);
+                const applicationId = selectedProjectApplicationId();
+                if (!projectId || !applicationId) return;
+
+                $.ajax({
+                    url: `/api/projects/${projectId}/applications`,
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ application_id: applicationId })
+                }).done(function() {
+                    refreshProjectDetails(projectId);
+                    loadProjectsData($('#searchForm input[name="search"]').val());
+                    $('#projectApplicationModalMessage').text('Application linked.').removeClass('hidden');
+                    $('#saveProjectApplicationButton').addClass('hidden');
+                    projectApplicationOptions = projectApplicationOptions.filter(app => Number(app.id) !== applicationId);
+                    $('#projectApplicationId').val('');
+                    $('#projectApplicationDropdownSelected').text('Select Application');
+                    renderProjectApplicationOptions();
+                }).fail(function(xhr) {
+                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Unable to link application.';
+                    showSwalModal({ title: 'Error!', text: error, icon: 'error', confirmText: 'OK' });
+                });
+            }
+
+            function removeProjectApplication(applicationId) {
+                if (!currentProjectDetails || !applicationId) return;
+                const projectId = currentProjectDetails.id;
+                showSwalModal({
+                    title: 'Remove application?',
+                    text: 'This application will no longer be linked to the project.',
+                    icon: 'warning',
+                    confirmText: 'Remove',
+                    cancelText: 'Cancel',
+                    onConfirm: function() {
+                        $.ajax({
+                            url: `/api/projects/${projectId}/applications/${applicationId}`,
+                            method: 'DELETE'
+                        }).done(function() {
+                            refreshProjectDetails(projectId);
+                            loadProjectsData($('#searchForm input[name="search"]').val());
+                        }).fail(function(xhr) {
+                            const error = xhr.responseJSON ? xhr.responseJSON.error : 'Unable to remove application.';
+                            showSwalModal({ title: 'Error!', text: error, icon: 'error', confirmText: 'OK' });
+                        });
+                    }
+                });
+            }
+
+            function projectAccessSelectedUserId() {
+                return Number($('#projectAccessUserId').val() || 0);
+            }
+
+            function projectAccessSelectedUser() {
+                const userId = projectAccessSelectedUserId();
+                return projectAccessUsers.find(user => Number(user.id) === userId) || null;
+            }
+
+            function projectAccessSelectedMembership() {
+                const userId = projectAccessSelectedUserId();
+                return projectAccessMemberships.find(membership => Number(membership.user_id) === userId) || null;
+            }
+
+            function projectAccessCurrentRoleForSelection() {
+                const user = projectAccessSelectedUser();
+                if (!user) return 'none';
+                if (user.platform_role === 'admin' || user.is_active === false) return 'none';
+                const membership = projectAccessSelectedMembership();
+                return membership ? membership.project_role : 'none';
+            }
+
+            function applyProjectAccessRoleStyles() {
+                const currentRole = $('#projectAccessRole').val() || 'none';
+                const user = projectAccessSelectedUser();
+                const hasUser = Boolean(user);
+                $('#projectAccessModal .membership-role-button').each(function() {
+                    const role = $(this).data('role');
+                    const isActive = role === currentRole;
+                    const isDisabled = !hasUser || user.platform_role === 'admin' || user.is_active === false;
+                    $(this)
+                        .toggleClass('cursor-not-allowed opacity-60', isDisabled)
+                        .toggleClass('cursor-pointer', !isDisabled)
+                        .toggleClass('is-active', isActive)
+                        .prop('disabled', isDisabled)
+                        .attr('aria-pressed', isActive ? 'true' : 'false');
+                });
+            }
+
+            function updateProjectAccessSaveButton() {
+                const user = projectAccessSelectedUser();
+                const currentRole = $('#projectAccessRole').val() || 'none';
+                const originalRole = projectAccessCurrentRoleForSelection();
+                const shouldShow = Boolean(user && user.platform_role !== 'admin' && user.is_active !== false && currentRole !== originalRole);
+                $('#saveProjectAccessButton').toggleClass('hidden', !shouldShow);
+                if (shouldShow) {
+                    $('#projectAccessModalMessage').addClass('hidden').text('');
+                }
+            }
+
+            function setProjectAccessRole(role) {
+                const normalizedRole = ['none', 'project_admin', 'project_user'].includes(role) ? role : 'none';
+                const selectedUser = projectAccessSelectedUser();
+                $('#projectAccessRole').val(normalizedRole);
+                if (normalizedRole === 'project_admin' && selectedUser && selectedUser.is_active === false) {
+                    $('#projectAccessUserId').val('');
+                    $('#projectAccessUserDropdownSelected').text('Select User');
+                }
+                renderProjectAccessUserOptions();
+                applyProjectAccessRoleStyles();
+                updateProjectAccessSaveButton();
+            }
+
+            function syncProjectAccessRoleFromSelection() {
+                $('#projectAccessRole').val(projectAccessCurrentRoleForSelection());
+                applyProjectAccessRoleStyles();
+                updateProjectAccessSaveButton();
+            }
+
+            function renderProjectAccessUserOptions() {
+                const term = ($('#projectAccessUserSearchInput').val() || '').trim().toLowerCase();
+                const selectedRole = $('#projectAccessRole').val() || 'none';
+                const filteredUsers = projectAccessUsers.filter(user => {
+                    if (user.platform_role === 'admin') {
+                        return false;
+                    }
+                    if (selectedRole === 'project_admin' && user.is_active === false) {
+                        return false;
+                    }
+                    const haystack = `${user.username || ''} ${user.full_name || ''}`.toLowerCase();
+                    return !term || haystack.includes(term);
+                });
+                if (!filteredUsers.length) {
+                    $('#projectAccessUserList').html('<li class="px-3 py-2 text-sm text-gray-500">No users found.</li>');
+                    return;
+                }
+                $('#projectAccessUserList').html(filteredUsers.map(user => {
+                    const isActive = user.is_active !== false;
+                    const disabledClass = isActive ? 'cursor-pointer hover:bg-yellow-100' : 'opacity-60 cursor-not-allowed';
+                    const statusDotClass = isActive
+                        ? 'bg-yellow-400 shadow-[0_0_0_3px_rgba(245,158,11,0.16),0_0_16px_rgba(251,191,36,0.9)]'
+                        : 'bg-gray-300 shadow-[0_0_0_3px_rgba(156,163,175,0.16)]';
+                    const label = projectAccessUserDisplayName(user);
+                    return `
+                        <li class="px-3 py-2 text-sm text-gray-700 ${disabledClass}" data-id="${user.id}" data-name="${escapeAttribute(label)}" aria-disabled="${isActive ? 'false' : 'true'}">
+                            <div class="flex min-w-0 items-center gap-2">
+                                <span class="inline-flex h-3.5 w-3.5 flex-shrink-0 rounded-full ${statusDotClass}" title="${isActive ? 'Enabled' : 'Disabled'}"></span>
+                                <span class="min-w-0 truncate">${escapeHtml(label)}</span>
+                            </div>
+                        </li>
+                    `;
+                }).join(''));
+            }
+
+            function openProjectAccessModal() {
+                if (!currentProjectDetails || !currentProjectDetails.can_edit) return;
+                const projectId = currentProjectDetails.id;
+                $('#projectAccessModalTitle').text('New Access');
+                $('#projectAccessProjectId').val(projectId);
+                $('#projectAccessProjectSelected').text(currentProjectDetails.name || 'Current Project');
+                $('#projectAccessUserId').val('');
+                $('#projectAccessUserDropdownSelected').text('Select User');
+                $('#projectAccessUserSearchInput').val('');
+                $('#projectAccessUserList').html('<li class="px-3 py-2 text-sm text-gray-500">Loading users...</li>');
+                $('#projectAccessRole').val('none');
+                $('#projectAccessModalMessage').addClass('hidden').text('');
+                $('#saveProjectAccessButton').addClass('hidden');
+                applyProjectAccessRoleStyles();
+                $('#projectAccessModal').removeClass('hidden');
+                $('#projectAccessUserDropdownButton').attr('aria-expanded', 'false');
+
+                $.when(
+                    $.getJSON('/api/users'),
+                    $.getJSON(`/api/project_memberships?project_id=${projectId}`)
+                ).done(function(usersResponse, membershipsResponse) {
+                    projectAccessUsers = usersResponse[0] || [];
+                    projectAccessMemberships = membershipsResponse[0] || [];
+                    renderProjectAccessUserOptions();
+                    syncProjectAccessRoleFromSelection();
+                }).fail(function(xhr) {
+                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Unable to load access details.';
+                    showSwalModal({ title: 'Error!', text: error, icon: 'error', confirmText: 'OK' });
+                    closeProjectAccessModal();
+                });
+            }
+
+            window.closeProjectAccessModal = function() {
+                $('#projectAccessModal').addClass('hidden');
+                $('#projectAccessUserDropdownPanel').addClass('hidden');
+                $('#projectAccessUserDropdownButton').attr('aria-expanded', 'false');
+            }
+
+            function saveProjectAccess(event) {
+                event.preventDefault();
+                const projectId = Number($('#projectAccessProjectId').val() || 0);
+                const userId = projectAccessSelectedUserId();
+                const user = projectAccessSelectedUser();
+                const role = $('#projectAccessRole').val() || 'none';
+                const existingMembership = projectAccessSelectedMembership();
+                if (!projectId || !userId || !user || user.platform_role === 'admin' || user.is_active === false) return;
+
+                function afterSaved(message) {
+                    $.when(
+                        $.getJSON(`/project/${projectId}`),
+                        $.getJSON(`/api/project_memberships?project_id=${projectId}`)
+                    ).done(function(projectResponse, membershipsResponse) {
+                        applyProjectDetails(projectResponse[0]);
+                        projectAccessMemberships = membershipsResponse[0] || [];
+                        syncProjectAccessRoleFromSelection();
+                        $('#projectAccessModalMessage').text(message || 'Access saved.').removeClass('hidden');
+                        $('#saveProjectAccessButton').addClass('hidden');
+                        loadProjectsData($('#searchForm input[name="search"]').val());
+                    });
+                }
+
+                if (role === 'none') {
+                    if (!existingMembership) return;
+                    deleteProjectAccess(existingMembership.id);
+                    closeProjectAccessModal();
+                    return;
+                }
+
+                const payload = {
+                    user_id: userId,
+                    project_id: projectId,
+                    project_role: role
+                };
+                const request = existingMembership
+                    ? $.ajax({ url: `/api/project_memberships/${existingMembership.id}`, method: 'PUT', contentType: 'application/json', data: JSON.stringify(payload) })
+                    : $.ajax({ url: '/api/project_memberships', method: 'POST', contentType: 'application/json', data: JSON.stringify(payload) });
+                request.done(function() {
+                    afterSaved('Access saved.');
+                }).fail(function(xhr) {
+                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Unable to save access.';
+                    showSwalModal({ title: 'Error!', text: error, icon: 'error', confirmText: 'OK' });
+                });
+            }
+
             window.updateProject = function() {
                 if (!currentEditingProjectId) return;
 
+                const linkInput = $('#modalProjectSourceLinkInput');
                 const updatedData = {
                     name: $('#modalProjectNameDisplay').text().trim(),
                     description: $('#modalProjectDescription').val().trim(),
-                    source_link: $('#modalProjectSourceLinkInput').val().trim(),
+                    source_link: linkInput.length ? linkInput.val().trim() : originalProjectData.source_link,
                     status: $('#editProjectStatus-selected').text().trim()
                 };                
 
@@ -1295,6 +2011,97 @@
                         showSwalModal({
                             title: 'Error!',
                             text: `Error: ${error}`,
+                            icon: 'error',
+                            confirmText: 'OK'
+                        });
+                    }
+                });
+            }
+
+            function deleteProjectAccess(membershipId) {
+                if (!membershipId) return;
+
+                function removeProjectAccess(deleteApplicationAccess) {
+                    $.ajax({
+                        url: `/api/project_memberships/${membershipId}`,
+                        type: 'DELETE',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ delete_application_access: Boolean(deleteApplicationAccess) }),
+                        success: function() {
+                            refreshProjectDetails(currentEditingProjectId);
+                            loadProjectsData($('#searchForm input[name="search"]').val());
+                        },
+                        error: function(xhr) {
+                            const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error removing project access';
+                            showSwalModal({
+                                title: 'Error!',
+                                text: error,
+                                icon: 'error',
+                                confirmText: 'OK'
+                            });
+                        }
+                    });
+                }
+
+                function confirmRemoval(details) {
+                    const applications = details.applications || [];
+                    if (!applications.length) {
+                        showSwalModal({
+                            title: 'Remove project access?',
+                            text: 'This user will be removed from the project access list.',
+                            icon: 'warning',
+                            confirmText: 'Remove',
+                            cancelText: 'Cancel',
+                            onConfirm: function() {
+                                removeProjectAccess(false);
+                            }
+                        });
+                        return;
+                    }
+
+                    const accessList = applications
+                        .map(function(application) {
+                            return `${application.application_name} (${application.access_code || application.access_label})`;
+                        })
+                        .join(', ');
+                    Swal.fire({
+                        title: 'Remove project access?',
+                        text: `The user has access to applications inside ${details.project_name}: ${accessList}. Do you want to delete the user from all applications of the project?`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        showDenyButton: true,
+                        confirmButtonText: 'Yes, delete all',
+                        denyButtonText: 'No, keep application access',
+                        cancelButtonText: 'Cancel',
+                        customClass: {
+                            popup: 'resource-page-swal bg-white rounded-lg shadow-lg',
+                            title: 'text-xl font-bold text-gray-800',
+                            content: 'text-gray-700',
+                            confirmButton: 'btn btn-danger',
+                            denyButton: 'btn btn-secondary',
+                            cancelButton: 'btn btn-secondary',
+                            actions: 'flex justify-center space-x-4'
+                        },
+                        buttonsStyling: false,
+                        scrollbarPadding: false
+                    }).then(function(result) {
+                        if (result.isConfirmed) {
+                            removeProjectAccess(true);
+                        } else if (result.isDenied) {
+                            removeProjectAccess(false);
+                        }
+                    });
+                }
+
+                $.ajax({
+                    url: `/api/project_memberships/${membershipId}/application_access`,
+                    type: 'GET',
+                    success: confirmRemoval,
+                    error: function(xhr) {
+                        const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error checking application access';
+                        showSwalModal({
+                            title: 'Error!',
+                            text: error,
                             icon: 'error',
                             confirmText: 'OK'
                         });
@@ -1403,12 +2210,6 @@
                     });
                 });
 
-                $('#projectListContainer').on('click', '.assign-users-button', function(e) {
-                    e.preventDefault();
-                    const pid = $(this).data('id');
-                    openAssignUsersModal(pid);
-                });
-
                 $('#projectListContainer').on('click', '.project-sort-button', function() {
                     const nextSortKey = $(this).data('sort-key');
                     projectSortDirection = projectSortKey === nextSortKey && projectSortDirection === 'asc'
@@ -1417,50 +2218,6 @@
                     projectSortKey = nextSortKey;
                     currentPage = 1;
                     loadProjectsData($('#searchForm input[name="search"]').val());
-                });
-
-                $('#assignUserSearch').on('input', renderAssignUserOptions);
-
-                $('#assignUsersOptions').on('change', '.assign-user-checkbox', function() {
-                    const userId = Number($(this).val());
-                    const user = assignUsers.find(function(item) {
-                        return item.id === userId;
-                    });
-                    if (!user) return;
-                    if ($(this).is(':checked')) {
-                        selectedAssignUsers.set(user.id, user);
-                    } else {
-                        selectedAssignUsers.delete(user.id);
-                    }
-                    renderSelectedAssignUsers();
-                    renderAssignUserOptions();
-                    renderAssignApplications(assignCurrentProjectData);
-                });
-
-                $('#selectedAssignUsers').on('click', '.remove-assign-user', function() {
-                    selectedAssignUsers.delete(Number($(this).data('id')));
-                    renderSelectedAssignUsers();
-                    renderAssignUserOptions();
-                    renderAssignApplications(assignCurrentProjectData);
-                });
-
-                $('#assignUsersModal').on('click', '.assign-project-role-button', function() {
-                    setAssignProjectRole($(this).data('role'));
-                });
-
-                $('#assignUsersModal').on('click', '.assign-app-option', function() {
-                    if ($(this).prop('disabled')) {
-                        return;
-                    }
-                    const applicationId = Number($(this).data('application-id'));
-                    $(`.assign-app-access-input[data-application-id="${applicationId}"]`).val($(this).data('value'));
-                    applyAssignApplicationStyles();
-                });
-
-                $('#assignUsersModal').on('click', function(e) {
-                    if (e.target.id === 'assignUsersModal') {
-                        closeAssignUsersModal();
-                    }
                 });
 
                 loadProjectsData();
@@ -1477,11 +2234,14 @@
                 window.closeNewProjectModal = function() {
                     $('#newProjectModal').addClass('hidden');
                     $('#newProjectForm')[0].reset();
-                    $('#projectStatus-selected').text('Select Status').removeClass('text-yellow-600');
+                    $('#projectStatus-selected').text('Draft').addClass('text-yellow-600');
                     $('#projectStatus-options li').each(function() {
                         $(this).find('span svg').addClass('hidden');
+                        if ($(this).data('value') === 'Draft') {
+                            $(this).find('span svg').removeClass('hidden');
+                        }
                     });
-                    $('#projectStatus-hidden').remove();
+                    $('#projectStatus-hidden').val('Draft');
                 }
                 $('#newProjectModal').on('click', function(e) {
                     if (e.target.id === 'newProjectModal') {
@@ -1492,6 +2252,91 @@
                 $('#projectModal').on('click', function(e) {
                     if (e.target.id === 'projectModal') {
                         closeProjectModal();
+                    }
+                });
+
+                $('#openProjectApplicationModalButton').on('click', openProjectApplicationModal);
+                $('#cancelProjectApplicationModal').on('click', closeProjectApplicationModal);
+                $('#projectApplicationForm').on('submit', saveProjectApplication);
+
+                $('#projectApplicationModal').on('click', function(e) {
+                    if (e.target.id === 'projectApplicationModal') {
+                        closeProjectApplicationModal();
+                    }
+                });
+
+                $('#projectApplicationDropdownButton').on('click', function(e) {
+                    e.stopPropagation();
+                    const willOpen = $('#projectApplicationDropdownPanel').hasClass('hidden');
+                    $('#projectApplicationDropdownPanel').toggleClass('hidden', !willOpen);
+                    $(this).attr('aria-expanded', willOpen ? 'true' : 'false');
+                });
+
+                $('#projectApplicationDropdownPanel').on('click', function(e) {
+                    e.stopPropagation();
+                });
+
+                $('#projectApplicationSearchInput').on('input', renderProjectApplicationOptions);
+
+                $('#projectApplicationList').on('click', 'li[data-id]', function() {
+                    $('#projectApplicationId').val($(this).data('id'));
+                    $('#projectApplicationDropdownSelected').text($(this).data('name'));
+                    $('#projectApplicationDropdownPanel').addClass('hidden');
+                    $('#projectApplicationDropdownButton').attr('aria-expanded', 'false');
+                    updateProjectApplicationSaveButton();
+                });
+
+                $('#projectModal').on('click', '.remove-project-application', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    removeProjectApplication(Number($(this).data('application-id')));
+                });
+
+                $('#openProjectAccessModalButton').on('click', openProjectAccessModal);
+                $('#cancelProjectAccessModal').on('click', closeProjectAccessModal);
+                $('#projectAccessForm').on('submit', saveProjectAccess);
+
+                $('#projectAccessModal').on('click', function(e) {
+                    if (e.target.id === 'projectAccessModal') {
+                        closeProjectAccessModal();
+                    }
+                });
+
+                $('#projectAccessUserDropdownButton').on('click', function(e) {
+                    e.stopPropagation();
+                    const willOpen = $('#projectAccessUserDropdownPanel').hasClass('hidden');
+                    $('#projectAccessUserDropdownPanel').toggleClass('hidden', !willOpen);
+                    $(this).attr('aria-expanded', willOpen ? 'true' : 'false');
+                });
+
+                $('#projectAccessUserDropdownPanel').on('click', function(e) {
+                    e.stopPropagation();
+                });
+
+                $('#projectAccessUserSearchInput').on('input', renderProjectAccessUserOptions);
+
+                $('#projectAccessUserList').on('click', 'li[data-id]', function() {
+                    if ($(this).attr('aria-disabled') === 'true') return;
+                    $('#projectAccessUserId').val($(this).data('id'));
+                    $('#projectAccessUserDropdownSelected').text($(this).data('name'));
+                    $('#projectAccessUserDropdownPanel').addClass('hidden');
+                    $('#projectAccessUserDropdownButton').attr('aria-expanded', 'false');
+                    syncProjectAccessRoleFromSelection();
+                });
+
+                $('#projectAccessModal .membership-role-button').on('click', function() {
+                    if ($(this).prop('disabled')) return;
+                    setProjectAccessRole($(this).data('role'));
+                });
+
+                $(document).on('click', function(e) {
+                    if (!$(e.target).closest('#projectAccessUserDropdownButton, #projectAccessUserDropdownPanel').length) {
+                        $('#projectAccessUserDropdownPanel').addClass('hidden');
+                        $('#projectAccessUserDropdownButton').attr('aria-expanded', 'false');
+                    }
+                    if (!$(e.target).closest('#projectApplicationDropdownButton, #projectApplicationDropdownPanel').length) {
+                        $('#projectApplicationDropdownPanel').addClass('hidden');
+                        $('#projectApplicationDropdownButton').attr('aria-expanded', 'false');
                     }
                 });
 
@@ -1527,6 +2372,7 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             let updatedName = result.value;
+                            const linkInput = $('#modalProjectSourceLinkInput');
                             $.ajax({
                                 url: `/edit_project/${currentEditingProjectId}`,
                                 type: 'POST',
@@ -1534,7 +2380,7 @@
                                 data: JSON.stringify({
                                     name: updatedName,
                                     description: $('#modalProjectDescription').val().trim(),
-                                    source_link: $('#modalProjectSourceLinkInput').val().trim() || originalProjectData.source_link,
+                                    source_link: linkInput.length ? linkInput.val().trim() : originalProjectData.source_link,
                                     status: $('#editProjectStatus-selected').text().trim()
                                 }),
                                 success: function(resp) {
@@ -1594,33 +2440,43 @@
                     });
                 });                
 
-                $('#editLinkBtn').on('click', function() {
-                    if (!inEditModeLink) {
-                        inEditModeLink = true;
-                        $(this).html(cancelIcon);
-                        $(this).removeClass('hover:text-blue-500').addClass('hover:text-red-500');
-                        $('#modalProjectSourceLinkDisplay').addClass('hidden');
-                        $('#modalProjectSourceLinkInput').removeClass('hidden').focus();
+                $('#editDescriptionBtn').on('click', function() {
+                    if (!inEditModeDescription) {
+                        inEditModeDescription = true;
+                        $(this).html(saveIcon);
+                        $(this).removeClass('hover:text-blue-500 hover:text-red-500').addClass('hover:text-green-600');
+                        $('#modalProjectDescriptionDisplay').addClass('hidden');
+                        $('#modalProjectDescription').removeClass('hidden').focus();
                     } else {
-                        inEditModeLink = false;
-                        $(this).html(editIcon);
-                        $(this).removeClass('hover:text-red-500').addClass('hover:text-blue-500');
-                        setSourceLinkDisplay(originalProjectData.source_link);
-                        $('#modalProjectSourceLinkInput').val(originalProjectData.source_link)
-                            .addClass('hidden');
-                        $('#modalProjectSourceLinkDisplay').removeClass('hidden');
-                        checkIfModified();
+                        updateProject();
                     }
                 });
 
-                $('#modalProjectDescription, #modalProjectSourceLinkInput').on('input', function() {
+                $('#projectModal').on('click', '#editLinkBtn', function() {
+                    if (!inEditModeLink) {
+                        inEditModeLink = true;
+                        setSourceLinkDisplay(originalProjectData.source_link);
+                        $('#modalProjectSourceLinkInput').focus().select();
+                    }
+                });
+
+                $('#projectModal').on('click', '#saveLinkEditBtn', function() {
+                    updateProject();
+                });
+
+                $('#projectModal').on('click', '.delete-project-access', function() {
+                    deleteProjectAccess(Number($(this).data('membership-id')));
+                });
+
+                $('#projectModal').on('input', '#modalProjectDescription, #modalProjectSourceLinkInput', function() {
                     checkIfModified();
                 });                
             });
 
             function checkIfModified() {
                 const currentDesc = $('#modalProjectDescription').val().trim();
-                const currentLink = $('#modalProjectSourceLinkInput').val().trim();
+                const linkInput = $('#modalProjectSourceLinkInput');
+                const currentLink = linkInput.length ? linkInput.val().trim() : originalProjectData.source_link;
                 const currentStatus = $('#editProjectStatus-selected').text().trim();
             
                 const changed = (
@@ -1630,7 +2486,7 @@
                 );
             
                 if (changed) {
-                    $('#saveChangesBtn').removeClass('hidden');
+                    $('#saveChangesBtn').toggleClass('hidden', inEditModeDescription || inEditModeLink);
                 } else {
                     $('#saveChangesBtn').addClass('hidden');
                 }
