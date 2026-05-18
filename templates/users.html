@@ -1149,6 +1149,8 @@
     let membershipsPage = 1;
     let usersSortKey = 'username';
     let usersSortDirection = 'asc';
+    const usersSortStorageKey = `vermicelli:${window.currentUsername || 'anonymous'}:users-sort`;
+    const usersSortKeys = ['username', 'full_name', 'role', 'created'];
     const USERS_PAGE_SIZE = 5;
     const MEMBERSHIPS_PAGE_SIZE = 5;
     const currentSessionUserId = {{ session.get('user_id')|tojson }};
@@ -1156,6 +1158,29 @@
     const initialUsersSubpage = initialUsersParams.get('tab') === 'access' ? 'projectAccess' : 'usersTable';
     const initialDetailsUserId = Number(initialUsersParams.get('user_id') || 0);
     let initialDetailsOpened = false;
+
+    function loadUsersSortPreference() {
+        try {
+            const saved = JSON.parse(localStorage.getItem(usersSortStorageKey) || '{}');
+            if (usersSortKeys.includes(saved.key)) {
+                usersSortKey = saved.key;
+            }
+            if (saved.direction === 'asc' || saved.direction === 'desc') {
+                usersSortDirection = saved.direction;
+            }
+        } catch (error) {
+            localStorage.removeItem(usersSortStorageKey);
+        }
+    }
+
+    function saveUsersSortPreference() {
+        localStorage.setItem(usersSortStorageKey, JSON.stringify({
+            key: usersSortKey,
+            direction: usersSortDirection
+        }));
+    }
+
+    loadUsersSortPreference();
 
     const detailsIcon = `
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
@@ -2895,6 +2920,7 @@
             ? 'desc'
             : 'asc';
         usersSortKey = nextSortKey;
+        saveUsersSortPreference();
         usersPage = 1;
         renderUsers();
     });

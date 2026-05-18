@@ -507,6 +507,8 @@
     const appsPerPage = 5;
     let appSortKey = 'id';
     let appSortDirection = 'asc';
+    const appSortStorageKey = `vermicelli:${window.currentUsername || 'anonymous'}:applications-sort`;
+    const appSortKeys = ['id', 'name', 'release_date'];
     const versioningOptions = {
         semver: {
             label: 'Semantic Versioning (Major.Minor.Patch)',
@@ -537,6 +539,29 @@
             error: 'Initial version must use Major.Minor.Patch.Build or Major.Minor.Patch.Build-id, for example 0.0.0.0 or 3.2.1.45-rc1.'
         }
     };
+
+    function loadAppSortPreference() {
+        try {
+            const saved = JSON.parse(localStorage.getItem(appSortStorageKey) || '{}');
+            if (appSortKeys.includes(saved.key)) {
+                appSortKey = saved.key;
+            }
+            if (saved.direction === 'asc' || saved.direction === 'desc') {
+                appSortDirection = saved.direction;
+            }
+        } catch (error) {
+            localStorage.removeItem(appSortStorageKey);
+        }
+    }
+
+    function saveAppSortPreference() {
+        localStorage.setItem(appSortStorageKey, JSON.stringify({
+            key: appSortKey,
+            direction: appSortDirection
+        }));
+    }
+
+    loadAppSortPreference();
 
     // ================== SweetAlert Helpers ==================
     function getButtonClass(icon, type) {
@@ -805,6 +830,7 @@
                 ? 'desc'
                 : 'asc';
             appSortKey = nextSortKey;
+            saveAppSortPreference();
             currentPage = 1;
             displayApps(currentPage);
             updatePaginationControls();

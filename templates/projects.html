@@ -1071,6 +1071,31 @@
             let totalPages = 1;
             let projectSortKey = 'start_date';
             let projectSortDirection = 'desc';
+            const projectSortStorageKey = `vermicelli:${window.currentUsername || 'anonymous'}:projects-sort`;
+            const projectSortKeys = ['name', 'status', 'start_date', 'access'];
+
+            function loadProjectSortPreference() {
+                try {
+                    const saved = JSON.parse(localStorage.getItem(projectSortStorageKey) || '{}');
+                    if (projectSortKeys.includes(saved.key)) {
+                        projectSortKey = saved.key;
+                    }
+                    if (saved.direction === 'asc' || saved.direction === 'desc') {
+                        projectSortDirection = saved.direction;
+                    }
+                } catch (error) {
+                    localStorage.removeItem(projectSortStorageKey);
+                }
+            }
+
+            function saveProjectSortPreference() {
+                localStorage.setItem(projectSortStorageKey, JSON.stringify({
+                    key: projectSortKey,
+                    direction: projectSortDirection
+                }));
+            }
+
+            loadProjectSortPreference();
 
             let originalProjectData = {
                 name: '',
@@ -2235,6 +2260,7 @@
                         ? 'desc'
                         : 'asc';
                     projectSortKey = nextSortKey;
+                    saveProjectSortPreference();
                     currentPage = 1;
                     loadProjectsData($('#searchForm input[name="search"]').val());
                 });
