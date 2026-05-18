@@ -21,6 +21,7 @@ from main import (
     Application,
     ApplicationDeployment,
     ApplicationMembership,
+    ChangeLog,
     PLATFORM_ADMIN,
     PLATFORM_SUPER_ADMIN,
     PLATFORM_USER,
@@ -560,7 +561,11 @@ def test_system_settings_page_is_admin_only_and_linked_from_avatar_menu(client):
     admin_response = client.get('/content/system-settings')
     assert admin_response.status_code == 200
     admin_body = admin_response.data.decode()
-    assert 'System Settings' in admin_body
+    assert 'Admin-only backup export and restore controls.' not in admin_body
+    assert 'Dashboard' in admin_body
+    assert 'data-system-tab="backupTab"' in admin_body
+    assert 'data-system-tab="logsTab"' in admin_body
+    assert 'Change Logs' in admin_body
     assert 'Export Backup' in admin_body
     assert 'Restore Backup' in admin_body
 
@@ -571,6 +576,42 @@ def test_system_settings_page_is_admin_only_and_linked_from_avatar_menu(client):
     assert b'System Settings' not in shell_user_response.data
     user_response = client.get('/content/system-settings')
     assert user_response.status_code == 403
+
+
+def test_admin_can_view_and_download_system_change_logs(client):
+    admin = create_user('admin', PLATFORM_ADMIN)
+    db.session.add(ChangeLog(
+        action='created',
+        entity_type='project',
+        entity_id=7,
+        entity_name='Logged Project',
+        details='Created project.',
+        actor_user_id=admin.id,
+        actor_username=admin.username,
+    ))
+    db.session.commit()
+    login_as(client, admin)
+
+    response = client.get('/api/system/logs')
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert payload['total_items'] == 1
+    assert payload['page'] == 1
+    assert payload['logs'][0]['entity_name'] == 'Logged Project'
+    assert payload['logs'][0]['actor_username'] == 'admin'
+
+    search_response = client.get('/api/system/logs?search=Logged')
+    assert search_response.status_code == 200
+    assert search_response.get_json()['total_items'] == 1
+
+    empty_search_response = client.get('/api/system/logs?search=Missing')
+    assert empty_search_response.status_code == 200
+    assert empty_search_response.get_json()['total_items'] == 0
+
+    download_response = client.get('/api/system/logs/download')
+    assert download_response.status_code == 200
+    assert download_response.mimetype == 'text/csv'
+    assert b'Logged Project' in download_response.data
 
 
 def test_account_settings_no_longer_contains_system_tab(client):

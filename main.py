@@ -1,8 +1,10 @@
 import os
 import json
 import base64
+import csv
 import hashlib
 import hmac
+import io
 import math
 import secrets
 from dotenv import load_dotenv
@@ -1477,6 +1479,50 @@ class Project(db.Model):
     memberships = db.relationship('ProjectMembership', back_populates='project', cascade='all, delete-orphan')
 
 
+class ChangeLog(db.Model):
+    """System-wide audit log for user-visible data changes."""
+    __tablename__ = 'change_logs'
+
+    id = db.Column(db.Integer, primary_key=True)
+    action = db.Column(db.String(50), nullable=False, index=True)
+    entity_type = db.Column(db.String(80), nullable=False, index=True)
+    entity_id = db.Column(db.Integer)
+    entity_name = db.Column(db.String(255))
+    details = db.Column(db.Text)
+    actor_user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='SET NULL'))
+    actor_username = db.Column(db.String(80))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
+
+    actor = db.relationship('User')
+
+
+def log_change(action, entity_type, entity_id=None, entity_name='', details='', actor=None):
+    actor = actor if actor is not None else get_current_user()
+    db.session.add(ChangeLog(
+        action=action,
+        entity_type=entity_type,
+        entity_id=entity_id,
+        entity_name=str(entity_name or '')[:255],
+        details=str(details or ''),
+        actor_user_id=actor.id if actor else None,
+        actor_username=actor.username if actor else 'system',
+    ))
+
+
+def serialize_change_log(entry, display_user=None):
+    return {
+        'id': entry.id,
+        'action': entry.action,
+        'entity_type': entry.entity_type,
+        'entity_id': entry.entity_id,
+        'entity_name': entry.entity_name or '',
+        'details': entry.details or '',
+        'actor_username': entry.actor_username or 'system',
+        'created_at': entry.created_at.isoformat() if entry.created_at else None,
+        'created_at_display': format_datetime_for_user(entry.created_at, display_user) if entry.created_at else 'N/A',
+    }
+
+
 def touch_project(project):
     if project is not None:
         project.updated_at = datetime.utcnow()
@@ -2165,6 +2211,20 @@ def serialize_backup_payload():
                 }
                 for membership in ApplicationMembership.query.order_by(ApplicationMembership.id).all()
             ],
+            'change_logs': [
+                {
+                    'id': entry.id,
+                    'action': entry.action,
+                    'entity_type': entry.entity_type,
+                    'entity_id': entry.entity_id,
+                    'entity_name': entry.entity_name or '',
+                    'details': entry.details or '',
+                    'actor_user_id': entry.actor_user_id,
+                    'actor_username': entry.actor_username or 'system',
+                    'created_at': backup_datetime(entry.created_at),
+                }
+                for entry in ChangeLog.query.order_by(ChangeLog.id).all()
+            ],
         }
     }
 
@@ -2225,6 +2285,7 @@ def get_backup_data(payload):
         'project_applications',
         'project_memberships',
         'application_memberships',
+        'change_logs',
     )
     for section in expected_sections:
         if section not in data:
@@ -2270,6 +2331,9 @@ def validate_backup_data(data):
     _, error = backup_section_ids(data['application_memberships'], 'application_memberships')
     if error:
         return error
+    _, error = backup_section_ids(data['change_logs'], 'change_logs')
+    if error:
+        return error
 
     if not data['users']:
         return 'Backup must contain at least one admin user.'
@@ -2304,6 +2368,7 @@ def validate_backup_data(data):
 
 
 def clear_application_data():
+    ChangeLog.query.delete(synchronize_session=False)
     db.session.execute(project_applications.delete())
     ApplicationMembership.query.delete(synchronize_session=False)
     ProjectMembership.query.delete(synchronize_session=False)
@@ -2320,7 +2385,7 @@ def clear_application_data():
 def reset_primary_key_sequences():
     if db.engine.dialect.name != 'postgresql':
         return
-    for table_name in ('users', 'project', 'application', 'version', 'application_repository_branches', 'application_deployments', 'project_memberships', 'application_memberships'):
+    for table_name in ('users', 'project', 'application', 'version', 'application_repository_branches', 'application_deployments', 'project_memberships', 'application_memberships', 'change_logs'):
         quoted_table_name = f'"{table_name}"'
         db.session.execute(text(
             f"SELECT setval(pg_get_serial_sequence('{quoted_table_name}', 'id'), "
@@ -2455,6 +2520,19 @@ def import_backup_payload(payload):
                 access_level=row.get('access_level') if row.get('access_level') in APPLICATION_ACCESS_LEVELS else ACCESS_VIEW_ONLY,
                 created_at=parse_backup_datetime(row.get('created_at')) or datetime.utcnow(),
                 updated_at=parse_backup_datetime(row.get('updated_at')) or datetime.utcnow(),
+            ))
+
+        for row in data['change_logs']:
+            db.session.add(ChangeLog(
+                id=row['id'],
+                action=row.get('action') or 'changed',
+                entity_type=row.get('entity_type') or 'system',
+                entity_id=row.get('entity_id'),
+                entity_name=row.get('entity_name') or '',
+                details=row.get('details') or '',
+                actor_user_id=row.get('actor_user_id') if row.get('actor_user_id') in {user['id'] for user in data['users']} else None,
+                actor_username=row.get('actor_username') or 'system',
+                created_at=parse_backup_datetime(row.get('created_at')) or datetime.utcnow(),
             ))
 
         db.session.flush()
@@ -2667,6 +2745,7 @@ def create_application_deployment(app_id):
         base_url=base_url,
     )
     db.session.add(deployment)
+    log_change('created', 'deployment', None, name, f'Configured deployment for application "{app_obj.name}".', current)
     db.session.commit()
     return jsonify({
         'message': 'Deployment configured.',
@@ -2693,6 +2772,7 @@ def update_application_deployment(deployment_id):
     deployment.name = name
     deployment.deployment_type = normalize_deployment_type(data.get('deployment_type'))
     deployment.base_url = base_url
+    log_change('updated', 'deployment', deployment.id, name, f'Updated deployment for application "{deployment.application.name}".', current)
     db.session.commit()
     return jsonify({
         'message': 'Deployment updated.',
@@ -2708,6 +2788,9 @@ def delete_application_deployment(deployment_id):
     if not can_write_application(current, deployment.application):
         return json_error('You do not have permission to delete this deployment.', 403)
 
+    deployment_name = deployment.name
+    application_name = deployment.application.name
+    log_change('deleted', 'deployment', deployment.id, deployment_name, f'Deleted deployment from application "{application_name}".', current)
     db.session.delete(deployment)
     db.session.commit()
     return jsonify({'message': 'Deployment deleted.'})
@@ -2871,6 +2954,7 @@ def edit_application(app_id):
 
     try:
         touch_projects({project.id: project for project in previous_projects + list(app_obj.projects)}.values())
+        log_change('updated', 'application', app_obj.id, app_obj.name, 'Updated application details.', current)
         db.session.commit()
         return jsonify({'message': 'Application updated successfully'})
     except IntegrityError:
@@ -2925,6 +3009,7 @@ def create_application():
             change_date=datetime.utcnow()
         )
         db.session.add(initial_version)
+        log_change('created', 'application', new_app.id, new_app.name, f'Created application with initial version {initial_version.number}.', get_current_user())
         db.session.commit()
 
         return jsonify({
@@ -2957,6 +3042,9 @@ def delete_application(app_id):
     if not can_write_application(get_current_user(), app_to_delete):
         return json_error('You do not have permission to delete this application.', 403)
     try:
+        current = get_current_user()
+        application_name = app_to_delete.name
+        log_change('deleted', 'application', app_to_delete.id, application_name, 'Deleted application.', current)
         db.session.delete(app_to_delete)
         db.session.commit()
         return jsonify({'message': 'Application deleted successfully'}), 200
@@ -3026,6 +3114,7 @@ def update_version(application_id):
             notes=release_notes
         )
         db.session.add(new_version)
+        log_change('created', 'version', None, new_version_number, f'Created version for application "{app_obj.name}".', jwt_user)
         db.session.commit()
 
         return jsonify({'new_version': new_version_number, 'notes': release_notes})
@@ -3086,6 +3175,7 @@ def update_application_versioning(application_id):
         next_prerelease,
         versioning_type
     )
+    log_change('updated', 'versioning', latest_version.id, app_obj.name, f'Updated versioning options to {versioning_type}.', current)
     db.session.commit()
     version_context = application_version_context(application_id, current)
 
@@ -3222,6 +3312,7 @@ def create_project():
                 project_role=PROJECT_ADMIN,
                 access_level=ACCESS_READ_WRITE,
             ))
+        log_change('created', 'project', new_project.id, new_project.name, 'Created project.', current)
         db.session.commit()
 
         return jsonify({'message': 'Project created successfully'}), 201
@@ -3236,6 +3327,9 @@ def delete_project(project_id):
     if not can_manage_project_resource(get_current_user(), project_id):
         return json_error('You do not have permission to delete this project.', 403)
     try:
+        current = get_current_user()
+        project_name = project.name
+        log_change('deleted', 'project', project.id, project_name, 'Deleted project.', current)
         db.session.delete(project)
         db.session.commit()
         return jsonify({'message': 'Project deleted successfully!'}), 200
@@ -3351,6 +3445,7 @@ def link_project_application(project_id):
     if app_obj not in project.applications:
         project.applications.append(app_obj)
         touch_project(project)
+        log_change('created', 'project application link', project.id, project.name, f'Linked application "{app_obj.name}".', current)
         db.session.commit()
     return jsonify({'message': 'Application linked successfully.'})
 
@@ -3367,6 +3462,7 @@ def unlink_project_application(project_id, application_id):
     if app_obj in project.applications:
         project.applications.remove(app_obj)
         touch_project(project)
+        log_change('deleted', 'project application link', project.id, project.name, f'Removed application "{app_obj.name}".', current)
         db.session.commit()
     return jsonify({'message': 'Application removed from project.'})
 
@@ -3407,6 +3503,7 @@ def edit_project(project_id):
     touch_project(project)
 
     try:
+        log_change('updated', 'project', project.id, project.name, 'Updated project details.', get_current_user())
         db.session.commit()
         return jsonify({'message': 'Project updated successfully'})
     except Exception as e:
@@ -3726,6 +3823,70 @@ def system_settings_content():
     return render_template('system_settings.html')
 
 
+@app.route('/api/system/logs')
+@login_required
+def system_logs():
+    current = get_current_user()
+    if not has_platform_role(current, PLATFORM_ADMIN):
+        return json_error('Only admins can view system logs.', 403)
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    search_query = request.args.get('search', '', type=str).strip()
+    page = max(page, 1)
+    per_page = min(max(per_page, 1), 100)
+    query = ChangeLog.query.order_by(ChangeLog.created_at.desc(), ChangeLog.id.desc())
+    if search_query:
+        search_like = f'%{search_query.lower()}%'
+        query = query.filter(or_(
+            func.lower(ChangeLog.action).like(search_like),
+            func.lower(ChangeLog.entity_type).like(search_like),
+            func.lower(ChangeLog.entity_name).like(search_like),
+            func.lower(ChangeLog.details).like(search_like),
+            func.lower(ChangeLog.actor_username).like(search_like),
+        ))
+    total_items = query.count()
+    total_pages = max(1, math.ceil(total_items / per_page)) if total_items else 1
+    page = min(page, total_pages)
+    entries = query.offset((page - 1) * per_page).limit(per_page).all()
+    return jsonify({
+        'logs': [serialize_change_log(entry, current) for entry in entries],
+        'page': page,
+        'per_page': per_page,
+        'total_items': total_items,
+        'total_pages': total_pages,
+        'has_prev': page > 1,
+        'has_next': page < total_pages,
+    })
+
+
+@app.route('/api/system/logs/download')
+@login_required
+def download_system_logs():
+    current = get_current_user()
+    if not has_platform_role(current, PLATFORM_ADMIN):
+        return json_error('Only admins can download system logs.', 403)
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['date', 'actor', 'action', 'entity_type', 'entity_id', 'entity_name', 'details'])
+    entries = ChangeLog.query.order_by(ChangeLog.created_at.desc(), ChangeLog.id.desc()).all()
+    for entry in entries:
+        writer.writerow([
+            format_datetime_for_user(entry.created_at, current) if entry.created_at else '',
+            entry.actor_username or 'system',
+            entry.action,
+            entry.entity_type,
+            entry.entity_id or '',
+            entry.entity_name or '',
+            entry.details or '',
+        ])
+    filename = f"vermicelli-change-logs-{datetime.utcnow().strftime('%Y%m%d-%H%M%S')}.csv"
+    return Response(
+        output.getvalue(),
+        mimetype='text/csv',
+        headers={'Content-Disposition': f'attachment; filename="{filename}"'}
+    )
+
+
 @app.route('/api/system/verify-admin-password', methods=['POST'])
 @login_required
 def verify_system_admin_password():
@@ -3750,6 +3911,8 @@ def export_system_backup():
     if error:
         return json_error(error, 400)
 
+    log_change('exported', 'backup', None, 'System backup', 'Exported encrypted system backup.', current)
+    db.session.commit()
     filename = f"vermicelli-backup-{datetime.utcnow().strftime('%Y%m%d-%H%M%S')}.vmbak"
     return Response(
         json.dumps(encrypted_payload, indent=2, sort_keys=True),
@@ -3780,10 +3943,21 @@ def import_system_backup():
     if error:
         return json_error(error, 400)
 
+    actor_username = current.username
     ok, error = import_backup_payload(payload)
     if not ok:
         return json_error(error, 400)
 
+    restored_actor = User.query.filter_by(username=actor_username).first()
+    db.session.add(ChangeLog(
+        action='restored',
+        entity_type='backup',
+        entity_name='System backup',
+        details='Restored encrypted system backup.',
+        actor_user_id=restored_actor.id if restored_actor else None,
+        actor_username=actor_username,
+    ))
+    db.session.commit()
     session.clear()
     return jsonify({'message': 'Backup imported successfully. Please sign in again.'})
 
@@ -3899,6 +4073,7 @@ def update_me():
     user.full_name = full_name
     user.timezone = timezone_name
     user.datetime_format = normalize_datetime_format(datetime_format)
+    log_change('updated', 'user', user.id, user.username, 'Updated account settings.', user)
     db.session.commit()
     return jsonify(serialize_user_details(user, user))
 
@@ -3923,6 +4098,7 @@ def update_my_password():
         return json_error('Password confirmation does not match.', 400)
 
     user.set_password(new_password)
+    log_change('updated', 'user', user.id, user.username, 'Changed account password.', user)
     db.session.commit()
     return jsonify({'message': 'Password updated successfully'})
 
@@ -3986,6 +4162,8 @@ def create_user():
     new_user.timezone = DEFAULT_TIMEZONE
     new_user.set_password(password)
     db.session.add(new_user)
+    db.session.flush()
+    log_change('created', 'user', new_user.id, new_user.username, 'Created user account.', current)
     db.session.commit()
     return jsonify(serialize_user(new_user, current)), 201
 
@@ -4033,6 +4211,7 @@ def update_user(user_id):
     target.timezone = timezone_name
     target.platform_role = new_platform_role
     target.can_create_projects = can_create_projects if new_platform_role == PLATFORM_USER else False
+    log_change('updated', 'user', target.id, target.username, 'Updated user account.', current)
     db.session.commit()
     return jsonify(serialize_user(target, current))
 
@@ -4063,6 +4242,7 @@ def update_user_status(user_id):
         return json_error('The last remaining admin cannot be disabled.', 400)
 
     target.is_active = is_active
+    log_change('updated', 'user', target.id, target.username, 'Enabled user account.' if is_active else 'Disabled user account.', current)
     db.session.commit()
     if session.get('user_id') == user_id and not is_active:
         session.clear()
@@ -4083,6 +4263,8 @@ def delete_user(user_id):
     if not ok:
         return json_error(message, 400)
 
+    username = target.username
+    log_change('deleted', 'user', target.id, username, 'Deleted user account.', current)
     db.session.delete(target)
     db.session.commit()
     if session.get('user_id') == user_id:
@@ -4169,6 +4351,7 @@ def create_project_membership():
     if project_role == PROJECT_ADMIN:
         ensure_project_applications_read_write_access(user_id, project)
     touch_project(project)
+    log_change('created', 'project access', None, project.name, f'Granted {project_role_label(project_role)} access to {target_user.username}.', current)
     db.session.commit()
     return jsonify(serialize_membership(membership)), 201
 
@@ -4193,6 +4376,7 @@ def update_project_membership(membership_id):
     if project_role == PROJECT_ADMIN:
         ensure_project_applications_read_write_access(membership.user_id, membership.project)
     touch_project(membership.project)
+    log_change('updated', 'project access', membership.id, membership.project.name, f'Changed {membership.user.username} to {project_role_label(project_role)}.', current)
     db.session.commit()
     return jsonify(serialize_membership(membership))
 
@@ -4278,6 +4462,7 @@ def delete_project_membership(membership_id):
         ensure_project_applications_read_write_access(membership.user_id, membership.project)
 
     touch_project(membership.project)
+    log_change('deleted', 'project access', membership.id, membership.project.name, f'Removed project access for {membership.user.username}.', current)
     db.session.delete(membership)
     db.session.commit()
     return jsonify({
@@ -4353,6 +4538,7 @@ def create_application_membership():
         touch_project(project)
     else:
         touch_projects(app_obj.projects)
+    log_change('created', 'application access', None, app_obj.name, f'Granted {access_label(access_level)} application access to {target_user.username}.', current)
     db.session.commit()
     return jsonify(serialize_application_membership(membership)), 201
 
@@ -4382,6 +4568,7 @@ def update_application_membership(membership_id):
         touch_project(project)
     else:
         touch_projects(membership.application.projects)
+    log_change('updated', 'application access', membership.id, membership.application.name, f'Changed {membership.user.username} to {access_label(access_level)}.', current)
     db.session.commit()
     return jsonify(serialize_application_membership(membership))
 
@@ -4395,6 +4582,7 @@ def delete_application_membership(membership_id):
         return json_error('You do not have permission to delete this application membership.', 403)
 
     touched_projects = list(membership.application.projects)
+    log_change('deleted', 'application access', membership.id, membership.application.name, f'Removed application access for {membership.user.username}.', current)
     db.session.delete(membership)
     touch_projects(touched_projects)
     db.session.commit()
@@ -4486,6 +4674,7 @@ def bulk_update_application_memberships():
             updated.append(app_membership)
 
     touch_projects(touched_projects.values())
+    log_change('updated', 'access', project.id, project.name, f'Bulk updated access for {len(user_ids)} user(s).', current)
     db.session.commit()
     return jsonify({
         'message': 'Application access updated successfully.',
