@@ -2,8 +2,6 @@
 
 # Default configuration values
 DEFAULT_BASE_URL="http://localhost:8000"
-DEFAULT_USERNAME="admin"
-DEFAULT_PASSWORD="password"
 DEFAULT_APP_ID=1
 DEFAULT_RELEASE_NOTES="No release notes available."
 
@@ -18,12 +16,8 @@ while [[ $# -gt 0 ]]; do
             VERSION_PART="$2"
             shift 2
             ;;
-        --username)
-            USERNAME="$2"
-            shift 2
-            ;;
-        --password)
-            PASSWORD="$2"
+        --apikey|--api-key)
+            API_KEY="$2"
             shift 2
             ;;
         --url)
@@ -47,56 +41,35 @@ done
 
 # Apply default values if flags are not provided
 BASE_URL=${BASE_URL:-$DEFAULT_BASE_URL}
-USERNAME=${USERNAME:-$DEFAULT_USERNAME}
-PASSWORD=${PASSWORD:-$DEFAULT_PASSWORD}
 APP_ID=${APP_ID:-$DEFAULT_APP_ID}
+API_KEY=${API_KEY:-${VERMICELLI_API_KEY:-}}
 RELEASE_NOTES=${RELEASE_NOTES:-${CI_COMMIT_MESSAGE:-${GITHUB_EVENT_HEAD_COMMIT_MESSAGE:-${GITEA_COMMIT_MESSAGE:-$DEFAULT_RELEASE_NOTES}}}}
 
-# Ensure the required flag `--version` is provided
-if [ -z "$VERSION_PART" ]; then
-    echo "Error: Missing required flag --version. Usage: ./update.sh --version <major|minor|patch> [--prerelease <id>] [other flags]"
+# Ensure the required API key is provided
+if [ -z "$API_KEY" ]; then
+    echo "Error: Missing required flag --apikey. Usage: ./update.sh --apikey <api-key> --appid <id> [--releasenotes <notes>] [--url <base-url>]"
     exit 1
 fi
-VERSION_PART=$(printf '%s' "$VERSION_PART" | tr '[:upper:]' '[:lower:]')
+if [ -n "$VERSION_PART" ]; then
+    VERSION_PART=$(printf '%s' "$VERSION_PART" | tr '[:upper:]' '[:lower:]')
+fi
 
 # API endpoints
-LOGIN_ENDPOINT="/api/login"
 UPDATE_ENDPOINT="/app/$APP_ID/update_version"
-
-# Function to log in and obtain JWT token
-get_jwt_token() {
-    echo "Logging in to obtain JWT token..." >&2
-    RESPONSE=$(curl -s -X POST -H "Content-Type: application/json" \
-        -d "{\"username\": \"$USERNAME\", \"password\": \"$PASSWORD\"}" \
-        "$BASE_URL$LOGIN_ENDPOINT")
-    
-    echo "Raw login response: $RESPONSE" >&2
-    
-    TOKEN=$(echo "$RESPONSE" | jq -r '.access_token')
-    
-    if [ -z "$TOKEN" ] || [ "$TOKEN" == "null" ]; then
-        echo "Error: Failed to obtain token. Response: $RESPONSE" >&2
-        exit 1
-    fi
-    
-    echo "$TOKEN"
-}
 
 # Function to update the version
 update_version() {
-    local TOKEN=$1
-    echo "Using token: $TOKEN" >&2
-    
-    echo "Updating $VERSION_PART version for application ID $APP_ID..."
+    echo "Updating version for application ID $APP_ID..."
     PAYLOAD=$(jq -n \
-        --arg version_part "$VERSION_PART" \
         --arg releasenotes "$RELEASE_NOTES" \
+        --arg version_part "${VERSION_PART:-}" \
         --arg prerelease "${PRERELEASE:-}" \
-        '{version_part: $version_part, releasenotes: $releasenotes}
+        '{releasenotes: $releasenotes}
+         + (if $version_part == "" then {} else {version_part: $version_part} end)
          + (if $prerelease == "" then {} else {prerelease: $prerelease} end)')
 
     RESPONSE=$(curl -s -X POST -H "Content-Type: application/json" \
-        -H "Authorization: Bearer $TOKEN" \
+        -H "X-API-Key: $API_KEY" \
         -d "$PAYLOAD" \
         "$BASE_URL$UPDATE_ENDPOINT")
     
@@ -105,13 +78,12 @@ update_version() {
     NEW_VERSION=$(echo "$RESPONSE" | jq -r '.new_version')
     
     if [ "$NEW_VERSION" == "null" ]; then
-        echo "Error: Failed to update $VERSION_PART version. Response: $RESPONSE" >&2
+        echo "Error: Failed to update version. Response: $RESPONSE" >&2
         exit 1
     fi
     
-    echo "$VERSION_PART version updated successfully. New version: $NEW_VERSION"
+    echo "Version updated successfully. New version: $NEW_VERSION"
 }
 
 # Main script execution
-JWT_TOKEN=$(get_jwt_token)
-update_version "$JWT_TOKEN"
+update_version

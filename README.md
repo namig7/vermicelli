@@ -98,8 +98,8 @@ For the advanced installation steps and features(Docker & Non-docker with Postgr
 ## update.sh - Usage Example
 
 ```bash
-./update.sh --version patch --appid 10 --releasenotes "$RELEASE_NOTES" --username myuser --password mypass --url http://myapi.example.com
+./update.sh --appid 10 --apikey "$VERMICELLI_API_KEY" --releasenotes "$RELEASE_NOTES" --url http://myapi.example.com
 ```
 
-The script increments the selected version part for the given application and saves `--releasenotes` on the new version.
+The script uses an API key generated from an application release increment and saves `--releasenotes` on the new version.
 Use your CI provider's commit message variable for `--releasenotes`, for example `$GITHUB_EVENT_HEAD_COMMIT_MESSAGE` on GitHub, `$CI_COMMIT_MESSAGE` on GitLab, or `$GITEA_COMMIT_MESSAGE` on Gitea. If no release notes are provided, the version stores `No release notes available.`.

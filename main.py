@@ -103,10 +103,20 @@ DEPLOYMENT_TYPES = (
 DEFAULT_TIMEZONE = 'UTC'
 DEFAULT_DATETIME_FORMAT = 'iso_24'
 DEFAULT_RELEASE_NOTES = 'No release notes available.'
+API_KEY_PREFIX = 'vmc'
 VERSIONING_SEMVER = 'semver'
 VERSIONING_SEMVER_PRERELEASE = 'semver_prerelease'
 VERSIONING_SEMVER_BUILD = 'semver_build'
 VERSIONING_SEMVER_PRERELEASE_BUILD = 'semver_pre_build'
+VERSION_BUILD_PATTERN_STANDARD = 'standard'
+VERSION_BUILD_PATTERN_DOT_PADDED = 'dot_padded'
+VERSION_BUILD_PATTERN_PARENTHESES = 'parentheses'
+VERSION_BUILD_PATTERN_DEFAULT = VERSION_BUILD_PATTERN_STANDARD
+VERSION_BUILD_PATTERNS = (
+    VERSION_BUILD_PATTERN_STANDARD,
+    VERSION_BUILD_PATTERN_DOT_PADDED,
+    VERSION_BUILD_PATTERN_PARENTHESES,
+)
 VERSIONING_TYPES = (
     VERSIONING_SEMVER,
     VERSIONING_SEMVER_PRERELEASE,
@@ -173,6 +183,7 @@ def utc_now():
 _USER_SCHEMA_READY = False
 _REPOSITORY_BRANCH_SCHEMA_READY = False
 _PROJECT_SCHEMA_READY = False
+_VERSION_INCREMENT_SCHEMA_READY = False
 _DATABASE_SCHEMA_READY_URI = None
 BACKUP_FORMAT = 'vermicelli-backup'
 BACKUP_VERSION = 1
@@ -352,6 +363,33 @@ def ensure_project_schema():
         logging.warning("Could not verify project metadata schema: %s", error)
 
 
+def ensure_version_increment_schema():
+    """Adds release increment columns for existing local databases."""
+    global _VERSION_INCREMENT_SCHEMA_READY
+    if _VERSION_INCREMENT_SCHEMA_READY:
+        return
+    try:
+        inspector = inspect(db.engine)
+        if 'version_increments' not in inspector.get_table_names():
+            return
+        existing_columns = {column['name'] for column in inspector.get_columns('version_increments')}
+        if 'is_enabled' not in existing_columns:
+            boolean_default = 'TRUE' if db.engine.dialect.name == 'postgresql' else '1'
+            db.session.execute(text(
+                f"ALTER TABLE version_increments ADD COLUMN is_enabled BOOLEAN NOT NULL DEFAULT {boolean_default}"
+            ))
+            db.session.commit()
+        if 'build_pattern' not in existing_columns:
+            db.session.execute(text(
+                f"ALTER TABLE version_increments ADD COLUMN build_pattern VARCHAR(30) NOT NULL DEFAULT '{VERSION_BUILD_PATTERN_DEFAULT}'"
+            ))
+            db.session.commit()
+        _VERSION_INCREMENT_SCHEMA_READY = True
+    except Exception as error:
+        db.session.rollback()
+        logging.warning("Could not verify version increment schema: %s", error)
+
+
 def ensure_database_schema():
     """Creates missing tables once for the active database URI."""
     global _DATABASE_SCHEMA_READY_URI
@@ -372,6 +410,7 @@ def ensure_runtime_schema():
     ensure_user_schema()
     ensure_repository_branch_schema()
     ensure_project_schema()
+    ensure_version_increment_schema()
 
 
 def json_error(message, status_code=403):
@@ -918,7 +957,7 @@ def apply_setup_runtime_config(values):
     if not database_config:
         return
 
-    global _USER_SCHEMA_READY, _REPOSITORY_BRANCH_SCHEMA_READY, _PROJECT_SCHEMA_READY, _DATABASE_SCHEMA_READY_URI
+    global _USER_SCHEMA_READY, _REPOSITORY_BRANCH_SCHEMA_READY, _PROJECT_SCHEMA_READY, _VERSION_INCREMENT_SCHEMA_READY, _DATABASE_SCHEMA_READY_URI
     database_uri = database_uri_from_setup_config(database_config)
     db.session.remove()
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
@@ -942,6 +981,7 @@ def apply_setup_runtime_config(values):
     _USER_SCHEMA_READY = False
     _REPOSITORY_BRANCH_SCHEMA_READY = False
     _PROJECT_SCHEMA_READY = False
+    _VERSION_INCREMENT_SCHEMA_READY = False
     _DATABASE_SCHEMA_READY_URI = None
 
 
@@ -951,6 +991,7 @@ def complete_initial_setup_config(database_config):
     write_setup_env(values)
     ensure_database_schema()
     ensure_user_schema()
+    ensure_version_increment_schema()
     return values
 
 
@@ -970,6 +1011,7 @@ def backup_validation_summary(data):
         'projects': len(data.get('projects', [])),
         'applications': len(data.get('applications', [])),
         'versions': len(data.get('versions', [])),
+        'version_increments': len(data.get('version_increments', [])),
         'repository_branches': len(data.get('application_repository_branches', [])),
     }
 
@@ -1004,9 +1046,93 @@ def release_notes_from_payload(payload):
     return DEFAULT_RELEASE_NOTES
 
 
+def normalize_version_part(value):
+    version_part = str(value or '').strip().lower()
+    return version_part if version_part in ('major', 'minor', 'patch') else None
+
+
+def generate_api_key():
+    return f'{API_KEY_PREFIX}_{secrets.token_urlsafe(32)}'
+
+
+def api_key_hash(raw_key):
+    return hashlib.sha256(str(raw_key or '').encode('utf-8')).hexdigest()
+
+
+def api_key_crypto_key():
+    secret = str(app.secret_key or app.config.get('SECRET_KEY') or app.config.get('JWT_SECRET_KEY') or '').encode('utf-8')
+    return hmac.new(secret, b'vermicelli-api-key-encryption-v1', hashlib.sha256).digest()
+
+
+def api_key_b64encode(value):
+    return base64.urlsafe_b64encode(value).decode('ascii')
+
+
+def api_key_b64decode(value):
+    return base64.urlsafe_b64decode(str(value or '').encode('ascii'))
+
+
+def protect_api_key(raw_key):
+    nonce = os.urandom(16)
+    key = api_key_crypto_key()
+    ciphertext = hmac_stream_xor(str(raw_key).encode('utf-8'), key, nonce)
+    tag = hmac.new(key, nonce + ciphertext, hashlib.sha256).digest()
+    return api_key_b64encode(nonce), api_key_b64encode(ciphertext), api_key_b64encode(tag)
+
+
+def unprotect_api_key(increment):
+    if not increment or not increment.api_key_nonce or not increment.api_key_ciphertext or not increment.api_key_tag:
+        return None
+    try:
+        nonce = api_key_b64decode(increment.api_key_nonce)
+        ciphertext = api_key_b64decode(increment.api_key_ciphertext)
+        supplied_tag = api_key_b64decode(increment.api_key_tag)
+    except (TypeError, ValueError):
+        return None
+
+    key = api_key_crypto_key()
+    expected_tag = hmac.new(key, nonce + ciphertext, hashlib.sha256).digest()
+    if not hmac.compare_digest(expected_tag, supplied_tag):
+        return None
+    try:
+        return hmac_stream_xor(ciphertext, key, nonce).decode('utf-8')
+    except UnicodeDecodeError:
+        return None
+
+
+def store_increment_api_key(increment, raw_key):
+    nonce, ciphertext, tag = protect_api_key(raw_key)
+    increment.api_key_hash = api_key_hash(raw_key)
+    increment.api_key_prefix = raw_key[:12]
+    increment.api_key_last4 = raw_key[-4:]
+    increment.api_key_nonce = nonce
+    increment.api_key_ciphertext = ciphertext
+    increment.api_key_tag = tag
+
+
+def masked_api_key(increment):
+    prefix = increment.api_key_prefix or f'{API_KEY_PREFIX}_'
+    last4 = increment.api_key_last4 or '****'
+    return f'{prefix}...{last4}'
+
+
 def normalize_versioning_type(value):
     versioning_type = (value or VERSIONING_SEMVER).strip()
     return versioning_type if versioning_type in VERSIONING_TYPES else VERSIONING_SEMVER
+
+
+def normalize_build_pattern(value):
+    build_pattern = (value or VERSION_BUILD_PATTERN_DEFAULT).strip()
+    return build_pattern if build_pattern in VERSION_BUILD_PATTERNS else VERSION_BUILD_PATTERN_DEFAULT
+
+
+def build_pattern_label(value):
+    labels = {
+        VERSION_BUILD_PATTERN_STANDARD: 'Standard (.0)',
+        VERSION_BUILD_PATTERN_DOT_PADDED: 'Build 0',
+        VERSION_BUILD_PATTERN_PARENTHESES: 'Parentheses (000)',
+    }
+    return labels[normalize_build_pattern(value)]
 
 
 def versioning_uses_prerelease(value):
@@ -1096,6 +1222,14 @@ def split_semver_prerelease(version_number):
 
 def parse_version_number(version_number):
     core, prerelease = split_semver_prerelease(version_number or '')
+    named_build_match = re.match(r'^\s*(\d+)\.(\d+)\.(\d+)\s+Build\s+(\d+)\s*$', core, re.IGNORECASE)
+    if named_build_match:
+        major, minor, patch, build = [int(part) for part in named_build_match.groups()]
+        return major, minor, patch, build, prerelease
+    parenthesized_match = re.match(r'^\s*(\d+)\.(\d+)\.(\d+)\s*\((\d+)\)\s*$', core)
+    if parenthesized_match:
+        major, minor, patch, build = [int(part) for part in parenthesized_match.groups()]
+        return major, minor, patch, build, prerelease
     parts = core.split('.')
     if len(parts) not in (3, 4):
         raise ValueError('Latest version is not a supported semantic version.')
@@ -1107,10 +1241,16 @@ def parse_version_number(version_number):
     return major, minor, patch, build, prerelease
 
 
-def format_version_number(major, minor, patch, build, prerelease, versioning_type):
+def format_version_number(major, minor, patch, build, prerelease, versioning_type, build_pattern=VERSION_BUILD_PATTERN_DEFAULT):
     if versioning_uses_build(versioning_type):
         build_value = 0 if build is None else int(build)
-        version_number = f"{major}.{minor}.{patch}.{build_value}"
+        normalized_pattern = normalize_build_pattern(build_pattern)
+        if normalized_pattern == VERSION_BUILD_PATTERN_DOT_PADDED:
+            version_number = f"{major}.{minor}.{patch} Build {build_value}"
+        elif normalized_pattern == VERSION_BUILD_PATTERN_PARENTHESES:
+            version_number = f"{major}.{minor}.{patch} ({build_value:03d})"
+        else:
+            version_number = f"{major}.{minor}.{patch}.{build_value}"
     else:
         version_number = f"{major}.{minor}.{patch}"
     if versioning_uses_prerelease(versioning_type) and prerelease:
@@ -1124,6 +1264,14 @@ def version_build_number(version_number):
         return build
     except ValueError:
         return None
+
+
+def default_build_number_for_application(application_id, latest_number=None):
+    version_count = Version.query.filter_by(application_id=application_id).count()
+    latest_build = version_build_number(latest_number or '')
+    if latest_build is not None:
+        return max(latest_build, version_count)
+    return version_count
 
 
 def normalize_initial_version_for_options(versioning_type, initial_version, prerelease_identifier=None):
@@ -1140,7 +1288,7 @@ def normalize_initial_version_for_options(versioning_type, initial_version, prer
     return initial_version_number, None
 
 
-def increment_version_number(latest_number, versioning_type, version_part, prerelease=None):
+def increment_version_number(latest_number, versioning_type, version_part, prerelease=None, build_pattern=VERSION_BUILD_PATTERN_DEFAULT):
     major, minor, patch, build, existing_prerelease = parse_version_number(latest_number)
     if version_part == 'major':
         major += 1
@@ -1164,7 +1312,94 @@ def increment_version_number(latest_number, versioning_type, version_part, prere
                 raise ValueError(prerelease_error)
         if not prerelease_value:
             raise ValueError('Pre-release Label is required for this application versioning mode.')
-    return format_version_number(major, minor, patch, build, prerelease_value, versioning_type)
+    return format_version_number(major, minor, patch, build, prerelease_value, versioning_type, build_pattern)
+
+
+def version_number_for_increment_base(latest_number, increment):
+    versioning_type = normalize_versioning_type(increment.version_type)
+    major, minor, patch, build, existing_prerelease = parse_version_number(latest_number)
+    if versioning_uses_build(versioning_type) and increment.build_number is not None:
+        build = increment.build_number
+    prerelease = increment.prerelease_identifier or existing_prerelease
+    return format_version_number(major, minor, patch, build, prerelease, versioning_type, getattr(increment, 'build_pattern', VERSION_BUILD_PATTERN_DEFAULT))
+
+
+def next_version_for_increment(latest_number, increment):
+    base_number = version_number_for_increment_base(latest_number, increment)
+    return increment_version_number(
+        base_number,
+        normalize_versioning_type(increment.version_type),
+        increment.version_part,
+        prerelease=increment.prerelease_identifier,
+        build_pattern=getattr(increment, 'build_pattern', VERSION_BUILD_PATTERN_DEFAULT)
+    )
+
+
+def version_increment_type_from_options(enable_prerelease=False, enable_build=False):
+    return versioning_type_from_options(bool(enable_prerelease), bool(enable_build))
+
+
+def request_boolean(value, default=False):
+    if value is None:
+        return default
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if normalized in ('1', 'true', 'yes', 'on', 'enabled'):
+            return True
+        if normalized in ('0', 'false', 'no', 'off', 'disabled'):
+            return False
+    return bool(value)
+
+
+def can_manage_version_increment(user, increment):
+    if not user or not increment:
+        return False
+    if increment.user_id == user.id:
+        return True
+    app_obj = increment.application
+    return has_platform_role(user, PLATFORM_ADMIN) or any(is_project_admin(user, project.id) for project in app_obj.projects)
+
+
+def serialize_version_increment(increment, current_user, latest_version=None):
+    versioning_type = normalize_versioning_type(increment.version_type)
+    raw_api_key = unprotect_api_key(increment) if current_user and increment.user_id == current_user.id else None
+    next_release = None
+    next_release_error = None
+    if latest_version:
+        try:
+            next_release = next_version_for_increment(latest_version.number, increment)
+        except ValueError as error:
+            next_release_error = str(error)
+
+    return {
+        'id': increment.id,
+        'application_id': increment.application_id,
+        'name': increment.name,
+        'version_part': increment.version_part,
+        'version_part_label': increment.version_part.title(),
+        'version_type': versioning_type,
+        'version_type_label': versioning_type_label(versioning_type),
+        'uses_prerelease': versioning_uses_prerelease(versioning_type),
+        'uses_build': versioning_uses_build(versioning_type),
+        'prerelease_identifier': increment.prerelease_identifier or '',
+        'build_number': increment.build_number,
+        'build_pattern': normalize_build_pattern(getattr(increment, 'build_pattern', VERSION_BUILD_PATTERN_DEFAULT)),
+        'build_pattern_label': build_pattern_label(getattr(increment, 'build_pattern', VERSION_BUILD_PATTERN_DEFAULT)),
+        'is_enabled': bool(increment.is_enabled),
+        'next_release': next_release,
+        'next_release_error': next_release_error,
+        'api_key': raw_api_key,
+        'api_key_mask': masked_api_key(increment),
+        'can_copy_key': bool(raw_api_key),
+        'can_manage': can_manage_version_increment(current_user, increment),
+        'generated_by': increment.user.username if increment.user else 'Unknown user',
+        'generated_by_user_id': increment.user_id,
+        'last_used_at': format_datetime_for_user(increment.last_used_at, current_user) if increment.last_used_at else 'Never used',
+        'created_at': format_datetime_for_user(increment.created_at, current_user) if increment.created_at else 'N/A',
+        'updated_at': format_datetime_for_user(increment.updated_at, current_user) if increment.updated_at else 'N/A',
+    }
 
 
 def serialize_version(version, current_user):
@@ -1351,6 +1586,7 @@ class User(db.Model):
 
     project_memberships = db.relationship('ProjectMembership', back_populates='user', cascade='all, delete-orphan')
     application_memberships = db.relationship('ApplicationMembership', back_populates='user', cascade='all, delete-orphan')
+    version_increments = db.relationship('VersionIncrement', back_populates='user', cascade='all, delete-orphan')
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password, method='pbkdf2:sha256')
@@ -1410,6 +1646,7 @@ class Application(db.Model):
     memberships = db.relationship('ApplicationMembership', back_populates='application', cascade='all, delete-orphan')
     repository_branches = db.relationship('ApplicationRepositoryBranch', back_populates='application', cascade='all, delete-orphan')
     deployments = db.relationship('ApplicationDeployment', back_populates='application', cascade='all, delete-orphan')
+    version_increments = db.relationship('VersionIncrement', back_populates='application', cascade='all, delete-orphan')
 
 
 class ApplicationRepositoryBranch(db.Model):
@@ -1464,6 +1701,37 @@ class Version(db.Model):
     version_type = db.Column(db.String(20))
     change_date = db.Column(db.DateTime, default=datetime.utcnow)
     notes = db.Column(db.Text)
+
+
+class VersionIncrement(db.Model):
+    """Named release automation increment with an API key owned by one user."""
+    __tablename__ = 'version_increments'
+    __table_args__ = (
+        db.UniqueConstraint('application_id', 'user_id', 'name', name='uq_version_increment_app_user_name'),
+    )
+
+    id = db.Column(db.Integer, primary_key=True)
+    application_id = db.Column(db.Integer, db.ForeignKey('application.id', ondelete='CASCADE'), nullable=False, index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+    name = db.Column(db.String(120), nullable=False)
+    version_part = db.Column(db.String(20), nullable=False, default='major')
+    version_type = db.Column(db.String(20), nullable=False, default=VERSIONING_SEMVER)
+    prerelease_identifier = db.Column(db.String(40))
+    build_number = db.Column(db.Integer)
+    build_pattern = db.Column(db.String(30), nullable=False, default=VERSION_BUILD_PATTERN_DEFAULT)
+    is_enabled = db.Column(db.Boolean, nullable=False, default=True)
+    api_key_hash = db.Column(db.String(64), nullable=False, unique=True, index=True)
+    api_key_prefix = db.Column(db.String(16), nullable=False)
+    api_key_last4 = db.Column(db.String(8), nullable=False)
+    api_key_nonce = db.Column(db.Text)
+    api_key_ciphertext = db.Column(db.Text)
+    api_key_tag = db.Column(db.Text)
+    last_used_at = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    application = db.relationship('Application', back_populates='version_increments')
+    user = db.relationship('User', back_populates='version_increments')
 
 class Project(db.Model):
     """Represents a project entity."""
@@ -2074,6 +2342,7 @@ def database_has_any_data():
         Project.query.count(),
         Application.query.count(),
         Version.query.count(),
+        VersionIncrement.query.count(),
         ApplicationRepositoryBranch.query.count(),
         ProjectMembership.query.count(),
         ApplicationMembership.query.count(),
@@ -2140,6 +2409,30 @@ def serialize_backup_payload():
                     'notes': version.notes or '',
                 }
                 for version in Version.query.order_by(Version.id).all()
+            ],
+            'version_increments': [
+                {
+                    'id': increment.id,
+                    'application_id': increment.application_id,
+                    'user_id': increment.user_id,
+                    'name': increment.name,
+                    'version_part': increment.version_part,
+                    'version_type': increment.version_type,
+                    'prerelease_identifier': increment.prerelease_identifier or '',
+                    'build_number': increment.build_number,
+                    'build_pattern': normalize_build_pattern(getattr(increment, 'build_pattern', VERSION_BUILD_PATTERN_DEFAULT)),
+                    'is_enabled': bool(increment.is_enabled),
+                    'api_key_hash': increment.api_key_hash,
+                    'api_key_prefix': increment.api_key_prefix,
+                    'api_key_last4': increment.api_key_last4,
+                    'api_key_nonce': increment.api_key_nonce or '',
+                    'api_key_ciphertext': increment.api_key_ciphertext or '',
+                    'api_key_tag': increment.api_key_tag or '',
+                    'last_used_at': backup_datetime(increment.last_used_at),
+                    'created_at': backup_datetime(increment.created_at),
+                    'updated_at': backup_datetime(increment.updated_at),
+                }
+                for increment in VersionIncrement.query.order_by(VersionIncrement.id).all()
             ],
             'application_repository_branches': [
                 {
@@ -2280,6 +2573,7 @@ def get_backup_data(payload):
         'projects',
         'applications',
         'versions',
+        'version_increments',
         'application_repository_branches',
         'application_deployments',
         'project_applications',
@@ -2319,6 +2613,9 @@ def validate_backup_data(data):
     _, error = backup_section_ids(data['versions'], 'versions')
     if error:
         return error
+    _, error = backup_section_ids(data['version_increments'], 'version_increments')
+    if error:
+        return error
     _, error = backup_section_ids(data['application_repository_branches'], 'application_repository_branches')
     if error:
         return error
@@ -2348,6 +2645,9 @@ def validate_backup_data(data):
     for version in data['versions']:
         if version.get('application_id') not in application_ids:
             return 'Backup contains a version for an unknown application.'
+    for increment in data['version_increments']:
+        if increment.get('application_id') not in application_ids or increment.get('user_id') not in user_ids:
+            return 'Backup contains a version increment for an unknown user or application.'
     for branch in data['application_repository_branches']:
         if branch.get('application_id') not in application_ids:
             return 'Backup contains repository metadata for an unknown application.'
@@ -2374,6 +2674,7 @@ def clear_application_data():
     ProjectMembership.query.delete(synchronize_session=False)
     ApplicationDeployment.query.delete(synchronize_session=False)
     ApplicationRepositoryBranch.query.delete(synchronize_session=False)
+    VersionIncrement.query.delete(synchronize_session=False)
     Version.query.delete(synchronize_session=False)
     Application.query.delete(synchronize_session=False)
     Project.query.delete(synchronize_session=False)
@@ -2385,7 +2686,7 @@ def clear_application_data():
 def reset_primary_key_sequences():
     if db.engine.dialect.name != 'postgresql':
         return
-    for table_name in ('users', 'project', 'application', 'version', 'application_repository_branches', 'application_deployments', 'project_memberships', 'application_memberships', 'change_logs'):
+    for table_name in ('users', 'project', 'application', 'version', 'version_increments', 'application_repository_branches', 'application_deployments', 'project_memberships', 'application_memberships', 'change_logs'):
         quoted_table_name = f'"{table_name}"'
         db.session.execute(text(
             f"SELECT setval(pg_get_serial_sequence('{quoted_table_name}', 'id'), "
@@ -2465,6 +2766,30 @@ def import_backup_payload(payload):
                 change_date=parse_backup_datetime(row.get('change_date')) or datetime.utcnow(),
                 notes=row.get('notes') or '',
             ))
+
+        for row in data['version_increments']:
+            increment = VersionIncrement(
+                id=row['id'],
+                application_id=row['application_id'],
+                user_id=row['user_id'],
+                name=row.get('name') or 'Release increment',
+                version_part=normalize_version_part(row.get('version_part')) or 'major',
+                version_type=normalize_versioning_type(row.get('version_type')),
+                prerelease_identifier=row.get('prerelease_identifier') or None,
+                build_number=row.get('build_number'),
+                build_pattern=normalize_build_pattern(row.get('build_pattern')),
+                is_enabled=request_boolean(row.get('is_enabled'), True),
+                api_key_hash=row.get('api_key_hash') or api_key_hash(generate_api_key()),
+                api_key_prefix=row.get('api_key_prefix') or f'{API_KEY_PREFIX}_',
+                api_key_last4=row.get('api_key_last4') or '****',
+                api_key_nonce=row.get('api_key_nonce') or '',
+                api_key_ciphertext=row.get('api_key_ciphertext') or '',
+                api_key_tag=row.get('api_key_tag') or '',
+                last_used_at=parse_backup_datetime(row.get('last_used_at')),
+                created_at=parse_backup_datetime(row.get('created_at')) or datetime.utcnow(),
+                updated_at=parse_backup_datetime(row.get('updated_at')) or datetime.utcnow(),
+            )
+            db.session.add(increment)
 
         for row in data['application_repository_branches']:
             db.session.add(ApplicationRepositoryBranch(
@@ -2613,6 +2938,7 @@ def application_details_content(app_id):
     project_name = app_obj.projects[0].name if app_obj.projects else None
     project_id = app_obj.projects[0].id if app_obj.projects else None
     app_access_level = application_access_level_for_user(current, app_obj)
+    can_edit = can_write_application(current, app_obj)
 
     return render_template(
         'application_details.html',
@@ -2635,10 +2961,14 @@ def application_details_content(app_id):
         project_id=project_id,
         created_at_display=format_datetime_for_user(app_obj.created_at, current) if app_obj.created_at else 'N/A',
         updated_at_display=format_datetime_for_user(app_obj.updated_at, current) if app_obj.updated_at else 'N/A',
-        can_edit_application=can_write_application(current, app_obj),
+        can_edit_application=can_edit,
         can_change_project=has_platform_role(current, PLATFORM_ADMIN),
         access_summary=serialize_application_access_summary(app_obj, current),
         access_level_label=access_label(app_access_level),
+        version_increments=[
+            serialize_version_increment(increment, current, version_context['latest_version'])
+            for increment in sorted(app_obj.version_increments, key=lambda item: (item.created_at or datetime.min, item.id))
+        ] if can_edit else [],
         script_username=current.username if current else 'USERNAME'
     )
 
@@ -2653,6 +2983,7 @@ def application_details_page(app_id):
     project_id = app_obj.projects[0].id if app_obj.projects else None
     version_context = application_version_context(app_obj.id, current)
     app_access_level = application_access_level_for_user(current, app_obj)
+    can_edit = can_write_application(current, app_obj)
     return render_template(
         'application_details.html',
         app=app_obj,
@@ -2674,10 +3005,14 @@ def application_details_page(app_id):
         ],
         created_at_display=format_datetime_for_user(app_obj.created_at, current) if app_obj.created_at else 'N/A',
         updated_at_display=format_datetime_for_user(app_obj.updated_at, current) if app_obj.updated_at else 'N/A',
-        can_edit_application=can_write_application(current, app_obj),
+        can_edit_application=can_edit,
         can_change_project=has_platform_role(current, PLATFORM_ADMIN),
         access_summary=serialize_application_access_summary(app_obj, current),
         access_level_label=access_label(app_access_level),
+        version_increments=[
+            serialize_version_increment(increment, current, version_context['latest_version'])
+            for increment in sorted(app_obj.version_increments, key=lambda item: (item.created_at or datetime.min, item.id))
+        ] if can_edit else [],
         script_username=current.username if current else 'USERNAME'
     )
 
@@ -2922,6 +3257,239 @@ def get_app_versions(app_id):
     versions_data = [serialize_version(version, current) for version in versions]
     return jsonify(versions_data)
 
+
+@app.route('/api/app/<int:application_id>/increments', methods=['GET'])
+@login_required
+def get_version_increments(application_id):
+    app_obj = Application.query.get_or_404(application_id)
+    current = get_current_user()
+    if not can_write_application(current, app_obj):
+        return json_error('You do not have permission to manage version increments.', 403)
+    latest_version = Version.query.filter_by(application_id=application_id).order_by(Version.change_date.desc()).first()
+    increments = VersionIncrement.query.filter_by(application_id=application_id).order_by(VersionIncrement.created_at, VersionIncrement.id).all()
+    return jsonify([
+        serialize_version_increment(increment, current, latest_version)
+        for increment in increments
+    ])
+
+
+@app.route('/api/app/<int:application_id>/increments', methods=['POST'])
+@login_required
+def create_version_increment(application_id):
+    app_obj = Application.query.get_or_404(application_id)
+    current = get_current_user()
+    if not can_write_application(current, app_obj):
+        return json_error('You do not have permission to manage version increments.', 403)
+
+    payload = request.get_json(silent=True) or {}
+    name = str(payload.get('name') or '').strip()
+    if not name:
+        return json_error('Increment name is required.', 400)
+    if len(name) > 120:
+        return json_error('Increment name must be 120 characters or fewer.', 400)
+
+    version_part = normalize_version_part(payload.get('version_part'))
+    if not version_part:
+        return json_error('Release part must be major, minor, or patch.', 400)
+
+    versioning_type = version_increment_type_from_options(
+        payload.get('enable_prerelease'),
+        payload.get('enable_build')
+    )
+    prerelease_value, prerelease_error = validate_prerelease_identifier(payload.get('prerelease_identifier'))
+    if prerelease_error:
+        return json_error(prerelease_error, 400)
+    if versioning_uses_prerelease(versioning_type) and not prerelease_value:
+        return json_error('Pre-release Label is required when Pre-release Label is enabled.', 400)
+
+    build_number = None
+    raw_build_number = payload.get('build_number')
+    build_pattern = normalize_build_pattern(payload.get('build_pattern'))
+    if versioning_uses_build(versioning_type):
+        if raw_build_number not in (None, ''):
+            try:
+                build_number = int(raw_build_number)
+            except (TypeError, ValueError):
+                return json_error('Build number must be a whole number.', 400)
+            if build_number < 0:
+                return json_error('Build number must be zero or greater.', 400)
+
+    duplicate = VersionIncrement.query.filter(
+        VersionIncrement.application_id == application_id,
+        VersionIncrement.user_id == current.id,
+        func.lower(VersionIncrement.name) == name.lower()
+    ).first()
+    if duplicate:
+        return json_error('You already have an increment with this name for this application.', 400)
+
+    latest_version = Version.query.filter_by(application_id=application_id).order_by(Version.change_date.desc()).first()
+    if latest_version is None:
+        return json_error('No versions found for this application.', 404)
+    if versioning_uses_build(versioning_type) and raw_build_number in (None, ''):
+        build_number = default_build_number_for_application(application_id, latest_version.number)
+
+    increment = VersionIncrement(
+        application_id=application_id,
+        user_id=current.id,
+        name=name,
+        version_part=version_part,
+        version_type=versioning_type,
+        prerelease_identifier=prerelease_value or None,
+        build_number=build_number,
+        build_pattern=build_pattern,
+    )
+    raw_api_key = generate_api_key()
+    store_increment_api_key(increment, raw_api_key)
+    db.session.add(increment)
+    log_change('created', 'version increment', None, name, f'Created release increment for application "{app_obj.name}".', current)
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        return json_error('An increment with this name already exists for your user.', 400)
+
+    return jsonify({
+        'message': 'Version increment created.',
+        'increment': serialize_version_increment(increment, current, latest_version),
+    }), 201
+
+
+@app.route('/api/app/<int:application_id>/increments/<int:increment_id>/regenerate', methods=['POST'])
+@login_required
+def regenerate_version_increment_key(application_id, increment_id):
+    current = get_current_user()
+    increment = VersionIncrement.query.filter_by(id=increment_id, application_id=application_id).first_or_404()
+    if not can_manage_version_increment(current, increment):
+        return json_error('You do not have permission to regenerate this increment.', 403)
+
+    raw_api_key = generate_api_key()
+    store_increment_api_key(increment, raw_api_key)
+    increment.updated_at = datetime.utcnow()
+    log_change('updated', 'version increment', increment.id, increment.name, 'Regenerated version increment API key.', current)
+    db.session.commit()
+
+    latest_version = Version.query.filter_by(application_id=application_id).order_by(Version.change_date.desc()).first()
+    return jsonify({
+        'message': 'Version increment API key regenerated.',
+        'increment': serialize_version_increment(increment, current, latest_version),
+    })
+
+
+@app.route('/api/app/<int:application_id>/increments/<int:increment_id>', methods=['PATCH'])
+@login_required
+def update_version_increment(application_id, increment_id):
+    current = get_current_user()
+    increment = VersionIncrement.query.filter_by(id=increment_id, application_id=application_id).first_or_404()
+    if not can_manage_version_increment(current, increment):
+        return json_error('You do not have permission to update this increment.', 403)
+
+    payload = request.get_json(silent=True) or {}
+    allowed_fields = {
+        'is_enabled',
+        'enabled',
+        'name',
+        'version_part',
+        'enable_prerelease',
+        'uses_prerelease',
+        'prerelease_identifier',
+        'enable_build',
+        'uses_build',
+        'build_number',
+        'build_pattern',
+    }
+    if not any(field in payload for field in allowed_fields):
+        return json_error('Increment update details are required.', 400)
+
+    if 'name' in payload:
+        name = str(payload.get('name') or '').strip()
+        if not name:
+            return json_error('Increment name is required.', 400)
+        if len(name) > 120:
+            return json_error('Increment name must be 120 characters or fewer.', 400)
+        duplicate = VersionIncrement.query.filter(
+            VersionIncrement.application_id == application_id,
+            VersionIncrement.user_id == increment.user_id,
+            func.lower(VersionIncrement.name) == name.lower(),
+            VersionIncrement.id != increment.id,
+        ).first()
+        if duplicate:
+            return json_error('An increment with this name already exists for this user.', 400)
+        increment.name = name
+
+    if 'version_part' in payload:
+        version_part = normalize_version_part(payload.get('version_part'))
+        if not version_part:
+            return json_error('Release part must be major, minor, or patch.', 400)
+        increment.version_part = version_part
+
+    current_versioning_type = normalize_versioning_type(increment.version_type)
+    prerelease_enabled = versioning_uses_prerelease(current_versioning_type)
+    build_enabled = versioning_uses_build(current_versioning_type)
+    if 'enable_prerelease' in payload or 'uses_prerelease' in payload:
+        prerelease_enabled = request_boolean(payload.get('enable_prerelease', payload.get('uses_prerelease')), prerelease_enabled)
+    if 'enable_build' in payload or 'uses_build' in payload:
+        build_enabled = request_boolean(payload.get('enable_build', payload.get('uses_build')), build_enabled)
+
+    next_versioning_type = version_increment_type_from_options(prerelease_enabled, build_enabled)
+    prerelease_value = increment.prerelease_identifier or ''
+    if 'prerelease_identifier' in payload:
+        prerelease_value = payload.get('prerelease_identifier')
+    prerelease_value, prerelease_error = validate_prerelease_identifier(prerelease_value)
+    if prerelease_error:
+        return json_error(prerelease_error, 400)
+    if versioning_uses_prerelease(next_versioning_type) and not prerelease_value:
+        return json_error('Pre-release Label is required when Pre-release Label is enabled.', 400)
+
+    build_number = increment.build_number
+    if versioning_uses_build(next_versioning_type):
+        raw_build_number = payload.get('build_number', build_number)
+        if raw_build_number in (None, ''):
+            latest_version = Version.query.filter_by(application_id=application_id).order_by(Version.change_date.desc()).first()
+            build_number = default_build_number_for_application(application_id, latest_version.number if latest_version else None)
+        else:
+            try:
+                build_number = int(raw_build_number)
+            except (TypeError, ValueError):
+                return json_error('Build number must be a whole number.', 400)
+            if build_number < 0:
+                return json_error('Build number must be zero or greater.', 400)
+    else:
+        build_number = None
+
+    increment.version_type = next_versioning_type
+    increment.prerelease_identifier = (prerelease_value or None) if versioning_uses_prerelease(next_versioning_type) else None
+    increment.build_number = build_number
+    increment.build_pattern = normalize_build_pattern(payload.get('build_pattern', getattr(increment, 'build_pattern', VERSION_BUILD_PATTERN_DEFAULT)))
+    if 'is_enabled' in payload or 'enabled' in payload:
+        increment.is_enabled = request_boolean(payload.get('is_enabled', payload.get('enabled')), True)
+    increment.updated_at = datetime.utcnow()
+    state_label = 'Enabled' if increment.is_enabled else 'Disabled'
+    message = f'Version increment {state_label.lower()}.' if set(payload.keys()).issubset({'is_enabled', 'enabled'}) else 'Version increment updated.'
+    log_change('updated', 'version increment', increment.id, increment.name, message, current)
+    db.session.commit()
+
+    latest_version = Version.query.filter_by(application_id=application_id).order_by(Version.change_date.desc()).first()
+    return jsonify({
+        'message': message,
+        'increment': serialize_version_increment(increment, current, latest_version),
+    })
+
+
+@app.route('/api/app/<int:application_id>/increments/<int:increment_id>', methods=['DELETE'])
+@login_required
+def delete_version_increment(application_id, increment_id):
+    current = get_current_user()
+    increment = VersionIncrement.query.filter_by(id=increment_id, application_id=application_id).first_or_404()
+    if not can_manage_version_increment(current, increment):
+        return json_error('You do not have permission to delete this increment.', 403)
+
+    increment_name = increment.name
+    log_change('deleted', 'version increment', increment.id, increment_name, 'Deleted version increment.', current)
+    db.session.delete(increment)
+    db.session.commit()
+    return jsonify({'message': 'Version increment deleted.'})
+
+
 @app.route('/edit_application/<int:app_id>', methods=['POST'])
 @login_required
 def edit_application(app_id):
@@ -3077,31 +3645,56 @@ def get_projects():
     projects_data = [{'id': p.id, 'name': p.name, 'description': p.description or ''} for p in projects]
     return jsonify(projects_data)
 
+
+def api_key_from_request():
+    header_value = (request.headers.get('X-API-Key') or '').strip()
+    if header_value:
+        return header_value
+    authorization = (request.headers.get('Authorization') or '').strip()
+    for scheme in ('ApiKey ', 'Api-Key ', 'Bearer '):
+        if authorization.lower().startswith(scheme.lower()):
+            return authorization[len(scheme):].strip()
+    payload = request.get_json(silent=True) or {}
+    return str(payload.get('api_key') or '').strip()
+
+
+def version_increment_from_request_key(application_id):
+    raw_api_key = api_key_from_request()
+    if not raw_api_key:
+        return None, None, ('API key is required for version updates.', 401)
+    increment = VersionIncrement.query.filter_by(api_key_hash=api_key_hash(raw_api_key)).first()
+    if not increment or increment.application_id != application_id:
+        return None, None, ('Invalid API key.', 401)
+    if not increment.is_enabled:
+        return None, None, ('This release increment is disabled.', 403)
+    user = increment.user
+    if not user or not user.is_active:
+        return None, None, ('The API key owner is disabled or missing.', 403)
+    return increment, user, None
+
+
 @app.route('/app/<int:application_id>/update_version', methods=['POST'])
-@jwt_required()
 def update_version(application_id):
     try:
         payload = request.get_json(silent=True) or {}
-        jwt_user = load_user_for_jwt_identity(get_jwt_identity())
+        increment, api_user, auth_error = version_increment_from_request_key(application_id)
+        if auth_error:
+            message, status_code = auth_error
+            return jsonify({'error': message}), status_code
+
         app_obj = Application.query.get_or_404(application_id)
-        if not can_write_application(jwt_user, app_obj):
+        if not can_write_application(api_user, app_obj):
             return jsonify({'error': 'You do not have permission to update this application.'}), 403
-        version_part = payload.get('version_part')
-        if version_part not in ['major', 'minor', 'patch']:
-            return jsonify({'error': 'Invalid version part'}), 400
 
         latest_version = Version.query.filter_by(application_id=application_id).order_by(Version.change_date.desc()).first()
         if latest_version is None:
             return jsonify({'error': 'No versions found for this application'}), 404
 
-        versioning_type = normalize_versioning_type(latest_version.version_type)
-        prerelease = payload.get('prerelease') or payload.get('pre_release') or payload.get('prerelease_identifier')
+        versioning_type = normalize_versioning_type(increment.version_type)
         try:
-            new_version_number = increment_version_number(
+            new_version_number = next_version_for_increment(
                 latest_version.number,
-                versioning_type,
-                version_part,
-                prerelease=prerelease
+                increment
             )
         except ValueError as error:
             return jsonify({'error': str(error)}), 400
@@ -3114,11 +3707,28 @@ def update_version(application_id):
             notes=release_notes
         )
         db.session.add(new_version)
-        log_change('created', 'version', None, new_version_number, f'Created version for application "{app_obj.name}".', jwt_user)
+        if versioning_uses_build(versioning_type):
+            increment.build_number = version_build_number(new_version_number)
+        increment.last_used_at = datetime.utcnow()
+        increment.updated_at = datetime.utcnow()
+        log_change(
+            'created',
+            'version',
+            None,
+            new_version_number,
+            f'Created version for application "{app_obj.name}" using increment "{increment.name}".',
+            api_user
+        )
         db.session.commit()
 
-        return jsonify({'new_version': new_version_number, 'notes': release_notes})
+        return jsonify({
+            'new_version': new_version_number,
+            'notes': release_notes,
+            'increment': increment.name,
+            'generated_by': api_user.username,
+        })
     except Exception as e:
+        db.session.rollback()
         logging.error(f"Error updating version for application {application_id}: {str(e)}")
         return jsonify({'error': 'Server error while updating version'}), 500
 
@@ -3147,15 +3757,15 @@ def update_application_versioning(application_id):
         return json_error('No versions found for this application.', 404)
 
     try:
-        major, minor, patch, build, existing_prerelease = parse_version_number(latest_version.number)
+        major, minor, patch, _build, existing_prerelease = parse_version_number(latest_version.number)
     except ValueError as error:
         return json_error(str(error), 400)
 
-    build_value = build
+    build_value = _build
     if versioning_uses_build(versioning_type):
         raw_build_number = payload.get('build_number')
         if raw_build_number in (None, ''):
-            build_value = build if build is not None else 0
+            build_value = default_build_number_for_application(application_id, latest_version.number)
         else:
             try:
                 build_value = int(raw_build_number)

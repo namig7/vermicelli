@@ -428,14 +428,432 @@
             padding: 0.85rem;
         }
 
-        .app-details-page .version-page-layout {
-            display: grid;
-            grid-template-columns: minmax(0, 1.15fr) minmax(20rem, 0.85fr);
-            gap: 1rem;
+        #versionIncrementModal {
+            background: rgba(31, 41, 55, 0.75);
+            backdrop-filter: none;
         }
 
-        .app-details-page .version-page-layout.is-read-only {
+        #versionIncrementModal .version-increment-panel {
+            display: flex;
+            max-height: calc(100vh - 2rem);
+            flex-direction: column;
+            overflow: hidden;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(17, 24, 39, 0.1), 0 4px 6px -4px rgba(17, 24, 39, 0.1);
+        }
+
+        #versionIncrementModal .version-increment-header {
+            display: flex;
+            flex: 0 0 auto;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            background: #f3f4f6;
+            box-shadow: 0 1px 2px rgba(17, 24, 39, 0.05);
+            padding: 1rem;
+        }
+
+        #versionIncrementModal .version-increment-title-row {
+            display: flex;
+            min-width: 0;
+            align-items: flex-start;
+            gap: 0.85rem;
+        }
+
+        #versionIncrementModal .version-increment-header-icon {
+            display: inline-flex;
+            width: 2.35rem;
+            height: 2.35rem;
+            flex: 0 0 2.35rem;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #fde68a;
+            border-radius: 0.625rem;
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        #versionIncrementModal .version-increment-header-icon svg {
+            width: 1.2rem;
+            height: 1.2rem;
+        }
+
+        #versionIncrementModal .version-increment-title {
+            color: #1f2937;
+            font-size: 1.125rem;
+            font-weight: 700;
+            line-height: 1.45rem;
+        }
+
+        #versionIncrementModal .version-increment-form {
+            display: flex;
+            min-height: 0;
+            flex: 1 1 auto;
+            flex-direction: column;
+        }
+
+        #versionIncrementModal .version-increment-subtitle {
+            margin-top: 0.2rem;
+            color: #6b7280;
+            font-size: 0.875rem;
+            line-height: 1.35rem;
+        }
+
+        #versionIncrementModal .version-increment-close {
+            display: inline-flex;
+            width: 1.5rem;
+            height: 1.5rem;
+            flex: 0 0 auto;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            transition: color 0.2s ease;
+        }
+
+        #versionIncrementModal .version-increment-close:hover {
+            color: #4b5563;
+        }
+
+        #versionIncrementModal .version-increment-close:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.35);
+        }
+
+        #versionIncrementModal .version-increment-body {
+            min-height: 0;
+            flex: 1 1 auto;
+            overflow-y: auto;
+            background: #ffffff;
+            padding: 1.5rem;
+        }
+
+        #versionIncrementModal .version-increment-footer {
+            display: flex;
+            flex: 0 0 auto;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            border-top: 1px solid #e5e7eb;
+            background: #f3f4f6;
+            padding: 1rem;
+        }
+
+        #versionIncrementModal .version-increment-actions {
+            display: inline-flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            margin-left: auto;
+        }
+
+        #versionIncrementModal .increment-modal-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 1.1rem;
+        }
+
+        #versionIncrementModal .increment-versioning-info,
+        #versionIncrementModal .increment-option-panel,
+        #versionIncrementModal .increment-preview-block {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.625rem;
+            background: #f9fafb;
+        }
+
+        #versionIncrementModal .increment-versioning-info {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            min-width: 0;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.85rem;
+        }
+
+        #versionIncrementModal .detail-label {
+            color: #6b7280;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0;
+            line-height: 1rem;
+            text-transform: uppercase;
+        }
+
+        #versionIncrementModal .increment-versioning-title {
+            margin-top: 0.25rem;
+            color: #111827;
+            font-size: 0.875rem;
+            font-weight: 700;
+            line-height: 1.25rem;
+            overflow-wrap: anywhere;
+        }
+
+        #versionIncrementModal .increment-versioning-summary {
+            margin-top: 0.25rem;
+            color: #6b7280;
+            font-size: 0.8125rem;
+            line-height: 1.25rem;
+        }
+
+        #versionIncrementModal .increment-versioning-meta {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 0.4rem;
+        }
+
+        #versionIncrementModal .increment-versioning-chip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 2rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 9999px;
+            background: #ffffff;
+            color: #374151;
+            padding: 0.35rem 0.75rem;
+            font-size: 0.8125rem;
+            font-weight: 700;
+            line-height: 1rem;
+        }
+
+        #versionIncrementModal .increment-preview-value {
+            color: #111827;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 0.8125rem;
+            font-weight: 800;
+            line-height: 1.45;
+            overflow-wrap: anywhere;
+        }
+
+        #versionIncrementModal .increment-preview-value {
+            display: block;
+            margin-top: 0.25rem;
+        }
+
+        #versionIncrementModal .next-version-changed-part {
+            color: #d97706;
+            font-weight: 900;
+        }
+
+        #versionIncrementModal .increment-field {
+            min-width: 0;
+        }
+
+        #versionIncrementModal .increment-field-label {
+            display: block;
+            color: #374151;
+            font-size: 0.875rem;
+            font-weight: 700;
+            line-height: 1.25rem;
+        }
+
+        #versionIncrementModal .increment-field-hint {
+            margin-top: 0.35rem;
+            color: #6b7280;
+            font-size: 0.75rem;
+            line-height: 1.1rem;
+        }
+
+        #versionIncrementModal .increment-text-input {
+            min-height: 2.65rem;
+            margin-top: 0.4rem;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        }
+
+        #versionIncrementModal .increment-text-input:focus {
+            border-color: #eab308;
+            box-shadow: 0 0 0 1px #eab308;
+            outline: none;
+        }
+
+        #versionIncrementModal .increment-form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.875rem;
+        }
+
+        #versionIncrementModal .increment-form-grid .is-wide {
+            grid-column: 1 / -1;
+        }
+
+        #versionIncrementModal .increment-release-part-grid,
+        #versionIncrementModal .increment-part-selector {
+            display: inline-flex;
+            width: auto;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.25rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 9999px;
+            background: #ffffff;
+            padding: 0.25rem;
+        }
+
+        #versionIncrementModal .increment-part-button {
+            display: inline-flex;
+            min-height: 2.25rem;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px;
+            background: transparent;
+            color: #4b5563;
+            padding: 0.45rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 700;
+            transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        #versionIncrementModal .increment-part-button:hover {
+            background: #fef3c7;
+            color: #a16207;
+        }
+
+        #versionIncrementModal .increment-part-button:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.35);
+        }
+
+        #versionIncrementModal .increment-part-button.is-active,
+        #versionIncrementModal .increment-part-button[aria-pressed="true"] {
+            background: #fde047;
+            color: #713f12;
+            box-shadow: 0 1px 2px rgba(180, 83, 9, 0.12);
+        }
+
+        #versionIncrementModal .increment-option-panel {
+            min-width: 0;
+            padding: 0.85rem;
+        }
+
+        #versionIncrementModal .increment-switch-row {
+            display: flex;
+            width: 100%;
+            min-width: 0;
+            min-height: 2.75rem;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: #ffffff;
+            color: #374151;
+            cursor: pointer;
+            padding: 0.65rem 0.75rem;
+            text-align: left;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        #versionIncrementModal .increment-switch-row:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.35);
+        }
+
+        #versionIncrementModal .increment-switch-label {
+            display: block;
+            min-width: 0;
+            font-size: 0.875rem;
+            font-weight: 800;
+            line-height: 1.2rem;
+            overflow-wrap: anywhere;
+        }
+
+        #versionIncrementModal .increment-switch-hint {
+            display: block;
+            margin-top: 0.15rem;
+            color: #6b7280;
+            font-size: 0.75rem;
+            font-weight: 500;
+            line-height: 1rem;
+        }
+
+        #versionIncrementModal .increment-option-field {
+            margin-top: 0.8rem;
+        }
+
+        #versionIncrementModal .increment-option-field input:disabled {
+            cursor: not-allowed;
+            background: #f3f4f6;
+            color: #6b7280;
+            box-shadow: none;
+        }
+
+        #versionIncrementModal .increment-preview-block {
+            min-width: 0;
+            padding: 0.85rem;
+        }
+
+        #versionIncrementModal .increment-preview-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 2rem minmax(0, 1fr);
+            align-items: stretch;
+            gap: 0.65rem;
+            margin-top: 0.75rem;
+        }
+
+        #versionIncrementModal .increment-preview-card {
+            min-width: 0;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: #ffffff;
+            padding: 0.75rem;
+        }
+
+        #versionIncrementModal .increment-preview-label {
+            display: block;
+            color: #374151;
+            font-size: 0.875rem;
+            font-weight: 700;
+            line-height: 1.25rem;
+        }
+
+        #versionIncrementModal .increment-arrow {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #b45309;
+        }
+
+        #versionIncrementModal .increment-arrow svg {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        #versionIncrementModal .increment-modal-message {
+            margin: 0;
+            color: #b45309;
+            font-size: 0.875rem;
+            font-weight: 700;
+            line-height: 1.25rem;
+        }
+
+        #versionIncrementDetailsModal .application-details-modal-panel,
+        #versionIncrementDetailEditModal .application-details-modal-panel {
+            display: flex;
+            max-height: calc(100vh - 2rem);
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        #versionIncrementDetailsModal .application-details-modal-header,
+        #versionIncrementDetailsModal .application-details-modal-footer,
+        #versionIncrementDetailEditModal .application-details-modal-header,
+        #versionIncrementDetailEditModal .application-details-modal-footer {
+            flex: 0 0 auto;
+        }
+
+        #versionIncrementDetailsModal .application-details-modal-body,
+        #versionIncrementDetailEditModal .application-details-modal-body {
+            min-height: 0;
+            flex: 1 1 auto;
+            overflow-y: auto;
+        }
+
+        .app-details-page .version-page-layout {
+            display: grid;
             grid-template-columns: 1fr;
+            gap: 1rem;
         }
 
         .app-details-page .version-panel {
@@ -601,8 +1019,14 @@
         @media (max-width: 900px) {
             .app-details-page .version-page-layout,
             .app-details-page .version-next-detail-grid,
-            .app-details-page .version-option-grid {
+            .app-details-page .version-option-grid,
+            #versionIncrementModal .increment-form-grid,
+            #versionIncrementModal .increment-versioning-info {
                 grid-template-columns: 1fr;
+            }
+
+            #versionIncrementModal .increment-versioning-meta {
+                justify-content: flex-start;
             }
         }
 
@@ -615,6 +1039,67 @@
                 width: 100%;
                 height: 1.25rem;
                 transform: rotate(90deg);
+            }
+
+            #versionIncrementModal {
+                align-items: flex-end;
+                padding: 0.75rem;
+            }
+
+            #versionIncrementModal .version-increment-panel {
+                max-height: calc(100vh - 1.5rem);
+            }
+
+            #versionIncrementModal .version-increment-header,
+            #versionIncrementModal .version-increment-body,
+            #versionIncrementModal .version-increment-footer {
+                padding: 1rem;
+            }
+
+            #versionIncrementModal .version-increment-header-icon {
+                width: 2.1rem;
+                height: 2.1rem;
+                flex-basis: 2.1rem;
+            }
+
+            #versionIncrementModal .increment-part-selector {
+                display: grid;
+                width: 100%;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                border-radius: 0.625rem;
+            }
+
+            #versionIncrementModal .increment-part-button {
+                min-width: 0;
+                padding-right: 0.5rem;
+                padding-left: 0.5rem;
+            }
+
+            #versionIncrementModal .increment-preview-row {
+                grid-template-columns: 1fr;
+            }
+
+            #versionIncrementModal .increment-arrow {
+                height: 1.25rem;
+            }
+
+            #versionIncrementModal .increment-arrow svg {
+                transform: rotate(90deg);
+            }
+
+            #versionIncrementModal .version-increment-footer,
+            #versionIncrementModal .version-increment-actions {
+                align-items: stretch;
+                flex-direction: column;
+                width: 100%;
+            }
+
+            #versionIncrementModal .version-increment-actions {
+                margin-left: 0;
+            }
+
+            #versionIncrementModal .version-increment-actions .btn {
+                width: 100%;
             }
         }
 
@@ -674,6 +1159,7 @@
 
         .app-details-page .version-script-box {
             min-height: 5.5rem;
+            margin: 0;
             border: 1px solid #374151;
             border-radius: 0.5rem;
             background: #111827;
@@ -739,6 +1225,334 @@
             color: #fbbf24;
         }
 
+        .app-details-page .version-api-key-table-wrap {
+            overflow-x: auto;
+            overflow-y: hidden;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            background: #ffffff;
+        }
+
+        .app-details-page .version-api-key-table {
+            width: 100%;
+            min-width: 52rem;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .app-details-page .version-api-key-table .col-increment {
+            width: 26%;
+        }
+
+        .app-details-page .version-api-key-table .col-owner {
+            width: 15%;
+        }
+
+        .app-details-page .version-api-key-table .col-next-version {
+            width: 23%;
+        }
+
+        .app-details-page .version-api-key-table .col-last-used {
+            width: 16%;
+        }
+
+        .app-details-page .version-api-key-table .col-enabled {
+            width: 8%;
+            text-align: center;
+        }
+
+        .app-details-page .version-api-key-table .col-actions {
+            width: 12%;
+        }
+
+        .app-details-page .version-api-key-table tbody tr {
+            cursor: pointer;
+        }
+
+        .app-details-page .version-api-key-table th,
+        .app-details-page .version-api-key-table td {
+            border-top: 1px solid #e5e7eb;
+            padding: 0.55rem 0.45rem;
+            text-align: left;
+            vertical-align: middle;
+            overflow: hidden;
+        }
+
+        .app-details-page .version-api-key-table tbody td {
+            color: #4b5563;
+            font-size: 0.8125rem;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+
+        .app-details-page .version-api-key-table thead th {
+            border-top: 0;
+            background: #f9fafb;
+            color: #6b7280;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        .app-details-page .version-api-key-name {
+            color: #111827;
+            font-size: 0.75rem;
+            font-weight: 800;
+            line-height: 1.15;
+        }
+
+        .app-details-page .version-owner-value,
+        .app-details-page .version-api-key-meta {
+            display: block;
+            min-width: 0;
+            max-width: 100%;
+            color: #4b5563;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            line-height: 1.25;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .app-details-page .version-api-key-actions {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .app-details-page .next-version-value {
+            display: block;
+            min-width: 0;
+            max-width: 100%;
+            color: #111827;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 0.8125rem;
+            font-weight: 700;
+            line-height: 1.25;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .app-details-page .next-version-changed-part {
+            color: #d97706;
+            font-weight: 900;
+        }
+
+        .app-details-page .version-api-key-table .table-action-button svg,
+        .app-details-page .version-key-actions .table-action-button svg,
+        .app-details-page .increment-details-card .table-action-button svg {
+            width: 1.5rem;
+            height: 1.5rem;
+            flex: 0 0 1.5rem;
+        }
+
+        .app-details-page .version-key-box {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 0.65rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: #f9fafb;
+            padding: 0.5rem;
+        }
+
+        .app-details-page .version-api-key-table .version-key-box {
+            height: 2.15rem;
+            gap: 0.25rem;
+            max-width: 100%;
+            min-width: 0;
+            padding: 0.25rem 0.3rem 0.25rem 0.55rem;
+        }
+
+        .app-details-page .version-api-key-table .version-key-actions .table-action-button {
+            width: 1.65rem;
+            height: 1.65rem;
+        }
+
+        .app-details-page .version-api-key-table .version-key-actions .table-action-button svg {
+            width: 1rem;
+            height: 1rem;
+            flex-basis: 1rem;
+        }
+
+        .app-details-page .version-api-key-table .version-key-value {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 0.75rem;
+        }
+
+        .app-details-page .version-api-key-table .next-version-value,
+        .app-details-page .version-api-key-table .date-time-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .app-details-page .version-api-key-table .table-actions {
+            flex-wrap: nowrap;
+            justify-content: center;
+        }
+
+        .app-details-page .version-api-key-table .version-key-action-separator {
+            display: none;
+        }
+
+        .app-details-page .version-api-key-table .version-script-box {
+            min-height: 2.15rem;
+            max-height: 2.15rem;
+            padding: 0.5rem 2.35rem 0.5rem 0.6rem;
+            font-size: 0.75rem;
+            line-height: 1.2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow-wrap: normal;
+        }
+
+        .app-details-page .version-api-key-table .version-script-copy-button {
+            top: 0.2rem;
+            right: 0.25rem;
+            width: 1.75rem;
+            height: 1.75rem;
+        }
+
+        .app-details-page .version-api-key-table .version-script-copy-button svg {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .app-details-page .version-key-actions {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        @media (max-width: 768px) {
+            .app-details-page .version-api-key-table .col-increment {
+                width: 33%;
+            }
+
+            .app-details-page .version-api-key-table .col-owner {
+                width: 18%;
+            }
+
+            .app-details-page .version-api-key-table .col-next-version {
+                width: 27%;
+            }
+
+            .app-details-page .version-api-key-table .col-enabled {
+                width: 10%;
+            }
+
+            .app-details-page .version-api-key-table .col-actions {
+                width: 12%;
+            }
+        }
+
+        .app-details-page .version-key-action-separator {
+            color: #d1d5db;
+            font-size: 0.875rem;
+            font-weight: 700;
+            line-height: 1;
+            padding: 0 0.1rem;
+        }
+
+        .app-details-page .version-key-value {
+            min-width: 0;
+            color: #111827;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 0.8125rem;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+        }
+
+        .app-details-page .increment-details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.85rem;
+        }
+
+        .app-details-page .increment-details-card {
+            min-width: 0;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: #f9fafb;
+            padding: 0.85rem;
+        }
+
+        .app-details-page .increment-details-card-heading {
+            display: flex;
+            min-width: 0;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+
+        .app-details-page .increment-details-edit {
+            margin-top: 0.65rem;
+            display: flex;
+            min-width: 0;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+
+        .app-details-page .increment-detail-toggle {
+            align-items: center;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: #ffffff;
+            padding: 0.65rem 0.75rem;
+        }
+
+        .app-details-page .increment-detail-edit-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+
+        #versionIncrementDetailEditModal .increment-field-label {
+            display: block;
+            color: #374151;
+            font-size: 0.875rem;
+            font-weight: 700;
+            line-height: 1.25rem;
+        }
+
+        #versionIncrementDetailEditModal .increment-modal-message {
+            margin: 0;
+            color: #b45309;
+            font-size: 0.875rem;
+            font-weight: 700;
+            line-height: 1.25rem;
+        }
+
+        .app-details-page .increment-details-card.is-wide {
+            grid-column: 1 / -1;
+        }
+
+        .app-details-page .increment-details-value {
+            margin-top: 0.25rem;
+            color: #111827;
+            font-size: 0.875rem;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+        }
+
+        @media (max-width: 700px) {
+            .app-details-page .increment-details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .app-details-page .increment-details-card.is-wide {
+                grid-column: auto;
+            }
+        }
+
         .app-details-page .version-part-button.is-active {
             background-color: #fef3c7;
             border-color: #fde68a;
@@ -778,6 +1592,32 @@
         .app-details-page .inline-icon-button:hover {
             background: #fef3c7;
             color: #b45309;
+        }
+
+        #versionIncrementDetailsNameEdit {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.75rem;
+            height: 1.75rem;
+            border-radius: 9999px;
+            color: #6b7280;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        #versionIncrementDetailsNameEdit:hover {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        #versionIncrementDetailsNameEdit.hidden {
+            display: none;
+        }
+
+        #versionIncrementDetailsNameEdit svg {
+            width: 1rem;
+            height: 1rem;
+            flex: 0 0 1rem;
         }
 
         .app-details-page .inline-icon-button.remove-button:hover {
@@ -1394,12 +2234,18 @@
             color: #fffbeb;
         }
 
+        html[data-theme="dark"] #versionIncrementDetailsNameEdit:hover {
+            background: #92400e;
+            color: #fffbeb;
+        }
+
         html[data-theme="dark"] .app-details-page .inline-icon-button.remove-button:hover {
             background: #7f1d1d;
             color: #fee2e2;
         }
 
-        html[data-theme="dark"] .app-details-page .inline-icon-button {
+        html[data-theme="dark"] .app-details-page .inline-icon-button,
+        html[data-theme="dark"] #versionIncrementDetailsNameEdit {
             color: #cbd5e1;
         }
 
@@ -1488,6 +2334,121 @@
             border-color: #4b5563;
         }
 
+        html[data-theme="dark"] #versionIncrementModal {
+            background: rgba(2, 6, 23, 0.74);
+        }
+
+        html[data-theme="dark"] #versionIncrementModal .version-increment-panel,
+        html[data-theme="dark"] #versionIncrementModal .version-increment-header,
+        html[data-theme="dark"] #versionIncrementModal .version-increment-body {
+            background: #1f2937 !important;
+            border-color: #374151;
+            color: #e5e7eb;
+        }
+
+        html[data-theme="dark"] #versionIncrementModal .version-increment-footer,
+        html[data-theme="dark"] #versionIncrementModal .increment-versioning-info,
+        html[data-theme="dark"] #versionIncrementModal .increment-option-panel,
+        html[data-theme="dark"] #versionIncrementModal .increment-preview-block {
+            background: #111827 !important;
+            border-color: #374151;
+            color: #e5e7eb;
+        }
+
+        html[data-theme="dark"] #versionIncrementModal .version-increment-title,
+        html[data-theme="dark"] #versionIncrementModal .increment-versioning-title,
+        html[data-theme="dark"] #versionIncrementModal .increment-preview-value,
+        html[data-theme="dark"] #versionIncrementModal .increment-preview-label,
+        html[data-theme="dark"] #versionIncrementModal .increment-field-label {
+            color: #f3f4f6;
+        }
+
+        html[data-theme="dark"] #versionIncrementModal .version-increment-subtitle,
+        html[data-theme="dark"] #versionIncrementModal .detail-label,
+        html[data-theme="dark"] #versionIncrementModal .increment-versioning-summary,
+        html[data-theme="dark"] #versionIncrementModal .increment-field-hint,
+        html[data-theme="dark"] #versionIncrementModal .increment-switch-hint {
+            color: #cbd5e1;
+        }
+
+        html[data-theme="dark"] #versionIncrementModal .version-increment-header-icon {
+            border-color: #92400e;
+            background: #451a03;
+            color: #fde68a;
+        }
+
+        html[data-theme="dark"] #versionIncrementModal .version-increment-close {
+            color: #cbd5e1;
+        }
+
+        html[data-theme="dark"] #versionIncrementModal .version-increment-close:hover {
+            border-color: #4b5563;
+            background: #111827;
+            color: #f3f4f6;
+        }
+
+        html[data-theme="dark"] #versionIncrementModal .increment-part-selector,
+        html[data-theme="dark"] #versionIncrementModal .increment-switch-row,
+        html[data-theme="dark"] #versionIncrementModal .increment-versioning-chip,
+        html[data-theme="dark"] #versionIncrementModal .increment-preview-card {
+            background: #1f2937;
+            border-color: #4b5563;
+            color: #e5e7eb;
+        }
+
+        html[data-theme="dark"] #versionIncrementModal .increment-part-button {
+            color: #d1d5db;
+        }
+
+        html[data-theme="dark"] #versionIncrementModal .increment-part-button.is-active,
+        html[data-theme="dark"] #versionIncrementModal .increment-part-button[aria-pressed="true"] {
+            background: #f59e0b;
+            color: #111827;
+        }
+
+        html[data-theme="dark"] #versionIncrementModal .increment-part-button:not([aria-pressed="true"]):hover {
+            background: #451a03 !important;
+            color: #fde68a !important;
+        }
+
+        html[data-theme="dark"] #versionIncrementModal .increment-switch-control.bg-gray-100 {
+            background: #0f172a !important;
+            border-color: #4b5563 !important;
+        }
+
+        html[data-theme="dark"] #versionIncrementModal .increment-switch-track.bg-gray-300 {
+            background: #334155 !important;
+        }
+
+        html[data-theme="dark"] #versionIncrementModal .increment-switch-control.bg-yellow-100 {
+            background: #fef3c7 !important;
+            border-color: #f59e0b !important;
+        }
+
+        html[data-theme="dark"] #versionIncrementModal .increment-switch-track.bg-yellow-400 {
+            background: #f59e0b !important;
+        }
+
+        html[data-theme="dark"] #versionIncrementModal input {
+            background-color: #111827 !important;
+            border-color: #4b5563 !important;
+            color: #f3f4f6 !important;
+        }
+
+        html[data-theme="dark"] #versionIncrementModal input:disabled {
+            background-color: #0f172a !important;
+            color: #94a3b8 !important;
+        }
+
+        html[data-theme="dark"] #versionIncrementModal .increment-text-input:focus {
+            border-color: #facc15 !important;
+            box-shadow: 0 0 0 1px #facc15;
+        }
+
+        html[data-theme="dark"] #versionIncrementModal .next-version-changed-part {
+            color: #facc15;
+        }
+
         html[data-theme="dark"] .app-details-page .version-panel,
         html[data-theme="dark"] .app-details-page .version-flow-node,
         html[data-theme="dark"] .app-details-page .version-part-selector {
@@ -1537,6 +2498,65 @@
             border-color: #4b5563;
             background: #020617;
             color: #e5e7eb;
+        }
+
+        html[data-theme="dark"] .app-details-page .version-api-key-table-wrap,
+        html[data-theme="dark"] .app-details-page .version-key-box {
+            background: #111827;
+            border-color: #4b5563;
+        }
+
+        html[data-theme="dark"] .app-details-page .version-api-key-table th,
+        html[data-theme="dark"] .app-details-page .version-api-key-table td {
+            border-color: #4b5563;
+        }
+
+        html[data-theme="dark"] .app-details-page .version-api-key-table tbody td {
+            color: #e5e7eb;
+        }
+
+        html[data-theme="dark"] .app-details-page .version-api-key-table thead th {
+            background: #1f2937;
+            color: #cbd5e1;
+        }
+
+        html[data-theme="dark"] .app-details-page .version-api-key-name,
+        html[data-theme="dark"] .app-details-page .next-version-value,
+        html[data-theme="dark"] .app-details-page .version-key-value,
+        html[data-theme="dark"] .app-details-page .increment-details-value {
+            color: #f3f4f6;
+        }
+
+        html[data-theme="dark"] .app-details-page .next-version-changed-part {
+            color: #facc15;
+        }
+
+        html[data-theme="dark"] .app-details-page .version-owner-value,
+        html[data-theme="dark"] .app-details-page .version-api-key-meta,
+        html[data-theme="dark"] .app-details-page .version-api-key-table .date-time-text {
+            color: #cbd5e1;
+        }
+
+        html[data-theme="dark"] .app-details-page .version-key-action-separator {
+            color: #4b5563;
+        }
+
+        html[data-theme="dark"] .app-details-page .increment-details-card {
+            background: #111827;
+            border-color: #4b5563;
+        }
+
+        html[data-theme="dark"] .app-details-page .increment-detail-toggle {
+            background: #1f2937;
+            border-color: #4b5563;
+        }
+
+        html[data-theme="dark"] #versionIncrementDetailEditModal .increment-field-label {
+            color: #f3f4f6;
+        }
+
+        html[data-theme="dark"] #versionIncrementDetailEditModal .increment-modal-message {
+            color: #facc15;
         }
 
         html[data-theme="dark"] .app-details-page .version-part-button.is-active {
@@ -2055,12 +3075,14 @@
             {% endif %}
         </div>
         <div class="toolbar-actions flex items-center app-details-actions hidden" data-app-actions-view="versions">
-            <button type="button" id="openVersionHistory" class="tab-link primary-action btn btn-secondary group justify-start py-3 text-left" data-app-id="{{ app.id }}">
-                <svg class="size-6 flex-shrink-0 text-yellow-500 group-hover:text-yellow-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                </svg>
-                History
-            </button>
+            {% if can_edit_application %}
+                <button type="button" id="openVersionIncrementModal" class="btn btn-primary">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    New Increment
+                </button>
+            {% endif %}
         </div>
         <div class="toolbar-actions flex items-center app-details-actions hidden" data-app-actions-view="access">
             {% if access_summary.can_manage_access %}
@@ -2276,12 +3298,20 @@
                                     <h2 class="version-number-display mt-1">{{ latest_version.number if latest_version else 'No versions available' }}</h2>
                                     <p class="date-time-text mt-1 text-sm text-gray-600">{{ latest_version_display if latest_version else 'N/A' }}</p>
                                 </div>
-                                <button type="button" id="printVersionHistory" class="btn btn-secondary release-action-button flex-shrink-0" data-app-id="{{ app.id }}">
-                                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0 1 10.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0 .229 2.523a1.125 1.125 0 0 1-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0 0 21 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 0 0-1.913-.247M6.34 18H5.25A2.25 2.25 0 0 1 3 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 0 1 1.913-.247m10.5 0a48.536 48.536 0 0 0-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5Zm-3 0h.008v.008H15V10.5Z" />
-                                    </svg>
-                                    Print
-                                </button>
+                                <div class="flex flex-wrap items-center justify-end gap-2">
+                                    <button type="button" id="openVersionHistory" class="btn btn-secondary release-action-button flex-shrink-0" data-app-id="{{ app.id }}">
+                                        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                        </svg>
+                                        History
+                                    </button>
+                                    <button type="button" id="printVersionHistory" class="btn btn-secondary release-action-button flex-shrink-0" data-app-id="{{ app.id }}">
+                                        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0 1 10.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0 .229 2.523a1.125 1.125 0 0 1-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0 0 21 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 0 0-1.913-.247M6.34 18H5.25A2.25 2.25 0 0 1 3 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 0 1 1.913-.247m10.5 0a48.536 48.536 0 0 0-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5Zm-3 0h.008v.008H15V10.5Z" />
+                                        </svg>
+                                        Print
+                                    </button>
+                                </div>
                             </div>
                             <div class="mt-4 flex flex-wrap gap-2">
                                 <span class="details-chip">{{ version_count }} {{ 'release' if version_count == 1 else 'releases' }}</span>
@@ -2298,138 +3328,16 @@
                                 <p class="mt-1 text-sm text-gray-700">{{ latest_version_notes or 'No release notes available.' }}</p>
                             </div>
                         </div>
-
-                        {% if can_edit_application %}
-                            <div class="version-panel version-panel-muted">
-                                <div class="version-panel-heading">
-                                    <div class="min-w-0">
-                                        <p class="detail-label">Next Release Preview</p>
-                                        <p id="versionOptionsMessage" class="hidden mt-1 text-sm font-medium text-yellow-700"></p>
-                                    </div>
-                                    <button type="button" id="saveVersionOptions" class="btn btn-primary flex-shrink-0">Save Options</button>
-                                </div>
-                                <div class="version-release-flow mt-4" id="versionNextPreview">
-                                    <div class="version-flow-node">
-                                        <p class="detail-label">Current release</p>
-                                        <p id="versionCurrentPreview" class="version-flow-value">{{ latest_version.number if latest_version else 'N/A' }}</p>
-                                    </div>
-                                    <span class="version-flow-arrow" aria-hidden="true">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                                        </svg>
-                                    </span>
-                                    <div class="version-flow-node">
-                                        <p class="detail-label">Release created by script</p>
-                                        <p id="versionNextPreviewValue" class="version-flow-value">{{ latest_version.number if latest_version else 'N/A' }}</p>
-                                    </div>
-                                </div>
-                                <div class="version-next-detail-grid mt-3">
-                                    <div class="version-next-detail-card">
-                                        <p class="detail-label">Release part</p>
-                                        <p id="versionNextPartValue" class="version-next-detail-value">Major</p>
-                                    </div>
-                                    <div class="version-next-detail-card">
-                                        <p class="detail-label">Pre-release Label</p>
-                                        <p id="versionNextLabelValue" class="version-next-detail-value">Not enabled</p>
-                                    </div>
-                                    <div class="version-next-detail-card">
-                                        <p class="detail-label">Build number</p>
-                                        <p id="versionNextBuildValue" class="version-next-detail-value">Not enabled</p>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endif %}
                     </div>
-
-                    {% if can_edit_application %}
-                        <div class="flex flex-col gap-4">
-                            <div class="version-panel">
-                                <div class="version-panel-heading">
-                                    <div class="min-w-0">
-                                        <p class="detail-label">Version Strategy</p>
-                                    </div>
-                                </div>
-                                <div class="mt-4">
-                                    <p class="detail-label mb-2">Release Part</p>
-                                    <div class="version-part-selector">
-                                        <button type="button" class="btn btn-secondary version-part-button is-active" data-version-part="MAJOR">Major</button>
-                                        <button type="button" class="btn btn-secondary version-part-button" data-version-part="MINOR">Minor</button>
-                                        <button type="button" class="btn btn-secondary version-part-button" data-version-part="PATCH">Patch</button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="version-option-grid">
-                                <div class="version-option-card">
-                                    <label class="version-toggle-row text-sm text-gray-700">
-                                        <span class="min-w-0">
-                                            <span class="block font-medium">Pre-release Label</span>
-                                        </span>
-                                        <span class="relative inline-flex flex-shrink-0">
-                                            <input type="checkbox" id="versionPrereleaseEnabled" class="version-toggle-input" {% if latest_uses_prerelease %}checked{% endif %}>
-                                            <span class="version-toggle-switch" aria-hidden="true"></span>
-                                        </span>
-                                    </label>
-                                    <div id="versionPrereleaseInputWrap" class="mt-3">
-                                        <label for="versionPrereleaseDropdownButton" class="block text-sm font-medium text-gray-700">Pre-release Label</label>
-                                        <input type="hidden" id="versionPrereleasePreset" value="alpha" data-current-prerelease="{{ latest_prerelease_identifier or '' }}">
-                                        <div class="relative mt-1">
-                                            <button type="button" id="versionPrereleaseDropdownButton" class="version-dropdown-button" aria-haspopup="listbox" aria-expanded="false">
-                                                <span id="versionPrereleaseDropdownSelected" class="truncate">alpha</span>
-                                                <svg class="h-4 w-4 flex-shrink-0 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" aria-hidden="true">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                                                </svg>
-                                            </button>
-                                            <div id="versionPrereleaseDropdownPanel" class="version-dropdown-panel hidden" role="listbox" aria-labelledby="versionPrereleaseDropdownButton">
-                                                <ul id="versionPrereleaseList" class="max-h-56 overflow-auto py-1 text-base sm:text-sm"></ul>
-                                            </div>
-                                        </div>
-                                        <input type="text" id="versionPrereleaseIdentifier" class="form-input mt-2 hidden block w-full focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500" value="{{ latest_prerelease_identifier or '' }}" placeholder="Custom label" disabled>
-                                    </div>
-                                </div>
-                                <div class="version-option-card">
-                                    <label class="version-toggle-row text-sm text-gray-700">
-                                        <span class="min-w-0">
-                                            <span class="block font-medium">Build Number</span>
-                                        </span>
-                                        <span class="relative inline-flex flex-shrink-0">
-                                            <input type="checkbox" id="versionBuildEnabled" class="version-toggle-input" {% if latest_uses_build %}checked{% endif %}>
-                                            <span class="version-toggle-switch" aria-hidden="true"></span>
-                                        </span>
-                                    </label>
-                                    <div id="versionBuildInputWrap" class="mt-3">
-                                        <label for="versionBuildNumber" class="block text-sm font-medium text-gray-700">Build Number</label>
-                                        <div class="mt-1 flex items-center gap-2">
-                                            <input type="number" id="versionBuildNumber" class="form-input version-build-number-input block w-full focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500" value="{{ latest_build_number if latest_build_number is not none else 0 }}" min="0" step="1" disabled>
-                                            <button type="button" id="editVersionBuildNumber" class="inline-icon-button flex-shrink-0" aria-label="Edit build number" title="Edit build number">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="version-panel">
-                                <div class="version-panel-heading mb-3">
-                                    <div class="min-w-0">
-                                        <p class="detail-label">Release Script</p>
-                                    </div>
-                                </div>
-                                <div class="relative">
-                                    <pre id="versionScriptBox" class="version-script-box"></pre>
-                                    <button type="button" id="copyVersionScript" class="version-script-copy-button" aria-label="Copy script" title="Copy script">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6" aria-hidden="true">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 7.5V6.108c0-1.135.845-2.098 1.976-2.192.373-.03.748-.057 1.123-.08M15.75 18H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08M15.75 18.75v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5A3.375 3.375 0 0 0 6.375 7.5H5.25m11.9-3.664A2.251 2.251 0 0 0 15 2.25h-1.5a2.251 2.251 0 0 0-2.15 1.586m5.8 0c.065.21.1.433.1.664v.75h-6V4.5c0-.231.035-.454.1-.664M6.75 7.5H4.875c-.621 0-1.125.504-1.125 1.125v12c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V16.5a9 9 0 0 0-9-9Z" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
                 </div>
             </section>
+
+            {% if can_edit_application %}
+                <div id="versionIncrementsTablePanel" class="app-details-view hidden" data-app-details-view="versions">
+                    <div id="versionIncrementList" class="version-increment-list"></div>
+                    <p id="versionIncrementEmpty" class="hidden text-sm text-gray-500">No increments configured.</p>
+                </div>
+            {% endif %}
 
             <section id="accessDetailsSection" class="detail-tile app-details-view hidden" data-app-details-view="access">
                 <div>
@@ -2587,8 +3495,10 @@
                                     </svg>
                                 </button>
                             {% else %}
-                                <button type="button" onclick="openEditAppModal({{ app.id }}, 'repository'); return false;" class="btn btn-primary" aria-label="Add repository link" title="Add repository link">
-                                    Add Repository
+                                <button type="button" onclick="openEditAppModal({{ app.id }}, 'repository'); return false;" class="inline-icon-button" aria-label="Add repository link" title="Add repository link">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                    </svg>
                                 </button>
                             {% endif %}
                         </div>
@@ -2807,6 +3717,201 @@
     </div>
 </div>
 
+{% if can_edit_application %}
+<div
+    id="versionIncrementModal"
+    class="application-details-modal hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center p-4"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="versionIncrementModalTitle"
+    aria-describedby="versionIncrementModalDescription"
+    aria-hidden="true"
+>
+    <div class="application-details-modal-panel version-increment-panel bg-white w-full max-w-2xl mx-auto relative">
+        <div class="application-details-modal-header rounded-t-md shadow-sm flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
+            <h3 id="versionIncrementModalTitle" class="text-lg font-bold text-gray-800">New Increment</h3>
+            <button type="button" onclick="closeVersionIncrementModal()" class="version-increment-close text-gray-400 hover:text-gray-600 focus:outline-none" aria-label="Close version increment modal">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <form id="versionIncrementForm" class="version-increment-form">
+            <p id="versionIncrementModalDescription" class="sr-only">Create a release key and choose how the next version should move.</p>
+            <div class="application-details-modal-body version-increment-body">
+                <div class="increment-modal-stack">
+                    <div class="increment-versioning-info" role="note" aria-label="Application versioning type">
+                        <div class="min-w-0">
+                            <p class="detail-label">Versioning Type</p>
+                            <p class="increment-versioning-title">{{ latest_version_type_label }}</p>
+                            <p class="increment-versioning-summary">Application releases currently use {{ latest_version_type_short_label }} formatting.</p>
+                        </div>
+                        {% if latest_uses_prerelease or latest_uses_build %}
+                            <div class="increment-versioning-meta" aria-label="Versioning options">
+                            {% if latest_uses_prerelease %}
+                                <span class="increment-versioning-chip">Pre-release Label</span>
+                            {% endif %}
+                            {% if latest_uses_build %}
+                                <span class="increment-versioning-chip">Build Number</span>
+                            {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="increment-field">
+                        <label for="incrementNameInput" class="increment-field-label">Increment Name</label>
+                        <input type="text" id="incrementNameInput" class="form-input increment-text-input block w-full" maxlength="120" required autocomplete="off" aria-describedby="incrementNameHelp versionIncrementModalMessage">
+                        <p id="incrementNameHelp" class="increment-field-hint">Shown in the increment list and used to identify the generated key.</p>
+                    </div>
+
+                    <fieldset class="increment-field">
+                        <legend class="increment-field-label">Release Part</legend>
+                        <input type="hidden" id="incrementVersionPart" value="major">
+                        <div class="increment-part-selector mt-2" role="group" aria-label="Release part">
+                            <button type="button" class="increment-part-button is-active" data-increment-part="major" aria-pressed="true">Major</button>
+                            <button type="button" class="increment-part-button" data-increment-part="minor" aria-pressed="false">Minor</button>
+                            <button type="button" class="increment-part-button" data-increment-part="patch" aria-pressed="false">Patch</button>
+                        </div>
+                    </fieldset>
+
+                    <div class="increment-form-grid" role="group" aria-label="Optional release metadata">
+                        <div class="increment-option-panel">
+                            <button type="button" class="increment-switch-row" id="incrementPrereleaseSwitch" aria-pressed="false" aria-controls="incrementPrereleaseField">
+                                <span class="min-w-0">
+                                    <span class="increment-switch-label">Pre-release Label</span>
+                                    <span class="increment-switch-hint">Append a label such as alpha or beta.</span>
+                                </span>
+                                <span class="increment-switch-control relative inline-flex h-7 w-12 flex-shrink-0 items-center rounded-full border bg-gray-100 border-gray-300 transition" aria-hidden="true">
+                                    <span class="increment-switch-track absolute inset-0 rounded-full bg-gray-300 transition"></span>
+                                    <span class="increment-switch-knob relative inline-flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-gray-300 transition-transform duration-200 ease-out" style="transform: translateX(0.25rem);">
+                                        <svg class="increment-switch-icon h-3.5 w-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+                                            <path class="increment-switch-check hidden" stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                            <path class="increment-switch-x" stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                        </svg>
+                                    </span>
+                                </span>
+                            </button>
+                            <input type="checkbox" id="incrementPrereleaseEnabled" class="hidden" autocomplete="off">
+                            <div id="incrementPrereleaseField" class="increment-option-field">
+                                <label for="incrementPrereleaseIdentifier" class="increment-field-label">Pre-release Label</label>
+                                <input type="text" id="incrementPrereleaseIdentifier" class="form-input increment-text-input block w-full" value="{{ latest_prerelease_identifier or 'alpha' }}" placeholder="alpha" disabled aria-describedby="versionIncrementModalMessage">
+                            </div>
+                        </div>
+                        <div class="increment-option-panel">
+                            <button type="button" class="increment-switch-row" id="incrementBuildSwitch" aria-pressed="false" aria-controls="incrementBuildField">
+                                <span class="min-w-0">
+                                    <span class="increment-switch-label">Build Number</span>
+                                    <span class="increment-switch-hint">Add and advance the build segment.</span>
+                                </span>
+                                <span class="increment-switch-control relative inline-flex h-7 w-12 flex-shrink-0 items-center rounded-full border bg-gray-100 border-gray-300 transition" aria-hidden="true">
+                                    <span class="increment-switch-track absolute inset-0 rounded-full bg-gray-300 transition"></span>
+                                    <span class="increment-switch-knob relative inline-flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-gray-300 transition-transform duration-200 ease-out" style="transform: translateX(0.25rem);">
+                                        <svg class="increment-switch-icon h-3.5 w-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+                                            <path class="increment-switch-check hidden" stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                            <path class="increment-switch-x" stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                        </svg>
+                                    </span>
+                                </span>
+                            </button>
+                            <input type="checkbox" id="incrementBuildEnabled" class="hidden" autocomplete="off">
+                            <div id="incrementBuildField" class="increment-option-field">
+                                <label for="incrementBuildNumber" class="increment-field-label">Build Number</label>
+                                <input type="number" id="incrementBuildNumber" class="form-input increment-text-input version-build-number-input block w-full" value="{{ latest_build_number if latest_build_number is not none else 0 }}" min="0" step="1" disabled aria-describedby="versionIncrementModalMessage">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="increment-preview-block" aria-live="polite">
+                        <p class="increment-field-label">Next Release Preview</p>
+                        <div class="increment-preview-row">
+                            <div class="increment-preview-card">
+                                <p class="increment-preview-label">Current Release</p>
+                                <p id="incrementCurrentPreview" class="increment-preview-value">{{ latest_version.number if latest_version else 'N/A' }}</p>
+                            </div>
+                            <span class="increment-arrow" aria-hidden="true">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                                </svg>
+                            </span>
+                            <div class="increment-preview-card">
+                                <p class="increment-preview-label">Next Release</p>
+                                <p id="incrementNextPreview" class="increment-preview-value">{{ latest_version.number if latest_version else 'N/A' }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p id="versionIncrementModalMessage" class="increment-modal-message hidden" role="alert" aria-live="polite"></p>
+                </div>
+            </div>
+            <div class="application-details-modal-footer version-increment-footer">
+                <div class="version-increment-actions">
+                    <button type="button" onclick="closeVersionIncrementModal()" class="btn btn-secondary">Cancel</button>
+                    <button type="submit" id="saveVersionIncrement" class="btn btn-primary">Create Increment</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+<div
+    id="versionIncrementDetailsModal"
+    class="application-details-modal hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center p-4"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="versionIncrementDetailsTitle"
+    aria-hidden="true"
+>
+    <div class="application-details-modal-panel bg-white rounded-lg shadow-lg w-full max-w-2xl mx-auto max-h-[calc(100vh-2rem)] overflow-hidden flex flex-col relative">
+        <div class="application-details-modal-header rounded-t-md shadow-sm flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
+            <h3 id="versionIncrementDetailsTitle" class="flex min-w-0 items-center gap-2 text-lg font-bold text-gray-800">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 flex-shrink-0 text-yellow-500" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
+                </svg>
+                <span id="versionIncrementDetailsName" class="min-w-0 truncate">Increment</span>
+                <button type="button" id="versionIncrementDetailsNameEdit" class="inline-icon-button hidden flex-shrink-0" data-field="name" aria-label="Edit increment name" title="Edit increment name"></button>
+            </h3>
+            <button type="button" onclick="closeVersionIncrementDetailsModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none" aria-label="Close increment details">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div id="versionIncrementDetailsContent" class="application-details-modal-body p-6 space-y-4 text-gray-700"></div>
+        <div class="application-details-modal-footer flex flex-shrink-0 justify-end p-4 border-t border-gray-200 bg-gray-100 text-right rounded-b-lg">
+            <button type="button" onclick="closeVersionIncrementDetailsModal()" class="btn btn-secondary">Close</button>
+        </div>
+    </div>
+</div>
+
+<div
+    id="versionIncrementDetailEditModal"
+    class="application-details-modal hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center p-4"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="versionIncrementDetailEditTitle"
+    aria-hidden="true"
+>
+    <div class="application-details-modal-panel bg-white rounded-lg shadow-lg w-full max-w-md mx-auto max-h-[calc(100vh-2rem)] overflow-hidden flex flex-col relative">
+        <div class="application-details-modal-header rounded-t-md shadow-sm flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
+            <h3 id="versionIncrementDetailEditTitle" class="text-lg font-bold text-gray-800">Edit Increment</h3>
+            <button type="button" onclick="closeVersionIncrementDetailEditModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none" aria-label="Close increment editor">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div class="application-details-modal-body p-6">
+            <div id="versionIncrementDetailEditContent" class="app-details-page space-y-4"></div>
+            <p id="versionIncrementDetailEditMessage" class="increment-modal-message hidden mt-3" role="alert" aria-live="polite"></p>
+        </div>
+        <div class="application-details-modal-footer flex flex-shrink-0 justify-end gap-3 p-4 border-t border-gray-200 bg-gray-100 text-right rounded-b-lg">
+            <button type="button" onclick="closeVersionIncrementDetailEditModal()" class="btn btn-secondary">Cancel</button>
+            <button type="button" id="saveIncrementDetailEdit" class="btn btn-primary">Save</button>
+        </div>
+    </div>
+</div>
+
 <div id="accessModal" class="application-details-modal hidden fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex justify-center items-center p-4">
     <div class="application-details-modal-panel bg-white rounded-lg shadow-lg w-full max-w-md mx-auto max-h-[calc(100vh-2rem)] overflow-y-auto relative">
         <div class="application-details-modal-header rounded-t-md shadow-sm flex justify-between items-center p-4 border-b border-gray-200 bg-gray-100">
@@ -2992,8 +4097,16 @@
             usesBuild: {{ 'true' if latest_uses_build else 'false' }},
             prereleaseIdentifier: {{ (latest_prerelease_identifier or '')|tojson }},
             buildNumber: {{ latest_build_number if latest_build_number is not none else 0 }},
+            releaseCount: {{ version_count }},
             selectedPart: 'MAJOR'
         };
+        let versionIncrements = {{ version_increments|tojson }};
+        const incrementDraft = {
+            versionPart: 'major'
+        };
+        let versionIncrementPreviousFocus = null;
+        let currentVersionIncrementDetailsId = null;
+        let incrementDetailsEditField = null;
         const currentProjectId = {{ project_id|tojson }};
         const currentProjectName = {{ (project_name or '')|tojson }};
         const accessProjects = currentProjectId ? [{ id: currentProjectId, name: currentProjectName || 'Selected Project' }] : [];
@@ -4199,6 +5312,11 @@
             { value: 'dev', label: 'dev' },
             { value: 'custom', label: 'Custom label' }
         ];
+        const buildPatternOptions = [
+            { value: 'standard', label: 'Standard (.0)' },
+            { value: 'dot_padded', label: 'Build 0' },
+            { value: 'parentheses', label: 'Parentheses (000)' }
+        ];
 
         function currentPrereleaseInputValue() {
             if (!$('#versionPrereleaseEnabled').is(':checked')) return '';
@@ -4214,6 +5332,27 @@
                 return item.value === value;
             });
             return option ? option.label : value;
+        }
+
+        function buildPatternLabel(value) {
+            const option = buildPatternOptions.find(function(item) {
+                return item.value === value;
+            });
+            return option ? option.label : buildPatternOptions[0].label;
+        }
+
+        function normalizeBuildPattern(value) {
+            return buildPatternOptions.some(function(option) {
+                return option.value === value;
+            }) ? value : 'standard';
+        }
+
+        function formatBuildPreviewValue(buildNumber, pattern) {
+            const normalizedBuild = Number.isFinite(buildNumber) && buildNumber >= 0 ? buildNumber : 0;
+            const paddedBuild = String(normalizedBuild).padStart(3, '0');
+            if (pattern === 'dot_padded') return ` Build ${normalizedBuild}`;
+            if (pattern === 'parentheses') return ` (${paddedBuild})`;
+            return `.${normalizedBuild}`;
         }
 
         function renderPrereleaseDropdownOptions() {
@@ -4234,10 +5373,41 @@
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75" />
             </svg>`;
+        const incrementDetailsIcon = `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 flex-shrink-0 text-yellow-500" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941"></path>
+            </svg>`;
+
+        function switchIconHtml(enabled) {
+            return `
+                <svg class="h-3.5 w-3.5 ${enabled ? 'text-yellow-500' : 'text-gray-400'}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+                    <path class="${enabled ? '' : 'hidden'}" stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                    <path class="${enabled ? 'hidden' : ''}" stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                </svg>`;
+        }
+        const releaseUrlVariable = '"$VERMICELLI_URL"';
 
         function parseVersionParts(versionNumber) {
             const rawVersion = String(versionNumber || '0.0.0');
             const pieces = rawVersion.split('-', 2);
+            const namedBuild = pieces[0].match(/^\s*(\d+)\.(\d+)\.(\d+)\s+Build\s+(\d+)\s*$/i);
+            if (namedBuild) {
+                return {
+                    major: Number.parseInt(namedBuild[1], 10) || 0,
+                    minor: Number.parseInt(namedBuild[2], 10) || 0,
+                    patch: Number.parseInt(namedBuild[3], 10) || 0,
+                    build: Number.parseInt(namedBuild[4], 10)
+                };
+            }
+            const parenthesizedBuild = pieces[0].match(/^\s*(\d+)\.(\d+)\.(\d+)\s*\((\d+)\)\s*$/);
+            if (parenthesizedBuild) {
+                return {
+                    major: Number.parseInt(parenthesizedBuild[1], 10) || 0,
+                    minor: Number.parseInt(parenthesizedBuild[2], 10) || 0,
+                    patch: Number.parseInt(parenthesizedBuild[3], 10) || 0,
+                    build: Number.parseInt(parenthesizedBuild[4], 10)
+                };
+            }
             const coreParts = pieces[0].split('.').map(function(part) {
                 const value = Number.parseInt(part, 10);
                 return Number.isFinite(value) ? value : 0;
@@ -4350,14 +5520,10 @@
                 { type: 'value', value: versionOptions.selectedPart },
                 { type: 'flag', value: '--appid' },
                 { type: 'value', value: String(versionOptions.appId) },
-                { type: 'flag', value: '--username' },
-                { type: 'value', value: versionOptions.username },
-                { type: 'flag', value: '--password' },
-                { type: 'secret', value: '****' },
+                { type: 'flag', value: '--apikey' },
+                { type: 'secret', value: '"$VERMICELLI_API_KEY"' },
                 { type: 'flag', value: '--url' },
-                { type: 'value', value: 'http://0.0.0.0:8000' },
-                { type: 'flag', value: '--releasenotes' },
-                { type: 'empty', value: '""' }
+                { type: 'value', value: releaseUrlVariable }
             ];
             if (prereleaseEnabled && prereleaseIdentifier) {
                 tokens.push({ type: 'flag', value: '--prerelease' });
@@ -4443,6 +5609,880 @@
                     .attr('title', 'Copy script')
                     .html(versionScriptCopyIcon);
             }, 900);
+        }
+
+        function showIncrementScriptCopied(button) {
+            if (!button || !button.length) return;
+            button
+                .addClass('is-copied')
+                .attr('aria-label', 'Script copied')
+                .attr('title', 'Script copied')
+                .html(versionScriptCopiedIcon);
+            setTimeout(function() {
+                button
+                    .removeClass('is-copied')
+                    .attr('aria-label', 'Copy release script')
+                    .attr('title', 'Copy release script')
+                    .html(versionScriptCopyIcon);
+            }, 900);
+        }
+
+        function showIncrementKeyCopied(button) {
+            if (!button || !button.length) return;
+            button
+                .addClass('is-copied')
+                .attr('aria-label', 'API key copied')
+                .attr('title', 'API key copied')
+                .html(versionScriptCopiedIcon);
+            setTimeout(function() {
+                button
+                    .removeClass('is-copied')
+                    .attr('aria-label', 'Copy API key')
+                    .attr('title', 'Copy API key')
+                    .html(versionScriptCopyIcon);
+            }, 900);
+        }
+
+        function incrementKeyDisplay(increment) {
+            return increment && increment.can_copy_key ? '************' : (increment.api_key_mask || 'Unavailable');
+        }
+
+        function incrementOwnerDisplay(increment) {
+            return increment.generated_by || 'Unknown user';
+        }
+
+        function releaseScriptForIncrement(increment, useActualKey) {
+            const keyValue = useActualKey && increment.api_key ? increment.api_key : '"$VERMICELLI_API_KEY"';
+            return `./update.sh --appid ${currentAppId} --apikey ${keyValue} --url ${releaseUrlVariable}`;
+        }
+
+        function incrementEnabledSwitchHtml(increment) {
+            const incrementEnabled = increment.is_enabled !== false;
+            const canManage = Boolean(increment.can_manage);
+            const stateLabel = incrementEnabled ? 'enabled' : 'disabled';
+            const nextLabel = incrementEnabled ? 'Disable increment' : 'Enable increment';
+            const disabledAttribute = canManage ? '' : ' disabled';
+            const buttonClasses = [
+                'toggle-version-increment-enabled',
+                'relative inline-flex h-7 w-12 items-center rounded-full border transition focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2',
+                incrementEnabled ? 'bg-yellow-100 border-yellow-300' : 'bg-gray-100 border-gray-300',
+                canManage ? 'cursor-pointer' : 'cursor-not-allowed opacity-80'
+            ].join(' ');
+            const trackClass = incrementEnabled ? 'bg-yellow-400' : 'bg-gray-300';
+            const knobClass = incrementEnabled ? 'ring-yellow-200' : 'ring-gray-300';
+            const knobPosition = incrementEnabled ? 'translateX(1.5rem)' : 'translateX(0.25rem)';
+            return `
+                <button
+                    type="button"
+                    class="${buttonClasses}"
+                    data-increment-id="${escapeAttribute(increment.id)}"
+                    data-next-enabled="${incrementEnabled ? 'false' : 'true'}"
+                    aria-label="${escapeAttribute(nextLabel)}"
+                    aria-pressed="${incrementEnabled ? 'true' : 'false'}"
+                    title="${escapeAttribute(canManage ? nextLabel : `Increment ${stateLabel}`)}"${disabledAttribute}
+                >
+                    <span class="absolute inset-0 rounded-full ${trackClass} transition"></span>
+                    <span class="relative inline-flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-sm ring-1 ${knobClass} transition-transform duration-200 ease-out" style="transform: ${knobPosition};">
+                        ${switchIconHtml(incrementEnabled)}
+                    </span>
+                </button>`;
+        }
+
+        function nextVersionHtml(increment) {
+            const nextVersion = increment.next_release || increment.next_release_error || 'N/A';
+            if (!increment.next_release) return escapeHtml(nextVersion);
+
+            const changedIndexByPart = {
+                major: 0,
+                minor: 1,
+                patch: 2
+            };
+            const changedIndex = changedIndexByPart[String(increment.version_part || '').toLowerCase()];
+            if (!Number.isInteger(changedIndex)) return escapeHtml(nextVersion);
+
+            const releaseValue = String(nextVersion);
+            const prereleaseIndex = releaseValue.indexOf('-');
+            const coreValue = prereleaseIndex === -1 ? releaseValue : releaseValue.slice(0, prereleaseIndex);
+            const prereleaseValue = prereleaseIndex === -1 ? '' : releaseValue.slice(prereleaseIndex);
+            const namedBuild = coreValue.match(/^(\d+)\.(\d+)\.(\d+)(\s+Build\s+\d+)$/i);
+            if (namedBuild) {
+                const coreHtml = namedBuild.slice(1, 4).map(function(part, index) {
+                    const value = escapeHtml(part);
+                    return index === changedIndex ? `<span class="next-version-changed-part">${value}</span>` : value;
+                }).join('.');
+                const buildHtml = increment.uses_build
+                    ? `<span class="next-version-changed-part">${escapeHtml(namedBuild[4])}</span>`
+                    : escapeHtml(namedBuild[4]);
+                return `${coreHtml}${buildHtml}${escapeHtml(prereleaseValue)}`;
+            }
+            const parenthesizedBuild = coreValue.match(/^(\d+)\.(\d+)\.(\d+)(\s+\(\d+\))$/);
+            if (parenthesizedBuild) {
+                const coreHtml = parenthesizedBuild.slice(1, 4).map(function(part, index) {
+                    const value = escapeHtml(part);
+                    return index === changedIndex ? `<span class="next-version-changed-part">${value}</span>` : value;
+                }).join('.');
+                const buildHtml = increment.uses_build
+                    ? `<span class="next-version-changed-part">${escapeHtml(parenthesizedBuild[4])}</span>`
+                    : escapeHtml(parenthesizedBuild[4]);
+                return `${coreHtml}${buildHtml}${escapeHtml(prereleaseValue)}`;
+            }
+            const coreParts = coreValue.split('.');
+            if (changedIndex >= coreParts.length) return escapeHtml(nextVersion);
+
+            const coreHtml = coreParts.map(function(part, index) {
+                const value = escapeHtml(part);
+                if (index !== changedIndex && !(increment.uses_build && index === 3)) return value;
+                return `<span class="next-version-changed-part">${value}</span>`;
+            }).join('.');
+
+            return `${coreHtml}${escapeHtml(prereleaseValue)}`;
+        }
+
+        function renderVersionIncrementCards() {
+            const list = $('#versionIncrementList');
+            const empty = $('#versionIncrementEmpty');
+            if (!list.length) return;
+            empty.toggleClass('hidden', versionIncrements.length > 0);
+            if (!versionIncrements.length) {
+                list.html('');
+                return;
+            }
+            const rows = versionIncrements.map(function(increment) {
+                const incrementOwner = incrementOwnerDisplay(increment);
+                const nextVersion = increment.next_release || increment.next_release_error || 'N/A';
+                const keyDisplay = incrementKeyDisplay(increment);
+                const canCopy = Boolean(increment.can_copy_key && increment.api_key);
+                const canManage = Boolean(increment.can_manage);
+                const copyKeyButton = canCopy ? `
+                    <button type="button" class="table-action-button copy-increment-key" data-increment-id="${escapeAttribute(increment.id)}" aria-label="Copy API key" title="Copy API key">${versionScriptCopyIcon}</button>
+                ` : '';
+                const generateKeyButton = canManage ? `
+                    <button type="button" class="table-action-button regenerate-version-increment" data-increment-id="${escapeAttribute(increment.id)}" aria-label="Generate API key" title="Generate API key">${deploymentCheckIcon}</button>
+                ` : '';
+                const detailsButton = `
+                    <button type="button" class="table-action-button open-version-increment-details" data-increment-id="${escapeAttribute(increment.id)}" aria-label="View increment details" title="Details">${incrementDetailsIcon}</button>
+                `;
+                const deleteButton = canManage ? `
+                    <button type="button" class="table-action-button delete-button delete-version-increment" data-increment-id="${escapeAttribute(increment.id)}" aria-label="Remove increment" title="Remove increment">${deploymentDeleteIcon}</button>
+                ` : '<span class="table-action-button invisible pointer-events-none" aria-hidden="true"></span>';
+                const keyButtons = [copyKeyButton, generateKeyButton].filter(Boolean).join('');
+                const keyActionSeparator = keyButtons ? '<span class="version-key-action-separator" aria-hidden="true">|</span>' : '';
+                const actionButtons = [detailsButton, deleteButton].join('');
+                const enabledToggle = incrementEnabledSwitchHtml(increment);
+
+                return `
+                    <tr class="hover:bg-gray-50 increment-row" data-increment-id="${escapeAttribute(increment.id)}">
+                        <td class="col-increment text-base text-gray-600 py-4 px-6 border-b border-gray-200" title="${escapeAttribute(keyDisplay)}">
+                            <div class="version-key-box">
+                                <span class="version-key-value">${escapeHtml(keyDisplay)}</span>
+                                <span class="version-key-actions">${keyActionSeparator}${keyButtons}</span>
+                            </div>
+                        </td>
+                        <td class="col-owner text-base text-gray-600 py-4 px-5 border-b border-gray-200" title="${escapeAttribute(incrementOwner)}">
+                            <span class="version-owner-value">${escapeHtml(incrementOwner)}</span>
+                        </td>
+                        <td class="col-next-version text-base text-gray-600 py-4 px-5 border-b border-gray-200" title="${escapeAttribute(nextVersion)}">
+                            <span class="next-version-value">${nextVersionHtml(increment)}</span>
+                        </td>
+                        <td class="col-last-used date-time-text hide-sm whitespace-nowrap text-sm text-gray-600 py-4 px-5 border-b border-gray-200" title="${escapeAttribute(increment.last_used_at || 'Never used')}">${escapeHtml(increment.last_used_at || 'Never used')}</td>
+                        <td class="col-enabled text-base text-gray-600 py-4 px-5 border-b border-gray-200">${enabledToggle}</td>
+                        <td class="col-actions text-base text-gray-600 py-4 px-5 border-b border-gray-200">
+                            <div class="table-actions">
+                                ${actionButtons}
+                            </div>
+                        </td>
+                    </tr>`;
+            }).join('');
+            list.html(`
+                <div class="responsive-table-wrap version-api-key-table-wrap bg-white shadow-md rounded-lg border border-gray-200 my-6">
+                    <table class="responsive-table version-api-key-table text-left border-collapse">
+                        <thead>
+                            <tr>
+                                <th class="col-increment py-4 px-6 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">API Key</th>
+                                <th class="col-owner whitespace-nowrap py-4 px-5 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Owner</th>
+                                <th class="col-next-version whitespace-nowrap py-4 px-5 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Next Version</th>
+                                <th class="col-last-used hide-sm whitespace-nowrap py-4 px-5 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Last Used</th>
+                                <th class="col-enabled whitespace-nowrap py-4 px-5 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Enabled</th>
+                                <th class="col-actions py-4 px-5 bg-gray-100 font-bold uppercase text-sm text-gray-600 border-b border-gray-200">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>`);
+        }
+
+        function incrementDetailEditButtonHtml(field, label, canManage) {
+            if (!canManage) return '';
+            return `
+                <button type="button" class="inline-icon-button edit-version-increment-detail" data-field="${escapeAttribute(field)}" aria-label="Edit ${escapeAttribute(label)}" title="Edit ${escapeAttribute(label)}">${deploymentEditIcon}</button>
+            `;
+        }
+
+        function incrementDetailsCardHtml(label, valueHtml, field, canManage, extraClass) {
+            const editButton = field ? incrementDetailEditButtonHtml(field, label, canManage) : '';
+            return `
+                <div class="increment-details-card ${extraClass || ''}">
+                    <div class="increment-details-card-heading">
+                        <p class="detail-label">${escapeHtml(label)}</p>
+                        ${editButton}
+                    </div>
+                    ${valueHtml}
+                </div>`;
+        }
+
+        function versionDropdownOptionsHtml(options, selectedValue) {
+            return options.map(function(option) {
+                const isActive = option.value === selectedValue;
+                return `<li class="version-dropdown-option${isActive ? ' is-active' : ''}" data-value="${escapeAttribute(option.value)}" role="option" aria-selected="${isActive ? 'true' : 'false'}">${escapeHtml(option.label)}</li>`;
+            }).join('');
+        }
+
+        function incrementNameEditHtml(increment) {
+            return `
+                <div class="increment-details-edit">
+                    <input type="text" id="detailIncrementNameInput" class="form-input increment-text-input block w-full" maxlength="120" value="${escapeAttribute(increment.name || '')}" autocomplete="off">
+                </div>`;
+        }
+
+        function incrementPrereleaseEditHtml(increment) {
+            const enabled = Boolean(increment.uses_prerelease);
+            const currentIdentifier = increment.prerelease_identifier || 'alpha';
+            const presetValues = prereleasePresetOptions.map(function(option) { return option.value; }).filter(function(value) { return value !== 'custom'; });
+            const selectedPreset = presetValues.includes(currentIdentifier) ? currentIdentifier : 'custom';
+            const customValue = selectedPreset === 'custom' ? currentIdentifier : '';
+            return `
+                <div class="increment-details-edit">
+                    <label class="version-toggle-row increment-detail-toggle" for="detailPrereleaseEnabled">
+                        <span class="min-w-0">
+                            <span class="block text-sm font-bold text-gray-700">Pre-release Label</span>
+                            <span class="block text-xs text-gray-500">Append a release label.</span>
+                        </span>
+                        <span class="relative inline-flex flex-shrink-0">
+                            <input type="checkbox" id="detailPrereleaseEnabled" class="version-toggle-input" ${enabled ? 'checked' : ''}>
+                            <span class="version-toggle-switch" aria-hidden="true"></span>
+                        </span>
+                    </label>
+                    <div>
+                        <label id="detailPrereleaseDropdownLabel" class="increment-field-label">Label</label>
+                        <div class="relative mt-1">
+                            <input type="hidden" id="detailPrereleasePreset" value="${escapeAttribute(selectedPreset)}">
+                            <button type="button" id="detailPrereleaseDropdownButton" class="version-dropdown-button" aria-haspopup="listbox" aria-expanded="false" ${enabled ? '' : 'disabled aria-disabled="true"'}>
+                                <span class="block truncate" id="detailPrereleaseDropdownSelected">${escapeHtml(prereleasePresetLabel(selectedPreset))}</span>
+                                <svg class="h-5 w-5 flex-shrink-0 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.23 8.27a.75.75 0 0 1 .02-1.06z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                            <div id="detailPrereleaseDropdownPanel" class="version-dropdown-panel hidden" role="listbox" aria-labelledby="detailPrereleaseDropdownLabel">
+                                <ul id="detailPrereleaseList" class="max-h-48 overflow-auto py-1">${versionDropdownOptionsHtml(prereleasePresetOptions, selectedPreset)}</ul>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="text" id="detailPrereleaseCustom" class="form-input increment-text-input block w-full ${selectedPreset === 'custom' ? '' : 'hidden'}" value="${escapeAttribute(customValue)}" placeholder="custom" ${enabled && selectedPreset === 'custom' ? '' : 'disabled'}>
+                </div>`;
+        }
+
+        function incrementBuildEditHtml(increment) {
+            const enabled = Boolean(increment.uses_build);
+            const buildNumber = Number.isFinite(Number(increment.build_number)) ? Number(increment.build_number) : 0;
+            const buildPattern = normalizeBuildPattern(increment.build_pattern || 'standard');
+            return `
+                <div class="increment-details-edit">
+                    <label class="version-toggle-row increment-detail-toggle" for="detailBuildEnabled">
+                        <span class="min-w-0">
+                            <span class="block text-sm font-bold text-gray-700">Build</span>
+                            <span class="block text-xs text-gray-500">Add and advance the build number.</span>
+                        </span>
+                        <span class="relative inline-flex flex-shrink-0">
+                            <input type="checkbox" id="detailBuildEnabled" class="version-toggle-input" ${enabled ? 'checked' : ''}>
+                            <span class="version-toggle-switch" aria-hidden="true"></span>
+                        </span>
+                    </label>
+                    <div>
+                        <label for="detailBuildNumber" class="increment-field-label">Build Number</label>
+                        <input type="number" id="detailBuildNumber" class="form-input increment-text-input version-build-number-input block w-full" value="${escapeAttribute(String(buildNumber))}" min="0" step="1" ${enabled ? '' : 'disabled'}>
+                    </div>
+                    <div>
+                        <label id="detailBuildPatternDropdownLabel" class="increment-field-label">Pattern</label>
+                        <div class="relative mt-1">
+                            <input type="hidden" id="detailBuildPattern" value="${escapeAttribute(buildPattern)}">
+                            <button type="button" id="detailBuildPatternDropdownButton" class="version-dropdown-button" aria-haspopup="listbox" aria-expanded="false" ${enabled ? '' : 'disabled aria-disabled="true"'}>
+                                <span class="block truncate" id="detailBuildPatternDropdownSelected">${escapeHtml(buildPatternLabel(buildPattern))}</span>
+                                <svg class="h-5 w-5 flex-shrink-0 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.23 8.27a.75.75 0 0 1 .02-1.06z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                            <div id="detailBuildPatternDropdownPanel" class="version-dropdown-panel hidden" role="listbox" aria-labelledby="detailBuildPatternDropdownLabel">
+                                <ul id="detailBuildPatternList" class="max-h-48 overflow-auto py-1">${versionDropdownOptionsHtml(buildPatternOptions, buildPattern)}</ul>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-500">Preview suffix: <span id="detailBuildPatternPreview" class="font-mono font-bold text-gray-700">${escapeHtml(formatBuildPreviewValue(buildNumber + 1, buildPattern))}</span></p>
+                </div>`;
+        }
+
+        function renderVersionIncrementDetails(increment) {
+            const content = $('#versionIncrementDetailsContent');
+            if (!content.length || !increment) return;
+            const prereleaseValue = increment.uses_prerelease ? (increment.prerelease_identifier || 'Required') : 'Not enabled';
+            const buildPattern = normalizeBuildPattern(increment.build_pattern || 'standard');
+            const buildNumber = increment.build_number !== null && increment.build_number !== undefined ? Number.parseInt(increment.build_number, 10) : 0;
+            const buildValue = increment.uses_build ? `${Number.isFinite(buildNumber) ? buildNumber : 0} · ${buildPatternLabel(buildPattern)}` : 'Not enabled';
+            const canCopy = Boolean(increment.can_copy_key && increment.api_key);
+            const canManage = Boolean(increment.can_manage);
+            const copyKeyButton = canCopy ? `
+                <button type="button" class="table-action-button copy-increment-key" data-increment-id="${escapeAttribute(increment.id)}" aria-label="Copy API key" title="Copy API key">${versionScriptCopyIcon}</button>
+            ` : '';
+            const generateKeyButton = canManage ? `
+                <button type="button" class="table-action-button regenerate-version-increment" data-increment-id="${escapeAttribute(increment.id)}" aria-label="Generate API key" title="Generate API key">${deploymentCheckIcon}</button>
+            ` : '';
+            const keyButtons = [copyKeyButton, generateKeyButton].filter(Boolean).join('');
+            const keyActionSeparator = keyButtons ? '<span class="version-key-action-separator" aria-hidden="true">|</span>' : '';
+            const copyScriptButton = canCopy ? `
+                <button type="button" class="version-script-copy-button copy-increment-script" data-increment-id="${escapeAttribute(increment.id)}" aria-label="Copy release script" title="Copy release script">${versionScriptCopyIcon}</button>
+            ` : '';
+            const releaseScript = releaseScriptForIncrement(increment, false);
+            const enabledToggle = incrementEnabledSwitchHtml(increment);
+            const prereleaseContent = `<p class="increment-details-value">${escapeHtml(prereleaseValue)}</p>`;
+            const buildContent = `<p class="increment-details-value">${escapeHtml(buildValue)}</p>`;
+
+            $('#versionIncrementDetailsName').text(increment.name || 'Unnamed increment');
+            $('#versionIncrementDetailsNameEdit')
+                .toggleClass('hidden', !canManage)
+                .html(deploymentEditIcon);
+            content.html(`
+                <div class="app-details-page">
+                    <div class="increment-details-grid">
+                        ${incrementDetailsCardHtml('Generated By', `<p class="increment-details-value">${escapeHtml(increment.generated_by || 'Unknown user')}</p>`)}
+                        <div class="increment-details-card">
+                            <p class="detail-label">Enabled</p>
+                            <div class="mt-2">${enabledToggle}</div>
+                        </div>
+                        ${incrementDetailsCardHtml('Release Part', `<p class="increment-details-value">${escapeHtml(increment.version_part_label || 'Release')}</p>`)}
+                        ${incrementDetailsCardHtml('Next Release', `<p class="increment-details-value next-version-value">${nextVersionHtml(increment)}</p>`)}
+                        ${incrementDetailsCardHtml('Pre-release Label', prereleaseContent, 'prerelease', canManage)}
+                        ${incrementDetailsCardHtml('Build', buildContent, 'build', canManage)}
+                        ${incrementDetailsCardHtml('Created', `<p class="increment-details-value date-time-text">${escapeHtml(increment.created_at || 'N/A')}</p>`)}
+                        ${incrementDetailsCardHtml('Updated', `<p class="increment-details-value date-time-text">${escapeHtml(increment.updated_at || 'N/A')}</p>`)}
+                        ${incrementDetailsCardHtml('Last Used', `<p class="increment-details-value date-time-text">${escapeHtml(increment.last_used_at || 'Never used')}</p>`)}
+                        <div class="increment-details-card is-wide">
+                            <p class="detail-label">API Key</p>
+                            <div class="version-key-box mt-2">
+                                <span class="version-key-value">${escapeHtml(incrementKeyDisplay(increment))}</span>
+                                <span class="version-key-actions">${keyActionSeparator}${keyButtons}</span>
+                            </div>
+                        </div>
+                        <div class="increment-details-card is-wide">
+                            <p class="detail-label">Release Script</p>
+                            <div class="relative mt-2">
+                                <pre class="version-script-box">${escapeHtml(releaseScript)}</pre>
+                                ${copyScriptButton}
+                            </div>
+                        </div>
+                    </div>
+                </div>`);
+        }
+
+        function openVersionIncrementDetailsModal(incrementId) {
+            const increment = incrementById(incrementId);
+            if (!increment) return;
+            currentVersionIncrementDetailsId = increment.id;
+            incrementDetailsEditField = null;
+            renderVersionIncrementDetails(increment);
+            $('#versionIncrementDetailsModal').removeClass('hidden').addClass('flex').attr('aria-hidden', 'false');
+        }
+
+        function closeVersionIncrementDetailsModal() {
+            currentVersionIncrementDetailsId = null;
+            incrementDetailsEditField = null;
+            closeVersionIncrementDetailEditModal();
+            $('#versionIncrementDetailsNameEdit').addClass('hidden').empty();
+            $('#versionIncrementDetailsModal').removeClass('flex').addClass('hidden').attr('aria-hidden', 'true');
+        }
+
+        function setIncrementDetailsEditField(field) {
+            const increment = incrementById(currentVersionIncrementDetailsId);
+            if (!increment || !increment.can_manage) return;
+            incrementDetailsEditField = field;
+            const titleByField = {
+                name: 'Edit Name',
+                prerelease: 'Edit Pre-release Label',
+                build: 'Edit Build'
+            };
+            const contentByField = {
+                name: incrementNameEditHtml(increment),
+                prerelease: incrementPrereleaseEditHtml(increment),
+                build: incrementBuildEditHtml(increment)
+            };
+            if (!contentByField[field]) return;
+            $('#versionIncrementDetailEditTitle').text(titleByField[field] || 'Edit Increment');
+            $('#versionIncrementDetailEditContent').html(contentByField[field]);
+            $('#versionIncrementDetailEditMessage').addClass('hidden').text('');
+            $('#saveIncrementDetailEdit').data('field', field).prop('disabled', false).removeClass('opacity-60');
+            $('#versionIncrementDetailEditModal').removeClass('hidden').addClass('flex').attr('aria-hidden', 'false');
+            window.setTimeout(function() {
+                if (field === 'name') {
+                    $('#detailIncrementNameInput').trigger('focus').trigger('select');
+                } else if (field === 'prerelease') {
+                    applyIncrementDetailsPrereleaseEditorVisibility();
+                } else if (field === 'build') {
+                    applyIncrementDetailsBuildEditorVisibility();
+                    $('#detailBuildNumber').trigger('focus').trigger('select');
+                }
+            }, 0);
+        }
+
+        function closeVersionIncrementDetailEditModal() {
+            incrementDetailsEditField = null;
+            $('#versionIncrementDetailEditModal').removeClass('flex').addClass('hidden').attr('aria-hidden', 'true');
+            $('#versionIncrementDetailEditContent').empty();
+            $('#versionIncrementDetailEditMessage').addClass('hidden').text('');
+            $('#saveIncrementDetailEdit').removeData('field').prop('disabled', false).removeClass('opacity-60');
+        }
+
+        function showIncrementDetailEditMessage(message) {
+            $('#versionIncrementDetailEditMessage').text(message).removeClass('hidden');
+        }
+
+        function renderIncrementDetailsPrereleaseDropdown() {
+            const selectedValue = $('#detailPrereleasePreset').val() || 'alpha';
+            $('#detailPrereleaseList').html(versionDropdownOptionsHtml(prereleasePresetOptions, selectedValue));
+            $('#detailPrereleaseDropdownSelected').text(prereleasePresetLabel(selectedValue));
+        }
+
+        function applyIncrementDetailsPrereleaseEditorVisibility() {
+            const enabled = $('#detailPrereleaseEnabled').is(':checked');
+            const selectedValue = $('#detailPrereleasePreset').val() || 'alpha';
+            const isCustom = selectedValue === 'custom';
+            $('#detailPrereleaseDropdownButton')
+                .prop('disabled', !enabled)
+                .attr('aria-disabled', enabled ? 'false' : 'true');
+            $('#detailPrereleaseCustom')
+                .toggleClass('hidden', !isCustom)
+                .prop('disabled', !enabled || !isCustom);
+            if (!enabled) {
+                $('#detailPrereleaseDropdownPanel').addClass('hidden');
+                $('#detailPrereleaseDropdownButton').attr('aria-expanded', 'false');
+            }
+            renderIncrementDetailsPrereleaseDropdown();
+        }
+
+        function selectedIncrementDetailsPrereleaseValue() {
+            if (!$('#detailPrereleaseEnabled').is(':checked')) return '';
+            const preset = $('#detailPrereleasePreset').val() || 'alpha';
+            if (preset === 'custom') return ($('#detailPrereleaseCustom').val() || '').trim();
+            return preset;
+        }
+
+        function renderIncrementDetailsBuildPatternDropdown() {
+            const selectedValue = normalizeBuildPattern($('#detailBuildPattern').val() || 'standard');
+            $('#detailBuildPatternList').html(versionDropdownOptionsHtml(buildPatternOptions, selectedValue));
+            $('#detailBuildPatternDropdownSelected').text(buildPatternLabel(selectedValue));
+            $('#detailBuildPatternPreview').text(formatBuildPreviewValue(selectedIncrementDetailsBuildNumber() + 1, selectedValue));
+        }
+
+        function selectedIncrementDetailsBuildNumber() {
+            const buildNumber = Number.parseInt($('#detailBuildNumber').val(), 10);
+            return Number.isFinite(buildNumber) && buildNumber >= 0 ? buildNumber : 0;
+        }
+
+        function applyIncrementDetailsBuildEditorVisibility() {
+            const enabled = $('#detailBuildEnabled').is(':checked');
+            $('#detailBuildNumber').prop('disabled', !enabled);
+            $('#detailBuildPatternDropdownButton')
+                .prop('disabled', !enabled)
+                .attr('aria-disabled', enabled ? 'false' : 'true');
+            if (!enabled) {
+                $('#detailBuildPatternDropdownPanel').addClass('hidden');
+                $('#detailBuildPatternDropdownButton').attr('aria-expanded', 'false');
+            }
+            renderIncrementDetailsBuildPatternDropdown();
+        }
+
+        function saveIncrementDetailEdit(field) {
+            const increment = incrementById(currentVersionIncrementDetailsId);
+            if (!increment || !increment.can_manage) return;
+            let payload = {};
+            if (field === 'name') {
+                const name = ($('#detailIncrementNameInput').val() || '').trim();
+                if (!name) {
+                    showIncrementDetailEditMessage('Increment name is required.');
+                    return;
+                }
+                payload.name = name;
+            } else if (field === 'prerelease') {
+                const enabled = $('#detailPrereleaseEnabled').is(':checked');
+                const prereleaseIdentifier = selectedIncrementDetailsPrereleaseValue();
+                if (enabled && !/^[A-Za-z][A-Za-z0-9]*$/.test(prereleaseIdentifier)) {
+                    showIncrementDetailEditMessage('Enter a valid Pre-release Label.');
+                    return;
+                }
+                payload = {
+                    enable_prerelease: enabled,
+                    prerelease_identifier: prereleaseIdentifier
+                };
+            } else if (field === 'build') {
+                const enabled = $('#detailBuildEnabled').is(':checked');
+                const rawBuildNumber = ($('#detailBuildNumber').val() || '').trim();
+                const buildNumber = Number.parseInt(rawBuildNumber, 10);
+                if (enabled && (!rawBuildNumber || !Number.isFinite(buildNumber) || buildNumber < 0)) {
+                    showIncrementDetailEditMessage('Build number must be zero or greater.');
+                    return;
+                }
+                payload = {
+                    enable_build: enabled,
+                    build_number: enabled ? buildNumber : null,
+                    build_pattern: normalizeBuildPattern($('#detailBuildPattern').val() || 'standard')
+                };
+            } else {
+                return;
+            }
+
+            const saveButton = $('#saveIncrementDetailEdit');
+            saveButton.prop('disabled', true).addClass('opacity-60');
+            $('#versionIncrementDetailEditMessage').addClass('hidden').text('');
+            $.ajax({
+                url: `/api/app/${currentAppId}/increments/${increment.id}`,
+                type: 'PATCH',
+                contentType: 'application/json',
+                data: JSON.stringify(payload),
+                success: function(response) {
+                    closeVersionIncrementDetailEditModal();
+                    if (response.increment) replaceIncrement(response.increment);
+                },
+                error: function(xhr) {
+                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error updating increment.';
+                    showIncrementDetailEditMessage(error);
+                },
+                complete: function() {
+                    saveButton.prop('disabled', false).removeClass('opacity-60');
+                }
+            });
+        }
+
+        function setIncrementPart(part) {
+            const normalizedPart = ['major', 'minor', 'patch'].includes(part) ? part : 'major';
+            incrementDraft.versionPart = normalizedPart;
+            $('#incrementVersionPart').val(normalizedPart);
+            $('.increment-part-button').each(function() {
+                const isActive = $(this).data('increment-part') === normalizedPart;
+                $(this)
+                    .toggleClass('is-active', isActive)
+                    .toggleClass('bg-yellow-300 text-yellow-900 shadow-sm', isActive)
+                    .toggleClass('bg-transparent text-gray-600 hover:bg-yellow-100 hover:text-yellow-700', !isActive)
+                    .attr('aria-pressed', isActive ? 'true' : 'false');
+            });
+            updateVersionIncrementPreview();
+        }
+
+        function setIncrementSwitchVisual(row, enabled) {
+            row
+                .toggleClass('is-active', enabled)
+                .attr('aria-pressed', enabled ? 'true' : 'false');
+            row.find('.increment-switch-control')
+                .toggleClass('bg-yellow-100 border-yellow-300', enabled)
+                .toggleClass('bg-gray-100 border-gray-300', !enabled);
+            row.find('.increment-switch-track')
+                .toggleClass('bg-yellow-400', enabled)
+                .toggleClass('bg-gray-300', !enabled);
+            row.find('.increment-switch-knob')
+                .toggleClass('ring-yellow-200', enabled)
+                .toggleClass('ring-gray-300', !enabled)
+                .css('transform', enabled ? 'translateX(1.5rem)' : 'translateX(0.25rem)');
+            row.find('.increment-switch-icon')
+                .toggleClass('text-yellow-500', enabled)
+                .toggleClass('text-gray-400', !enabled);
+            row.find('.increment-switch-check')
+                .toggleClass('hidden', !enabled);
+            row.find('.increment-switch-x')
+                .toggleClass('hidden', enabled);
+        }
+
+        function setIncrementOptionSwitch(kind, enabled) {
+            const isPrerelease = kind === 'prerelease';
+            const checkbox = isPrerelease ? $('#incrementPrereleaseEnabled') : $('#incrementBuildEnabled');
+            const field = isPrerelease ? $('#incrementPrereleaseIdentifier') : $('#incrementBuildNumber');
+            const switchButton = isPrerelease ? $('#incrementPrereleaseSwitch') : $('#incrementBuildSwitch');
+            checkbox.prop('checked', enabled);
+            if (!isPrerelease && enabled) {
+                field.val(incrementDefaultBuildNumber());
+            }
+            field.prop('disabled', !enabled);
+            setIncrementSwitchVisual(switchButton, enabled);
+            updateVersionIncrementPreview();
+        }
+
+        function incrementDefaultBuildNumber() {
+            const parts = parseVersionParts(versionOptions.currentVersion);
+            const releaseCount = Number.parseInt(versionOptions.releaseCount, 10);
+            const releaseCountBuild = Number.isFinite(releaseCount) && releaseCount >= 0 ? releaseCount : 0;
+            if (Number.isFinite(parts.build) && parts.build >= 0) {
+                return Math.max(parts.build, releaseCountBuild);
+            }
+            return releaseCountBuild;
+        }
+
+        function updateVersionIncrementPreview() {
+            const parts = parseVersionParts(versionOptions.currentVersion);
+            const selectedPart = incrementDraft.versionPart || 'major';
+            if (selectedPart === 'major') {
+                parts.major += 1;
+                parts.minor = 0;
+                parts.patch = 0;
+            } else if (selectedPart === 'minor') {
+                parts.minor += 1;
+                parts.patch = 0;
+            } else {
+                parts.patch += 1;
+            }
+            const changedIndexByPart = {
+                major: 0,
+                minor: 1,
+                patch: 2
+            };
+            const changedIndex = changedIndexByPart[selectedPart];
+            let nextVersionHtml = [parts.major, parts.minor, parts.patch].map(function(part, index) {
+                const value = escapeHtml(String(part));
+                return index === changedIndex ? `<span class="next-version-changed-part">${value}</span>` : value;
+            }).join('.');
+            const buildEnabled = $('#incrementBuildEnabled').is(':checked');
+            const buildNumber = Number.parseInt($('#incrementBuildNumber').val(), 10);
+            const normalizedBuild = Number.isFinite(buildNumber) && buildNumber >= 0 ? buildNumber : 0;
+            if (buildEnabled) {
+                nextVersionHtml += `.<span class="next-version-changed-part">${escapeHtml(String(normalizedBuild + 1))}</span>`;
+            }
+            const prereleaseEnabled = $('#incrementPrereleaseEnabled').is(':checked');
+            const prereleaseIdentifier = ($('#incrementPrereleaseIdentifier').val() || '').trim();
+            if (prereleaseEnabled && prereleaseIdentifier) {
+                nextVersionHtml += `-${escapeHtml(prereleaseIdentifier)}`;
+            }
+            $('#incrementCurrentPreview').text(versionOptions.currentVersion || 'N/A');
+            $('#incrementNextPreview').html(nextVersionHtml);
+        }
+
+        function resetVersionIncrementModal() {
+            $('#versionIncrementModalMessage').addClass('hidden').text('');
+            $('#incrementNameInput').val('');
+            $('#incrementPrereleaseIdentifier').val(versionOptions.prereleaseIdentifier || 'alpha');
+            $('#incrementBuildNumber').val(incrementDefaultBuildNumber());
+            setIncrementPart('major');
+            setIncrementOptionSwitch('prerelease', false);
+            setIncrementOptionSwitch('build', false);
+            updateVersionIncrementPreview();
+        }
+
+        function versionIncrementFocusableElements() {
+            const panel = document.querySelector('#versionIncrementModal .version-increment-panel');
+            if (!panel) return [];
+            return Array.from(panel.querySelectorAll([
+                'a[href]',
+                'button:not([disabled])',
+                'input:not([disabled]):not([type="hidden"])',
+                'select:not([disabled])',
+                'textarea:not([disabled])',
+                '[tabindex]:not([tabindex="-1"])'
+            ].join(','))).filter(function(element) {
+                return Boolean(element.offsetWidth || element.offsetHeight || element.getClientRects().length);
+            });
+        }
+
+        function trapVersionIncrementFocus(event) {
+            if (event.key !== 'Tab' || $('#versionIncrementModal').hasClass('hidden')) return;
+            const focusable = versionIncrementFocusableElements();
+            if (!focusable.length) return;
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        }
+
+        function openVersionIncrementModal() {
+            if (!canEditApplication) return;
+            versionIncrementPreviousFocus = document.activeElement;
+            resetVersionIncrementModal();
+            $('#versionIncrementModal').removeClass('hidden').addClass('flex').attr('aria-hidden', 'false');
+            window.setTimeout(function() {
+                $('#incrementNameInput').trigger('focus');
+            }, 0);
+        }
+
+        function closeVersionIncrementModal() {
+            $('#versionIncrementModal').removeClass('flex').addClass('hidden').attr('aria-hidden', 'true');
+            if (versionIncrementPreviousFocus && document.contains(versionIncrementPreviousFocus)) {
+                versionIncrementPreviousFocus.focus();
+            }
+            versionIncrementPreviousFocus = null;
+        }
+
+        function incrementById(incrementId) {
+            return versionIncrements.find(function(increment) {
+                return Number(increment.id) === Number(incrementId);
+            });
+        }
+
+        function replaceIncrement(updatedIncrement) {
+            versionIncrements = versionIncrements.map(function(increment) {
+                return Number(increment.id) === Number(updatedIncrement.id) ? updatedIncrement : increment;
+            });
+            renderVersionIncrementCards();
+            if (!$('#versionIncrementDetailsModal').hasClass('hidden') && Number(currentVersionIncrementDetailsId) === Number(updatedIncrement.id)) {
+                renderVersionIncrementDetails(updatedIncrement);
+            }
+        }
+
+        function createVersionIncrement(event) {
+            event.preventDefault();
+            const name = ($('#incrementNameInput').val() || '').trim();
+            const prereleaseEnabled = $('#incrementPrereleaseEnabled').is(':checked');
+            const buildEnabled = $('#incrementBuildEnabled').is(':checked');
+            const prereleaseIdentifier = ($('#incrementPrereleaseIdentifier').val() || '').trim();
+            const buildNumber = Number.parseInt($('#incrementBuildNumber').val(), 10);
+            if (!name) {
+                $('#versionIncrementModalMessage').text('Increment name is required.').removeClass('hidden');
+                return;
+            }
+            if (prereleaseEnabled && !/^[A-Za-z][A-Za-z0-9]*$/.test(prereleaseIdentifier)) {
+                $('#versionIncrementModalMessage').text('Enter a valid Pre-release Label.').removeClass('hidden');
+                return;
+            }
+            if (buildEnabled && (!Number.isFinite(buildNumber) || buildNumber < 0)) {
+                $('#versionIncrementModalMessage').text('Build number must be zero or greater.').removeClass('hidden');
+                return;
+            }
+            $('#saveVersionIncrement').prop('disabled', true).addClass('opacity-60');
+            $.ajax({
+                url: `/api/app/${currentAppId}/increments`,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    name,
+                    version_part: incrementDraft.versionPart || 'major',
+                    enable_prerelease: prereleaseEnabled,
+                    prerelease_identifier: prereleaseIdentifier,
+                    enable_build: buildEnabled,
+                    build_number: buildEnabled ? buildNumber : null
+                }),
+                success: function(response) {
+                    if (response.increment) {
+                        versionIncrements.push(response.increment);
+                        renderVersionIncrementCards();
+                    }
+                    closeVersionIncrementModal();
+                },
+                error: function(xhr) {
+                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error creating increment.';
+                    $('#versionIncrementModalMessage').text(error).removeClass('hidden');
+                },
+                complete: function() {
+                    $('#saveVersionIncrement').prop('disabled', false).removeClass('opacity-60');
+                }
+            });
+        }
+
+        function copyIncrementKey(incrementId, button) {
+            const increment = incrementById(incrementId);
+            if (!increment || !increment.api_key) {
+                showAppAlert({ title: 'API key unavailable', text: 'Only the user who generated this key can copy it.', icon: 'warning' });
+                return;
+            }
+            copyTextToClipboard(increment.api_key).then(function() {
+                showIncrementKeyCopied(button);
+            }).catch(function() {
+                showAppAlert({ title: 'Copy failed', text: 'Could not copy the API key.', icon: 'error' });
+            });
+        }
+
+        function copyIncrementScript(incrementId, button) {
+            const increment = incrementById(incrementId);
+            if (!increment || !increment.api_key) {
+                showAppAlert({ title: 'Script unavailable', text: 'Only the user who generated this key can copy the release script.', icon: 'warning' });
+                return;
+            }
+            copyTextToClipboard(releaseScriptForIncrement(increment, true)).then(function() {
+                showIncrementScriptCopied(button);
+            }).catch(function() {
+                showAppAlert({ title: 'Copy failed', text: 'Could not copy the release script.', icon: 'error' });
+            });
+        }
+
+        function setVersionIncrementEnabled(incrementId, enabled, button) {
+            const increment = incrementById(incrementId);
+            if (!increment || !increment.can_manage) return;
+            if (button && button.length) {
+                button.prop('disabled', true).addClass('opacity-80');
+            }
+            $.ajax({
+                url: `/api/app/${currentAppId}/increments/${incrementId}`,
+                type: 'PATCH',
+                contentType: 'application/json',
+                data: JSON.stringify({ is_enabled: Boolean(enabled) }),
+                success: function(response) {
+                    if (response.increment) replaceIncrement(response.increment);
+                },
+                error: function(xhr) {
+                    const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error updating increment.';
+                    showAppAlert({ title: 'Error', text: error, icon: 'error' });
+                    renderVersionIncrementCards();
+                }
+            });
+        }
+
+        function regenerateVersionIncrement(incrementId) {
+            const increment = incrementById(incrementId);
+            if (!increment || !increment.can_manage) return;
+            confirmAppAction({
+                title: 'Generate API key?',
+                text: 'Existing scripts using this increment will need the new key.',
+                confirmButtonText: 'Generate key',
+                danger: true
+            }).then(function(confirmed) {
+                if (!confirmed) return;
+                $.ajax({
+                    url: `/api/app/${currentAppId}/increments/${incrementId}/regenerate`,
+                    type: 'POST',
+                    success: function(response) {
+                        if (response.increment) replaceIncrement(response.increment);
+                    },
+                    error: function(xhr) {
+                        const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error regenerating API key.';
+                        showAppAlert({ title: 'Error', text: error, icon: 'error' });
+                    }
+                });
+            });
+        }
+
+        function deleteVersionIncrement(incrementId) {
+            const increment = incrementById(incrementId);
+            if (!increment || !increment.can_manage) return;
+            confirmAppAction({
+                title: 'Remove increment?',
+                text: 'Release scripts using this API key will stop working.',
+                confirmButtonText: 'Remove',
+                danger: true
+            }).then(function(confirmed) {
+                if (!confirmed) return;
+                $.ajax({
+                    url: `/api/app/${currentAppId}/increments/${incrementId}`,
+                    type: 'DELETE',
+                    success: function() {
+                        versionIncrements = versionIncrements.filter(function(item) {
+                            return Number(item.id) !== Number(incrementId);
+                        });
+                        renderVersionIncrementCards();
+                        if (Number(currentVersionIncrementDetailsId) === Number(incrementId)) {
+                            closeVersionIncrementDetailsModal();
+                        }
+                    },
+                    error: function(xhr) {
+                        const error = xhr.responseJSON ? xhr.responseJSON.error : 'Error removing increment.';
+                        showAppAlert({ title: 'Error', text: error, icon: 'error' });
+                    }
+                });
+            });
         }
 
         function saveVersionOptions() {
@@ -4883,6 +6923,7 @@
         window.deleteDeployment = deleteDeployment;
         window.openDeploymentResult = openDeploymentResult;
         window.closeDeploymentResultModal = closeDeploymentResultModal;
+        window.closeVersionIncrementDetailEditModal = closeVersionIncrementDetailEditModal;
 
         $(function() {
             renderDeployments(currentDeployments);
@@ -4988,6 +7029,14 @@
                     $('#versionPrereleaseDropdownPanel').addClass('hidden');
                     $('#versionPrereleaseDropdownButton').attr('aria-expanded', 'false');
                 }
+                if (!$(event.target).closest('#detailPrereleaseDropdownButton, #detailPrereleaseDropdownPanel').length) {
+                    $('#detailPrereleaseDropdownPanel').addClass('hidden');
+                    $('#detailPrereleaseDropdownButton').attr('aria-expanded', 'false');
+                }
+                if (!$(event.target).closest('#detailBuildPatternDropdownButton, #detailBuildPatternDropdownPanel').length) {
+                    $('#detailBuildPatternDropdownPanel').addClass('hidden');
+                    $('#detailBuildPatternDropdownButton').attr('aria-expanded', 'false');
+                }
             });
             $('#deploymentForm').on('submit', upsertDeployment);
             $('#versionPrereleaseEnabled, #versionBuildEnabled').on('change', applyVersionOptionVisibility);
@@ -5024,13 +7073,125 @@
                     showAppAlert({ title: 'Copy failed', text: 'Could not copy the script to the clipboard.', icon: 'error' });
                 });
             });
-            applyPrereleasePreset();
-            applyVersionOptionVisibility();
+            $('#openVersionIncrementModal').on('click', openVersionIncrementModal);
+            $('#versionIncrementForm').on('submit', createVersionIncrement);
+            $('#versionIncrementModal').on('click', function(event) {
+                if (event.target.id === 'versionIncrementModal') closeVersionIncrementModal();
+            });
+            $('#versionIncrementModal').on('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    event.preventDefault();
+                    closeVersionIncrementModal();
+                    return;
+                }
+                trapVersionIncrementFocus(event);
+            });
+            $('#versionIncrementModal').on('click', '.increment-part-button', function() {
+                setIncrementPart($(this).data('increment-part') || 'major');
+            });
+            $('#incrementPrereleaseEnabled').on('change', function() {
+                setIncrementOptionSwitch('prerelease', $(this).is(':checked'));
+            });
+            $('#incrementBuildEnabled').on('change', function() {
+                setIncrementOptionSwitch('build', $(this).is(':checked'));
+            });
+            $('#incrementPrereleaseSwitch').on('click', function() {
+                setIncrementOptionSwitch('prerelease', !$('#incrementPrereleaseEnabled').is(':checked'));
+            });
+            $('#incrementBuildSwitch').on('click', function() {
+                setIncrementOptionSwitch('build', !$('#incrementBuildEnabled').is(':checked'));
+            });
+            $('#incrementPrereleaseIdentifier, #incrementBuildNumber').on('input', updateVersionIncrementPreview);
+            $('#versionIncrementList, #versionIncrementDetailsContent').on('click', '.copy-increment-key', function() {
+                copyIncrementKey($(this).data('increment-id'), $(this));
+            });
+            $('#versionIncrementList, #versionIncrementDetailsContent').on('click', '.copy-increment-script', function() {
+                copyIncrementScript($(this).data('increment-id'), $(this));
+            });
+            $('#versionIncrementList, #versionIncrementDetailsContent').on('click', '.regenerate-version-increment', function() {
+                regenerateVersionIncrement($(this).data('increment-id'));
+            });
+            $('#versionIncrementList, #versionIncrementDetailsContent').on('click', '.toggle-version-increment-enabled', function() {
+                setVersionIncrementEnabled($(this).data('increment-id'), String($(this).data('next-enabled')) === 'true', $(this));
+            });
+            $('#versionIncrementDetailsNameEdit').on('click', function(event) {
+                event.preventDefault();
+                setIncrementDetailsEditField('name');
+            });
+            $('#versionIncrementDetailsContent').on('click', '.edit-version-increment-detail', function(event) {
+                event.preventDefault();
+                setIncrementDetailsEditField($(this).data('field'));
+            });
+            $('#saveIncrementDetailEdit').on('click', function(event) {
+                event.preventDefault();
+                saveIncrementDetailEdit($(this).data('field'));
+            });
+            $('#versionIncrementDetailEditContent').on('change', '#detailPrereleaseEnabled', applyIncrementDetailsPrereleaseEditorVisibility);
+            $('#versionIncrementDetailEditContent').on('click', '#detailPrereleaseDropdownButton', function(event) {
+                event.stopPropagation();
+                if ($(this).prop('disabled')) return;
+                const isHidden = $('#detailPrereleaseDropdownPanel').hasClass('hidden');
+                $('#detailPrereleaseDropdownPanel').toggleClass('hidden', !isHidden);
+                $(this).attr('aria-expanded', isHidden ? 'true' : 'false');
+            });
+            $('#versionIncrementDetailEditContent').on('click', '#detailPrereleaseList li[data-value]', function() {
+                $('#detailPrereleasePreset').val($(this).data('value'));
+                $('#detailPrereleaseDropdownPanel').addClass('hidden');
+                $('#detailPrereleaseDropdownButton').attr('aria-expanded', 'false');
+                applyIncrementDetailsPrereleaseEditorVisibility();
+            });
+            $('#versionIncrementDetailEditContent').on('change', '#detailBuildEnabled', applyIncrementDetailsBuildEditorVisibility);
+            $('#versionIncrementDetailEditContent').on('input', '#detailBuildNumber', renderIncrementDetailsBuildPatternDropdown);
+            $('#versionIncrementDetailEditContent').on('click', '#detailBuildPatternDropdownButton', function(event) {
+                event.stopPropagation();
+                if ($(this).prop('disabled')) return;
+                const isHidden = $('#detailBuildPatternDropdownPanel').hasClass('hidden');
+                $('#detailBuildPatternDropdownPanel').toggleClass('hidden', !isHidden);
+                $(this).attr('aria-expanded', isHidden ? 'true' : 'false');
+            });
+            $('#versionIncrementDetailEditContent').on('click', '#detailBuildPatternList li[data-value]', function() {
+                $('#detailBuildPattern').val($(this).data('value'));
+                $('#detailBuildPatternDropdownPanel').addClass('hidden');
+                $('#detailBuildPatternDropdownButton').attr('aria-expanded', 'false');
+                renderIncrementDetailsBuildPatternDropdown();
+            });
+            $('#versionIncrementList').on('click', 'tbody tr[data-increment-id]', function(event) {
+                if ($(event.target).closest('button, a, input, select, textarea, label, [role="button"]').length) return;
+                openVersionIncrementDetailsModal($(this).data('increment-id'));
+            });
+            $('#versionIncrementList').on('click', '.open-version-increment-details', function() {
+                openVersionIncrementDetailsModal($(this).data('increment-id'));
+            });
+            $('#versionIncrementList').on('click', '.delete-version-increment', function() {
+                deleteVersionIncrement($(this).data('increment-id'));
+            });
+            $('#versionIncrementDetailsModal').on('click', function(event) {
+                if (event.target.id === 'versionIncrementDetailsModal') closeVersionIncrementDetailsModal();
+            });
+            $('#versionIncrementDetailEditModal').on('click', function(event) {
+                if (event.target.id === 'versionIncrementDetailEditModal') closeVersionIncrementDetailEditModal();
+            });
+            $('#versionIncrementDetailEditModal').on('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    event.preventDefault();
+                    closeVersionIncrementDetailEditModal();
+                }
+            });
+            $('#versionIncrementDetailsModal').on('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    event.preventDefault();
+                    closeVersionIncrementDetailsModal();
+                }
+            });
+            renderVersionIncrementCards();
             showApplicationDetailsView(sessionStorage.getItem(activeTabStorageKey) || 'overview');
             if (!currentRepositoryBranches.length) {
                 refreshRepositoryMetadata({ silent: true });
             }
         });
+        window.openVersionIncrementModal = openVersionIncrementModal;
+        window.closeVersionIncrementModal = closeVersionIncrementModal;
+        window.closeVersionIncrementDetailsModal = closeVersionIncrementDetailsModal;
     })();
 
 

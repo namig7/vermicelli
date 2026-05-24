@@ -31,6 +31,7 @@ from main import (
     ProjectMembership,
     User,
     Version,
+    VersionIncrement,
     app,
     db,
     decrypt_backup_payload,
@@ -1118,6 +1119,357 @@ def test_read_write_user_application_details_show_edit_controls_and_access(clien
     assert b'id="editAppModal"' in response.data
     assert f'openEditAppModal({app_obj.id})'.encode() in response.data
     assert f'deleteApplication({app_obj.id})'.encode() in response.data
+
+
+def test_version_increment_api_key_updates_application_version(client):
+    user = create_user('release-user')
+    app_obj = Application(name='API Key Release App')
+    db.session.add(app_obj)
+    db.session.flush()
+    db.session.add_all([
+        Version(application_id=app_obj.id, number='1.2.3', version_type='semver'),
+        ApplicationMembership(
+            user_id=user.id,
+            application_id=app_obj.id,
+            access_level=ACCESS_READ_WRITE,
+        ),
+    ])
+    db.session.commit()
+    login_as(client, user)
+
+    create_response = client.post(f'/api/app/{app_obj.id}/increments', json={
+        'name': 'Patch CI',
+        'version_part': 'patch',
+    })
+
+    assert create_response.status_code == 201
+    increment_payload = create_response.get_json()['increment']
+    assert increment_payload['api_key'].startswith('vmc_')
+    assert increment_payload['can_copy_key'] is True
+    assert increment_payload['is_enabled'] is True
+
+    update_response = client.post(
+        f'/app/{app_obj.id}/update_version',
+        headers={'X-API-Key': increment_payload['api_key']},
+        json={'releasenotes': 'Automated release'},
+    )
+
+    assert update_response.status_code == 200
+    assert update_response.get_json()['new_version'] == '1.2.4'
+    latest_version = Version.query.filter_by(application_id=app_obj.id).order_by(Version.change_date.desc()).first()
+    increment = VersionIncrement.query.one()
+    assert latest_version.number == '1.2.4'
+    assert latest_version.notes == 'Automated release'
+    assert increment.last_used_at is not None
+
+
+def test_build_increment_defaults_to_release_count(client):
+    user = create_user('release-count-user')
+    app_obj = Application(name='Release Count Build App')
+    db.session.add(app_obj)
+    db.session.flush()
+    db.session.add_all([
+        Version(
+            application_id=app_obj.id,
+            number='0.1.0',
+            version_type='semver',
+            change_date=datetime(2026, 1, 1, 12, 0),
+        ),
+        Version(
+            application_id=app_obj.id,
+            number='0.2.0',
+            version_type='semver',
+            change_date=datetime(2026, 1, 2, 12, 0),
+        ),
+        Version(
+            application_id=app_obj.id,
+            number='1.0.0',
+            version_type='semver',
+            change_date=datetime(2026, 1, 3, 12, 0),
+        ),
+        ApplicationMembership(
+            user_id=user.id,
+            application_id=app_obj.id,
+            access_level=ACCESS_READ_WRITE,
+        ),
+    ])
+    db.session.commit()
+    login_as(client, user)
+
+    details_response = client.get(f'/content/application_details/{app_obj.id}')
+    assert details_response.status_code == 200
+    assert b'releaseCount: 3' in details_response.data
+
+    create_response = client.post(f'/api/app/{app_obj.id}/increments', json={
+        'name': 'Patch builds',
+        'version_part': 'patch',
+        'enable_build': True,
+    })
+
+    assert create_response.status_code == 201
+    increment_payload = create_response.get_json()['increment']
+    assert increment_payload['build_number'] == 3
+    assert increment_payload['next_release'] == '1.0.1.4'
+
+
+def test_version_increment_details_can_be_updated(client):
+    user = create_user('release-edit-user')
+    app_obj = Application(name='Editable Increment App')
+    db.session.add(app_obj)
+    db.session.flush()
+    db.session.add_all([
+        Version(application_id=app_obj.id, number='1.2.3', version_type='semver'),
+        ApplicationMembership(
+            user_id=user.id,
+            application_id=app_obj.id,
+            access_level=ACCESS_READ_WRITE,
+        ),
+    ])
+    db.session.commit()
+    login_as(client, user)
+
+    create_response = client.post(f'/api/app/{app_obj.id}/increments', json={
+        'name': 'Patch CI',
+        'version_part': 'patch',
+    })
+    assert create_response.status_code == 201
+    increment_payload = create_response.get_json()['increment']
+    increment_id = increment_payload['id']
+    api_key = increment_payload['api_key']
+
+    update_response = client.patch(f'/api/app/{app_obj.id}/increments/{increment_id}', json={
+        'name': 'Patch RC builds',
+        'enable_prerelease': True,
+        'prerelease_identifier': 'rc',
+        'enable_build': True,
+        'build_number': 7,
+        'build_pattern': 'parentheses',
+    })
+
+    assert update_response.status_code == 200
+    updated_increment = update_response.get_json()['increment']
+    assert updated_increment['name'] == 'Patch RC builds'
+    assert updated_increment['uses_prerelease'] is True
+    assert updated_increment['prerelease_identifier'] == 'rc'
+    assert updated_increment['uses_build'] is True
+    assert updated_increment['build_number'] == 7
+    assert updated_increment['build_pattern'] == 'parentheses'
+    assert updated_increment['next_release'] == '1.2.4 (008)-rc'
+
+    release_response = client.post(
+        f'/app/{app_obj.id}/update_version',
+        headers={'X-API-Key': api_key},
+        json={'releasenotes': 'Edited increment release'},
+    )
+
+    assert release_response.status_code == 200
+    assert release_response.get_json()['new_version'] == '1.2.4 (008)-rc'
+    increment = db.session.get(VersionIncrement, increment_id)
+    assert increment.name == 'Patch RC builds'
+    assert increment.build_number == 8
+
+
+def test_version_increment_build_zero_pattern_uses_named_build(client):
+    user = create_user('release-build-zero-user')
+    app_obj = Application(name='Named Build Increment App')
+    db.session.add(app_obj)
+    db.session.flush()
+    db.session.add_all([
+        Version(application_id=app_obj.id, number='1.0.1', version_type='semver'),
+        ApplicationMembership(
+            user_id=user.id,
+            application_id=app_obj.id,
+            access_level=ACCESS_READ_WRITE,
+        ),
+    ])
+    db.session.commit()
+    login_as(client, user)
+
+    create_response = client.post(f'/api/app/{app_obj.id}/increments', json={
+        'name': 'Patch named build',
+        'version_part': 'patch',
+        'enable_build': True,
+        'build_number': 2,
+        'build_pattern': 'dot_padded',
+    })
+
+    assert create_response.status_code == 201
+    increment_payload = create_response.get_json()['increment']
+    assert increment_payload['build_pattern'] == 'dot_padded'
+    assert increment_payload['next_release'] == '1.0.2 Build 3'
+
+    release_response = client.post(
+        f'/app/{app_obj.id}/update_version',
+        headers={'X-API-Key': increment_payload['api_key']},
+        json={'releasenotes': 'Named build release'},
+    )
+
+    assert release_response.status_code == 200
+    assert release_response.get_json()['new_version'] == '1.0.2 Build 3'
+    increment = db.session.get(VersionIncrement, increment_payload['id'])
+    assert increment.build_number == 3
+
+
+def test_versioning_build_default_uses_release_count(client):
+    user = create_user('versioning-build-user')
+    app_obj = Application(name='Versioning Build Count App')
+    db.session.add(app_obj)
+    db.session.flush()
+    db.session.add_all([
+        Version(
+            application_id=app_obj.id,
+            number='0.1.0',
+            version_type='semver',
+            change_date=datetime(2026, 1, 1, 12, 0),
+        ),
+        Version(
+            application_id=app_obj.id,
+            number='0.2.0',
+            version_type='semver',
+            change_date=datetime(2026, 1, 2, 12, 0),
+        ),
+        Version(
+            application_id=app_obj.id,
+            number='1.0.0',
+            version_type='semver',
+            change_date=datetime(2026, 1, 3, 12, 0),
+        ),
+        ApplicationMembership(
+            user_id=user.id,
+            application_id=app_obj.id,
+            access_level=ACCESS_READ_WRITE,
+        ),
+    ])
+    db.session.commit()
+    login_as(client, user)
+
+    response = client.put(f'/app/{app_obj.id}/versioning', json={
+        'enable_build': True,
+    })
+
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert payload['latest_version']['number'] == '1.0.0.3'
+    assert payload['latest_build_number'] == 3
+
+
+def test_version_increment_keys_are_only_returned_to_owner(client):
+    owner = create_user('release-owner')
+    manager = create_user('release-manager')
+    project = Project(name='Release Project', status='Draft')
+    app_obj = Application(name='Manager Hidden Key App')
+    app_obj.projects.append(project)
+    db.session.add_all([project, app_obj])
+    db.session.flush()
+    db.session.add_all([
+        Version(application_id=app_obj.id, number='2.0.0', version_type='semver'),
+        ApplicationMembership(
+            user_id=owner.id,
+            application_id=app_obj.id,
+            access_level=ACCESS_READ_WRITE,
+        ),
+        ProjectMembership(
+            user_id=manager.id,
+            project_id=project.id,
+            project_role=PROJECT_ADMIN,
+            access_level=ACCESS_READ_WRITE,
+        ),
+    ])
+    db.session.commit()
+
+    login_as(client, owner)
+    create_response = client.post(f'/api/app/{app_obj.id}/increments', json={
+        'name': 'Major CI',
+        'version_part': 'major',
+    })
+    assert create_response.status_code == 201
+    owner_key = create_response.get_json()['increment']['api_key']
+    increment_id = create_response.get_json()['increment']['id']
+
+    login_as(client, manager)
+    manager_list_response = client.get(f'/api/app/{app_obj.id}/increments')
+    assert manager_list_response.status_code == 200
+    manager_increment = manager_list_response.get_json()[0]
+    assert manager_increment['generated_by'] == owner.username
+    assert manager_increment['api_key'] is None
+    assert manager_increment['can_copy_key'] is False
+    assert manager_increment['can_manage'] is True
+    assert manager_increment['is_enabled'] is True
+
+    regenerate_response = client.post(f'/api/app/{app_obj.id}/increments/{increment_id}/regenerate')
+    assert regenerate_response.status_code == 200
+    assert regenerate_response.get_json()['increment']['api_key'] is None
+
+    login_as(client, owner)
+    owner_list_response = client.get(f'/api/app/{app_obj.id}/increments')
+    assert owner_list_response.status_code == 200
+    regenerated_key = owner_list_response.get_json()[0]['api_key']
+    assert regenerated_key.startswith('vmc_')
+    assert regenerated_key != owner_key
+
+
+def test_version_increment_enabled_state_is_managed_and_enforced(client):
+    owner = create_user('toggle-owner')
+    manager = create_user('toggle-manager')
+    project = Project(name='Toggle Project', status='Draft')
+    app_obj = Application(name='Toggle Increment App')
+    app_obj.projects.append(project)
+    db.session.add_all([project, app_obj])
+    db.session.flush()
+    db.session.add_all([
+        Version(application_id=app_obj.id, number='3.4.5', version_type='semver'),
+        ApplicationMembership(
+            user_id=owner.id,
+            application_id=app_obj.id,
+            access_level=ACCESS_READ_WRITE,
+        ),
+        ProjectMembership(
+            user_id=manager.id,
+            project_id=project.id,
+            project_role=PROJECT_ADMIN,
+            access_level=ACCESS_READ_WRITE,
+        ),
+    ])
+    db.session.commit()
+
+    login_as(client, owner)
+    create_response = client.post(f'/api/app/{app_obj.id}/increments', json={
+        'name': 'Patch toggle',
+        'version_part': 'patch',
+    })
+    assert create_response.status_code == 201
+    increment_payload = create_response.get_json()['increment']
+    increment_id = increment_payload['id']
+    api_key = increment_payload['api_key']
+
+    login_as(client, manager)
+    disable_response = client.patch(f'/api/app/{app_obj.id}/increments/{increment_id}', json={
+        'is_enabled': False,
+    })
+    assert disable_response.status_code == 200
+    assert disable_response.get_json()['increment']['is_enabled'] is False
+
+    update_response = client.post(
+        f'/app/{app_obj.id}/update_version',
+        headers={'X-API-Key': api_key},
+        json={'releasenotes': 'Disabled release'},
+    )
+    assert update_response.status_code == 403
+    assert update_response.get_json()['error'] == 'This release increment is disabled.'
+
+    enable_response = client.patch(f'/api/app/{app_obj.id}/increments/{increment_id}', json={
+        'is_enabled': True,
+    })
+    assert enable_response.status_code == 200
+    assert enable_response.get_json()['increment']['is_enabled'] is True
+
+    update_response = client.post(
+        f'/app/{app_obj.id}/update_version',
+        headers={'X-API-Key': api_key},
+        json={'releasenotes': 'Enabled release'},
+    )
+    assert update_response.status_code == 200
+    assert update_response.get_json()['new_version'] == '3.4.6'
 
 
 def test_read_write_user_can_configure_and_check_deployment(client, monkeypatch):
