@@ -1269,6 +1269,66 @@ def test_version_increment_details_can_be_updated(client):
     assert increment.build_number == 8
 
 
+def test_version_increment_prerelease_pattern_formats_next_release(client):
+    user = create_user('release-prerelease-pattern-user')
+    app_obj = Application(name='Prerelease Pattern Increment App')
+    db.session.add(app_obj)
+    db.session.flush()
+    db.session.add_all([
+        Version(application_id=app_obj.id, number='2.0.0', version_type='semver'),
+        ApplicationMembership(
+            user_id=user.id,
+            application_id=app_obj.id,
+            access_level=ACCESS_READ_WRITE,
+        ),
+    ])
+    db.session.commit()
+    login_as(client, user)
+
+    create_response = client.post(f'/api/app/{app_obj.id}/increments', json={
+        'name': 'Patch stable',
+        'version_part': 'patch',
+        'enable_prerelease': True,
+        'prerelease_identifier': 'stable',
+        'prerelease_pattern': 'space',
+    })
+
+    assert create_response.status_code == 201
+    increment_payload = create_response.get_json()['increment']
+    assert increment_payload['prerelease_pattern'] == 'space'
+    assert increment_payload['next_release'] == '2.0.1 stable'
+
+    update_response = client.patch(f'/api/app/{app_obj.id}/increments/{increment_payload["id"]}', json={
+        'prerelease_identifier': 'unstable',
+        'prerelease_pattern': 'parentheses',
+    })
+
+    assert update_response.status_code == 200
+    updated_increment = update_response.get_json()['increment']
+    assert updated_increment['prerelease_identifier'] == 'unstable'
+    assert updated_increment['prerelease_pattern'] == 'parentheses'
+    assert updated_increment['next_release'] == '2.0.1 (unstable)'
+
+    release_response = client.post(
+        f'/app/{app_obj.id}/update_version',
+        headers={'X-API-Key': increment_payload['api_key']},
+        json={'releasenotes': 'Parenthesized prerelease'},
+    )
+
+    assert release_response.status_code == 200
+    assert release_response.get_json()['new_version'] == '2.0.1 (unstable)'
+    assert db.session.get(VersionIncrement, increment_payload['id']).build_number is None
+
+    next_response = client.post(
+        f'/app/{app_obj.id}/update_version',
+        headers={'X-API-Key': increment_payload['api_key']},
+        json={'releasenotes': 'Next parenthesized prerelease'},
+    )
+
+    assert next_response.status_code == 200
+    assert next_response.get_json()['new_version'] == '2.0.2 (unstable)'
+
+
 def test_version_increment_build_zero_pattern_uses_named_build(client):
     user = create_user('release-build-zero-user')
     app_obj = Application(name='Named Build Increment App')

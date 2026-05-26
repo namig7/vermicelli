@@ -108,6 +108,15 @@ VERSIONING_SEMVER = 'semver'
 VERSIONING_SEMVER_PRERELEASE = 'semver_prerelease'
 VERSIONING_SEMVER_BUILD = 'semver_build'
 VERSIONING_SEMVER_PRERELEASE_BUILD = 'semver_pre_build'
+VERSION_PRERELEASE_PATTERN_HYPHEN = 'hyphen'
+VERSION_PRERELEASE_PATTERN_SPACE = 'space'
+VERSION_PRERELEASE_PATTERN_PARENTHESES = 'parentheses'
+VERSION_PRERELEASE_PATTERN_DEFAULT = VERSION_PRERELEASE_PATTERN_HYPHEN
+VERSION_PRERELEASE_PATTERNS = (
+    VERSION_PRERELEASE_PATTERN_HYPHEN,
+    VERSION_PRERELEASE_PATTERN_SPACE,
+    VERSION_PRERELEASE_PATTERN_PARENTHESES,
+)
 VERSION_BUILD_PATTERN_STANDARD = 'standard'
 VERSION_BUILD_PATTERN_DOT_PADDED = 'dot_padded'
 VERSION_BUILD_PATTERN_PARENTHESES = 'parentheses'
@@ -382,6 +391,11 @@ def ensure_version_increment_schema():
         if 'build_pattern' not in existing_columns:
             db.session.execute(text(
                 f"ALTER TABLE version_increments ADD COLUMN build_pattern VARCHAR(30) NOT NULL DEFAULT '{VERSION_BUILD_PATTERN_DEFAULT}'"
+            ))
+            db.session.commit()
+        if 'prerelease_pattern' not in existing_columns:
+            db.session.execute(text(
+                f"ALTER TABLE version_increments ADD COLUMN prerelease_pattern VARCHAR(30) NOT NULL DEFAULT '{VERSION_PRERELEASE_PATTERN_DEFAULT}'"
             ))
             db.session.commit()
         _VERSION_INCREMENT_SCHEMA_READY = True
@@ -1121,6 +1135,20 @@ def normalize_versioning_type(value):
     return versioning_type if versioning_type in VERSIONING_TYPES else VERSIONING_SEMVER
 
 
+def normalize_prerelease_pattern(value):
+    prerelease_pattern = (value or VERSION_PRERELEASE_PATTERN_DEFAULT).strip()
+    return prerelease_pattern if prerelease_pattern in VERSION_PRERELEASE_PATTERNS else VERSION_PRERELEASE_PATTERN_DEFAULT
+
+
+def prerelease_pattern_label(value):
+    labels = {
+        VERSION_PRERELEASE_PATTERN_HYPHEN: 'Hyphen (-label)',
+        VERSION_PRERELEASE_PATTERN_SPACE: 'Space label',
+        VERSION_PRERELEASE_PATTERN_PARENTHESES: 'Parentheses (label)',
+    }
+    return labels[normalize_prerelease_pattern(value)]
+
+
 def normalize_build_pattern(value):
     build_pattern = (value or VERSION_BUILD_PATTERN_DEFAULT).strip()
     return build_pattern if build_pattern in VERSION_BUILD_PATTERNS else VERSION_BUILD_PATTERN_DEFAULT
@@ -1182,9 +1210,8 @@ def versioning_type_short_label(value):
 
 
 def prerelease_identifier_from_version(version_number):
-    if not version_number or '-' not in version_number:
-        return ''
-    return version_number.split('-', 1)[1]
+    _core, prerelease = split_semver_prerelease(version_number or '')
+    return prerelease
 
 
 def validate_prerelease_identifier(identifier):
@@ -1216,8 +1243,17 @@ def validate_initial_version(versioning_type, version_number):
 
 
 def split_semver_prerelease(version_number):
-    core, _, prerelease = version_number.partition('-')
-    return core, prerelease
+    value = str(version_number or '').strip()
+    parenthesized_match = re.match(r'^(.+?)\s+\(([A-Za-z][A-Za-z0-9]*)\)\s*$', value)
+    if parenthesized_match:
+        return parenthesized_match.group(1), parenthesized_match.group(2)
+    hyphen_match = re.match(r'^(.+)-([A-Za-z][A-Za-z0-9]*)\s*$', value)
+    if hyphen_match:
+        return hyphen_match.group(1), hyphen_match.group(2)
+    space_match = re.match(r'^(.+?)\s+([A-Za-z][A-Za-z0-9]*)\s*$', value)
+    if space_match:
+        return space_match.group(1), space_match.group(2)
+    return value, ''
 
 
 def parse_version_number(version_number):
@@ -1241,7 +1277,7 @@ def parse_version_number(version_number):
     return major, minor, patch, build, prerelease
 
 
-def format_version_number(major, minor, patch, build, prerelease, versioning_type, build_pattern=VERSION_BUILD_PATTERN_DEFAULT):
+def format_version_number(major, minor, patch, build, prerelease, versioning_type, build_pattern=VERSION_BUILD_PATTERN_DEFAULT, prerelease_pattern=VERSION_PRERELEASE_PATTERN_DEFAULT):
     if versioning_uses_build(versioning_type):
         build_value = 0 if build is None else int(build)
         normalized_pattern = normalize_build_pattern(build_pattern)
@@ -1254,7 +1290,13 @@ def format_version_number(major, minor, patch, build, prerelease, versioning_typ
     else:
         version_number = f"{major}.{minor}.{patch}"
     if versioning_uses_prerelease(versioning_type) and prerelease:
-        version_number = f"{version_number}-{prerelease}"
+        normalized_prerelease_pattern = normalize_prerelease_pattern(prerelease_pattern)
+        if normalized_prerelease_pattern == VERSION_PRERELEASE_PATTERN_SPACE:
+            version_number = f"{version_number} {prerelease}"
+        elif normalized_prerelease_pattern == VERSION_PRERELEASE_PATTERN_PARENTHESES:
+            version_number = f"{version_number} ({prerelease})"
+        else:
+            version_number = f"{version_number}-{prerelease}"
     return version_number
 
 
@@ -1288,7 +1330,7 @@ def normalize_initial_version_for_options(versioning_type, initial_version, prer
     return initial_version_number, None
 
 
-def increment_version_number(latest_number, versioning_type, version_part, prerelease=None, build_pattern=VERSION_BUILD_PATTERN_DEFAULT):
+def increment_version_number(latest_number, versioning_type, version_part, prerelease=None, build_pattern=VERSION_BUILD_PATTERN_DEFAULT, prerelease_pattern=VERSION_PRERELEASE_PATTERN_DEFAULT):
     major, minor, patch, build, existing_prerelease = parse_version_number(latest_number)
     if version_part == 'major':
         major += 1
@@ -1312,7 +1354,7 @@ def increment_version_number(latest_number, versioning_type, version_part, prere
                 raise ValueError(prerelease_error)
         if not prerelease_value:
             raise ValueError('Pre-release Label is required for this application versioning mode.')
-    return format_version_number(major, minor, patch, build, prerelease_value, versioning_type, build_pattern)
+    return format_version_number(major, minor, patch, build, prerelease_value, versioning_type, build_pattern, prerelease_pattern)
 
 
 def version_number_for_increment_base(latest_number, increment):
@@ -1321,7 +1363,16 @@ def version_number_for_increment_base(latest_number, increment):
     if versioning_uses_build(versioning_type) and increment.build_number is not None:
         build = increment.build_number
     prerelease = increment.prerelease_identifier or existing_prerelease
-    return format_version_number(major, minor, patch, build, prerelease, versioning_type, getattr(increment, 'build_pattern', VERSION_BUILD_PATTERN_DEFAULT))
+    return format_version_number(
+        major,
+        minor,
+        patch,
+        build,
+        prerelease,
+        versioning_type,
+        getattr(increment, 'build_pattern', VERSION_BUILD_PATTERN_DEFAULT),
+        getattr(increment, 'prerelease_pattern', VERSION_PRERELEASE_PATTERN_DEFAULT),
+    )
 
 
 def next_version_for_increment(latest_number, increment):
@@ -1331,7 +1382,8 @@ def next_version_for_increment(latest_number, increment):
         normalize_versioning_type(increment.version_type),
         increment.version_part,
         prerelease=increment.prerelease_identifier,
-        build_pattern=getattr(increment, 'build_pattern', VERSION_BUILD_PATTERN_DEFAULT)
+        build_pattern=getattr(increment, 'build_pattern', VERSION_BUILD_PATTERN_DEFAULT),
+        prerelease_pattern=getattr(increment, 'prerelease_pattern', VERSION_PRERELEASE_PATTERN_DEFAULT),
     )
 
 
@@ -1384,6 +1436,8 @@ def serialize_version_increment(increment, current_user, latest_version=None):
         'uses_prerelease': versioning_uses_prerelease(versioning_type),
         'uses_build': versioning_uses_build(versioning_type),
         'prerelease_identifier': increment.prerelease_identifier or '',
+        'prerelease_pattern': normalize_prerelease_pattern(getattr(increment, 'prerelease_pattern', VERSION_PRERELEASE_PATTERN_DEFAULT)),
+        'prerelease_pattern_label': prerelease_pattern_label(getattr(increment, 'prerelease_pattern', VERSION_PRERELEASE_PATTERN_DEFAULT)),
         'build_number': increment.build_number,
         'build_pattern': normalize_build_pattern(getattr(increment, 'build_pattern', VERSION_BUILD_PATTERN_DEFAULT)),
         'build_pattern_label': build_pattern_label(getattr(increment, 'build_pattern', VERSION_BUILD_PATTERN_DEFAULT)),
@@ -1717,6 +1771,7 @@ class VersionIncrement(db.Model):
     version_part = db.Column(db.String(20), nullable=False, default='major')
     version_type = db.Column(db.String(20), nullable=False, default=VERSIONING_SEMVER)
     prerelease_identifier = db.Column(db.String(40))
+    prerelease_pattern = db.Column(db.String(30), nullable=False, default=VERSION_PRERELEASE_PATTERN_DEFAULT)
     build_number = db.Column(db.Integer)
     build_pattern = db.Column(db.String(30), nullable=False, default=VERSION_BUILD_PATTERN_DEFAULT)
     is_enabled = db.Column(db.Boolean, nullable=False, default=True)
@@ -2419,6 +2474,7 @@ def serialize_backup_payload():
                     'version_part': increment.version_part,
                     'version_type': increment.version_type,
                     'prerelease_identifier': increment.prerelease_identifier or '',
+                    'prerelease_pattern': normalize_prerelease_pattern(getattr(increment, 'prerelease_pattern', VERSION_PRERELEASE_PATTERN_DEFAULT)),
                     'build_number': increment.build_number,
                     'build_pattern': normalize_build_pattern(getattr(increment, 'build_pattern', VERSION_BUILD_PATTERN_DEFAULT)),
                     'is_enabled': bool(increment.is_enabled),
@@ -2776,6 +2832,7 @@ def import_backup_payload(payload):
                 version_part=normalize_version_part(row.get('version_part')) or 'major',
                 version_type=normalize_versioning_type(row.get('version_type')),
                 prerelease_identifier=row.get('prerelease_identifier') or None,
+                prerelease_pattern=normalize_prerelease_pattern(row.get('prerelease_pattern')),
                 build_number=row.get('build_number'),
                 build_pattern=normalize_build_pattern(row.get('build_pattern')),
                 is_enabled=request_boolean(row.get('is_enabled'), True),
@@ -3301,6 +3358,7 @@ def create_version_increment(application_id):
         return json_error(prerelease_error, 400)
     if versioning_uses_prerelease(versioning_type) and not prerelease_value:
         return json_error('Pre-release Label is required when Pre-release Label is enabled.', 400)
+    prerelease_pattern = normalize_prerelease_pattern(payload.get('prerelease_pattern'))
 
     build_number = None
     raw_build_number = payload.get('build_number')
@@ -3335,6 +3393,7 @@ def create_version_increment(application_id):
         version_part=version_part,
         version_type=versioning_type,
         prerelease_identifier=prerelease_value or None,
+        prerelease_pattern=prerelease_pattern,
         build_number=build_number,
         build_pattern=build_pattern,
     )
@@ -3392,6 +3451,7 @@ def update_version_increment(application_id, increment_id):
         'enable_prerelease',
         'uses_prerelease',
         'prerelease_identifier',
+        'prerelease_pattern',
         'enable_build',
         'uses_build',
         'build_number',
@@ -3458,6 +3518,7 @@ def update_version_increment(application_id, increment_id):
 
     increment.version_type = next_versioning_type
     increment.prerelease_identifier = (prerelease_value or None) if versioning_uses_prerelease(next_versioning_type) else None
+    increment.prerelease_pattern = normalize_prerelease_pattern(payload.get('prerelease_pattern', getattr(increment, 'prerelease_pattern', VERSION_PRERELEASE_PATTERN_DEFAULT)))
     increment.build_number = build_number
     increment.build_pattern = normalize_build_pattern(payload.get('build_pattern', getattr(increment, 'build_pattern', VERSION_BUILD_PATTERN_DEFAULT)))
     if 'is_enabled' in payload or 'enabled' in payload:

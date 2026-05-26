@@ -987,6 +987,21 @@
             box-shadow: 0 16px 28px rgba(17, 24, 39, 0.16);
         }
 
+        #versionIncrementDetailEditModal .application-details-modal-panel,
+        #versionIncrementDetailEditModal .application-details-modal-body {
+            overflow: visible;
+        }
+
+        #versionIncrementDetailEditModal .version-dropdown-panel {
+            z-index: 90;
+            overflow: visible;
+        }
+
+        #versionIncrementDetailEditModal .version-dropdown-list {
+            max-height: none;
+            overflow: visible;
+        }
+
         .app-details-page .version-dropdown-option {
             cursor: pointer;
             padding: 0.7rem 0.85rem;
@@ -1557,6 +1572,48 @@
             background-color: #fef3c7;
             border-color: #fde68a;
             color: #b45309;
+        }
+
+        .app-details-page .version-format-toggle {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.35rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: #ffffff;
+            padding: 0.3rem;
+        }
+
+        .app-details-page .version-format-toggle-button {
+            display: inline-flex;
+            min-height: 2.25rem;
+            align-items: center;
+            justify-content: center;
+            border: 0;
+            border-radius: 0.375rem;
+            background: transparent;
+            color: #4b5563;
+            padding: 0.35rem 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 800;
+            text-align: center;
+            transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .app-details-page .version-format-toggle-button:hover:not(:disabled) {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .app-details-page .version-format-toggle-button.is-active {
+            background: #fcd34d;
+            color: #78350f;
+            box-shadow: 0 1px 2px rgba(120, 53, 15, 0.12);
+        }
+
+        .app-details-page .version-format-toggle-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.55;
         }
 
         .app-details-page .access-admin-button {
@@ -2451,7 +2508,8 @@
 
         html[data-theme="dark"] .app-details-page .version-panel,
         html[data-theme="dark"] .app-details-page .version-flow-node,
-        html[data-theme="dark"] .app-details-page .version-part-selector {
+        html[data-theme="dark"] .app-details-page .version-part-selector,
+        html[data-theme="dark"] .app-details-page .version-format-toggle {
             background: #111827;
             border-color: #4b5563;
         }
@@ -2562,6 +2620,16 @@
         html[data-theme="dark"] .app-details-page .version-part-button.is-active {
             background-color: #f59e0b;
             border-color: #f59e0b;
+            color: #111827;
+        }
+
+        html[data-theme="dark"] .app-details-page .version-format-toggle-button {
+            color: #d1d5db;
+        }
+
+        html[data-theme="dark"] .app-details-page .version-format-toggle-button:hover:not(:disabled),
+        html[data-theme="dark"] .app-details-page .version-format-toggle-button.is-active {
+            background-color: #f59e0b;
             color: #111827;
         }
 
@@ -5308,9 +5376,16 @@
             { value: 'alpha', label: 'alpha' },
             { value: 'beta', label: 'beta' },
             { value: 'rc', label: 'rc' },
+            { value: 'stable', label: 'stable' },
+            { value: 'unstable', label: 'unstable' },
             { value: 'nightly', label: 'nightly' },
             { value: 'dev', label: 'dev' },
             { value: 'custom', label: 'Custom label' }
+        ];
+        const prereleasePatternOptions = [
+            { value: 'space', label: 'Space' },
+            { value: 'hyphen', label: '-' },
+            { value: 'parentheses', label: '()' }
         ];
         const buildPatternOptions = [
             { value: 'standard', label: 'Standard (.0)' },
@@ -5332,6 +5407,19 @@
                 return item.value === value;
             });
             return option ? option.label : value;
+        }
+
+        function normalizePrereleasePattern(value) {
+            return prereleasePatternOptions.some(function(option) {
+                return option.value === value;
+            }) ? value : 'hyphen';
+        }
+
+        function prereleasePatternLabel(value) {
+            const option = prereleasePatternOptions.find(function(item) {
+                return item.value === normalizePrereleasePattern(value);
+            });
+            return option ? option.label : '-';
         }
 
         function buildPatternLabel(value) {
@@ -5387,10 +5475,38 @@
         }
         const releaseUrlVariable = '"$VERMICELLI_URL"';
 
+        function splitVersionCoreAndPrerelease(versionNumber) {
+            const rawVersion = String(versionNumber || '').trim();
+            const parenthesizedPrerelease = rawVersion.match(/^(.+?)\s+\(([A-Za-z][A-Za-z0-9]*)\)\s*$/);
+            if (parenthesizedPrerelease) {
+                return {
+                    core: parenthesizedPrerelease[1],
+                    prerelease: parenthesizedPrerelease[2],
+                    suffix: ` (${parenthesizedPrerelease[2]})`
+                };
+            }
+            const hyphenPrerelease = rawVersion.match(/^(.+)-([A-Za-z][A-Za-z0-9]*)\s*$/);
+            if (hyphenPrerelease) {
+                return {
+                    core: hyphenPrerelease[1],
+                    prerelease: hyphenPrerelease[2],
+                    suffix: `-${hyphenPrerelease[2]}`
+                };
+            }
+            const spacePrerelease = rawVersion.match(/^(.+?)\s+([A-Za-z][A-Za-z0-9]*)\s*$/);
+            if (spacePrerelease) {
+                return {
+                    core: spacePrerelease[1],
+                    prerelease: spacePrerelease[2],
+                    suffix: ` ${spacePrerelease[2]}`
+                };
+            }
+            return { core: rawVersion, prerelease: '', suffix: '' };
+        }
+
         function parseVersionParts(versionNumber) {
-            const rawVersion = String(versionNumber || '0.0.0');
-            const pieces = rawVersion.split('-', 2);
-            const namedBuild = pieces[0].match(/^\s*(\d+)\.(\d+)\.(\d+)\s+Build\s+(\d+)\s*$/i);
+            const versionParts = splitVersionCoreAndPrerelease(versionNumber || '0.0.0');
+            const namedBuild = versionParts.core.match(/^\s*(\d+)\.(\d+)\.(\d+)\s+Build\s+(\d+)\s*$/i);
             if (namedBuild) {
                 return {
                     major: Number.parseInt(namedBuild[1], 10) || 0,
@@ -5399,7 +5515,7 @@
                     build: Number.parseInt(namedBuild[4], 10)
                 };
             }
-            const parenthesizedBuild = pieces[0].match(/^\s*(\d+)\.(\d+)\.(\d+)\s*\((\d+)\)\s*$/);
+            const parenthesizedBuild = versionParts.core.match(/^\s*(\d+)\.(\d+)\.(\d+)\s*\((\d+)\)\s*$/);
             if (parenthesizedBuild) {
                 return {
                     major: Number.parseInt(parenthesizedBuild[1], 10) || 0,
@@ -5408,7 +5524,7 @@
                     build: Number.parseInt(parenthesizedBuild[4], 10)
                 };
             }
-            const coreParts = pieces[0].split('.').map(function(part) {
+            const coreParts = versionParts.core.split('.').map(function(part) {
                 const value = Number.parseInt(part, 10);
                 return Number.isFinite(value) ? value : 0;
             });
@@ -5701,9 +5817,9 @@
             if (!Number.isInteger(changedIndex)) return escapeHtml(nextVersion);
 
             const releaseValue = String(nextVersion);
-            const prereleaseIndex = releaseValue.indexOf('-');
-            const coreValue = prereleaseIndex === -1 ? releaseValue : releaseValue.slice(0, prereleaseIndex);
-            const prereleaseValue = prereleaseIndex === -1 ? '' : releaseValue.slice(prereleaseIndex);
+            const versionDisplayParts = splitVersionCoreAndPrerelease(releaseValue);
+            const coreValue = versionDisplayParts.core;
+            const prereleaseValue = versionDisplayParts.suffix;
             const namedBuild = coreValue.match(/^(\d+)\.(\d+)\.(\d+)(\s+Build\s+\d+)$/i);
             if (namedBuild) {
                 const coreHtml = namedBuild.slice(1, 4).map(function(part, index) {
@@ -5837,6 +5953,21 @@
             }).join('');
         }
 
+        function prereleasePatternOptionsHtml(selectedValue, enabled) {
+            const normalizedValue = normalizePrereleasePattern(selectedValue);
+            return prereleasePatternOptions.map(function(option) {
+                const isActive = option.value === normalizedValue;
+                return `
+                    <button
+                        type="button"
+                        class="version-format-toggle-button detail-prerelease-pattern-button${isActive ? ' is-active' : ''}"
+                        data-value="${escapeAttribute(option.value)}"
+                        aria-pressed="${isActive ? 'true' : 'false'}"
+                        ${enabled ? '' : 'disabled'}
+                    >${escapeHtml(option.label)}</button>`;
+            }).join('');
+        }
+
         function incrementNameEditHtml(increment) {
             return `
                 <div class="increment-details-edit">
@@ -5850,6 +5981,7 @@
             const presetValues = prereleasePresetOptions.map(function(option) { return option.value; }).filter(function(value) { return value !== 'custom'; });
             const selectedPreset = presetValues.includes(currentIdentifier) ? currentIdentifier : 'custom';
             const customValue = selectedPreset === 'custom' ? currentIdentifier : '';
+            const prereleasePattern = normalizePrereleasePattern(increment.prerelease_pattern || 'hyphen');
             return `
                 <div class="increment-details-edit">
                     <label class="version-toggle-row increment-detail-toggle" for="detailPrereleaseEnabled">
@@ -5873,11 +6005,21 @@
                                 </svg>
                             </button>
                             <div id="detailPrereleaseDropdownPanel" class="version-dropdown-panel hidden" role="listbox" aria-labelledby="detailPrereleaseDropdownLabel">
-                                <ul id="detailPrereleaseList" class="max-h-48 overflow-auto py-1">${versionDropdownOptionsHtml(prereleasePresetOptions, selectedPreset)}</ul>
+                                <ul id="detailPrereleaseList" class="version-dropdown-list py-1">${versionDropdownOptionsHtml(prereleasePresetOptions, selectedPreset)}</ul>
                             </div>
                         </div>
                     </div>
-                    <input type="text" id="detailPrereleaseCustom" class="form-input increment-text-input block w-full ${selectedPreset === 'custom' ? '' : 'hidden'}" value="${escapeAttribute(customValue)}" placeholder="custom" ${enabled && selectedPreset === 'custom' ? '' : 'disabled'}>
+                    <div id="detailPrereleaseCustomWrap" class="${selectedPreset === 'custom' ? '' : 'hidden'}">
+                        <label for="detailPrereleaseCustom" class="increment-field-label">Other label</label>
+                        <input type="text" id="detailPrereleaseCustom" class="form-input increment-text-input mt-1 block w-full" value="${escapeAttribute(customValue)}" placeholder="custom" ${enabled && selectedPreset === 'custom' ? '' : 'disabled'}>
+                    </div>
+                    <div>
+                        <input type="hidden" id="detailPrereleasePattern" value="${escapeAttribute(prereleasePattern)}">
+                        <label class="increment-field-label">Separator</label>
+                        <div id="detailPrereleasePatternToggle" class="version-format-toggle mt-1" role="group" aria-label="Pre-release label separator">
+                            ${prereleasePatternOptionsHtml(prereleasePattern, enabled)}
+                        </div>
+                    </div>
                 </div>`;
         }
 
@@ -5912,7 +6054,7 @@
                                 </svg>
                             </button>
                             <div id="detailBuildPatternDropdownPanel" class="version-dropdown-panel hidden" role="listbox" aria-labelledby="detailBuildPatternDropdownLabel">
-                                <ul id="detailBuildPatternList" class="max-h-48 overflow-auto py-1">${versionDropdownOptionsHtml(buildPatternOptions, buildPattern)}</ul>
+                                <ul id="detailBuildPatternList" class="version-dropdown-list py-1">${versionDropdownOptionsHtml(buildPatternOptions, buildPattern)}</ul>
                             </div>
                         </div>
                     </div>
@@ -5923,7 +6065,10 @@
         function renderVersionIncrementDetails(increment) {
             const content = $('#versionIncrementDetailsContent');
             if (!content.length || !increment) return;
-            const prereleaseValue = increment.uses_prerelease ? (increment.prerelease_identifier || 'Required') : 'Not enabled';
+            const prereleasePattern = normalizePrereleasePattern(increment.prerelease_pattern || 'hyphen');
+            const prereleaseValue = increment.uses_prerelease
+                ? `${increment.prerelease_identifier || 'Required'} · ${prereleasePatternLabel(prereleasePattern)}`
+                : 'Not enabled';
             const buildPattern = normalizeBuildPattern(increment.build_pattern || 'standard');
             const buildNumber = increment.build_number !== null && increment.build_number !== undefined ? Number.parseInt(increment.build_number, 10) : 0;
             const buildValue = increment.uses_build ? `${Number.isFinite(buildNumber) ? buildNumber : 0} · ${buildPatternLabel(buildPattern)}` : 'Not enabled';
@@ -6059,6 +6204,10 @@
             $('#detailPrereleaseCustom')
                 .toggleClass('hidden', !isCustom)
                 .prop('disabled', !enabled || !isCustom);
+            $('#detailPrereleaseCustomWrap').toggleClass('hidden', !isCustom);
+            $('#detailPrereleasePatternToggle .detail-prerelease-pattern-button')
+                .prop('disabled', !enabled)
+                .toggleClass('opacity-50 cursor-not-allowed', !enabled);
             if (!enabled) {
                 $('#detailPrereleaseDropdownPanel').addClass('hidden');
                 $('#detailPrereleaseDropdownButton').attr('aria-expanded', 'false');
@@ -6071,6 +6220,17 @@
             const preset = $('#detailPrereleasePreset').val() || 'alpha';
             if (preset === 'custom') return ($('#detailPrereleaseCustom').val() || '').trim();
             return preset;
+        }
+
+        function setIncrementDetailsPrereleasePattern(pattern) {
+            const normalizedPattern = normalizePrereleasePattern(pattern);
+            $('#detailPrereleasePattern').val(normalizedPattern);
+            $('#detailPrereleasePatternToggle .detail-prerelease-pattern-button').each(function() {
+                const isActive = $(this).data('value') === normalizedPattern;
+                $(this)
+                    .toggleClass('is-active', isActive)
+                    .attr('aria-pressed', isActive ? 'true' : 'false');
+            });
         }
 
         function renderIncrementDetailsBuildPatternDropdown() {
@@ -6118,7 +6278,8 @@
                 }
                 payload = {
                     enable_prerelease: enabled,
-                    prerelease_identifier: prereleaseIdentifier
+                    prerelease_identifier: prereleaseIdentifier,
+                    prerelease_pattern: normalizePrereleasePattern($('#detailPrereleasePattern').val() || 'hyphen')
                 };
             } else if (field === 'build') {
                 const enabled = $('#detailBuildEnabled').is(':checked');
@@ -7139,6 +7300,10 @@
                 $('#detailPrereleaseDropdownPanel').addClass('hidden');
                 $('#detailPrereleaseDropdownButton').attr('aria-expanded', 'false');
                 applyIncrementDetailsPrereleaseEditorVisibility();
+            });
+            $('#versionIncrementDetailEditContent').on('click', '.detail-prerelease-pattern-button', function() {
+                if ($(this).prop('disabled')) return;
+                setIncrementDetailsPrereleasePattern($(this).data('value'));
             });
             $('#versionIncrementDetailEditContent').on('change', '#detailBuildEnabled', applyIncrementDetailsBuildEditorVisibility);
             $('#versionIncrementDetailEditContent').on('input', '#detailBuildNumber', renderIncrementDetailsBuildPatternDropdown);
