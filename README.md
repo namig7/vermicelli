@@ -56,6 +56,8 @@ DB=verdb
 USERS=admin:password;testuser:testpass
 ```
 
+Vermicelli targets Python 3.14.5. If you use `pyenv` or another version manager, the repository includes `.python-version`.
+
 Quick start (local, SQLite):
 
 ```bash
@@ -76,7 +78,35 @@ python scripts/init_db.py
 python scripts/reset_db.py
 ```
 
-This script runs the container in detached mode, mapping port 8000 and using the `.env` file.
+## Build and Deploy
+
+Build the Docker image from this repository:
+
+```bash
+docker build -t vermicelli:local .
+```
+
+The Dockerfile uses Python 3.14.5 by default. To pin the same version explicitly in CI:
+
+```bash
+docker build --build-arg PYTHON_VERSION=3.14.5 -t vermicelli:local .
+```
+
+Run the locally built image with SQLite:
+
+```bash
+mkdir -p data
+docker run -d \
+  --name vermicelli \
+  -p 8000:8000 \
+  --env-file .env \
+  -v "$(pwd)/data:/app/data" \
+  vermicelli:local
+```
+
+When using the SQLite volume above, set `DB=data/verdb` in `.env` so the database is stored at `/app/data/verdb.db` inside the container.
+
+Run the published image instead of a local build:
 
 ```bash
 docker run -d \
@@ -89,7 +119,26 @@ docker run -d \
 
 > [!NOTE]
 > Ensure that DB_ENGINE=sqlite is set in your .env if you want to use SQLite.
-> Also, if you want to persist the database file outside the container, use a volume or bind mount. **`-v "$(pwd)/data:/app/data"`**   is an example of mounting a local folder to store the SQLite database file persistently. When using SQLite make sure that the path points to `/app/data/verdb.db` (or a similar path), so the data is not lost when the container is removed.
+> Also, if you want to persist the database file outside the container, use a volume or bind mount. **`-v "$(pwd)/data:/app/data"`** is an example of mounting a local folder to store the SQLite database file persistently. When using SQLite make sure that the `DB` path points to `/app/data/verdb.db` (or a similar path), so the data is not lost when the container is removed.
+
+Deploy with PostgreSQL by setting these values in `.env` and using either image run command above:
+
+```yaml
+DB_ENGINE=postgres
+DB=verdb
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_HOST=postgres.example.com
+DB_PORT=5432
+DB_SSLMODE=require
+```
+
+Initialize the schema from inside a running container. Use reset only when you intend to drop and recreate all tables:
+
+```bash
+docker exec vermicelli python scripts/init_db.py
+docker exec vermicelli python scripts/reset_db.py
+```
 
 ## Advanced Installation
 

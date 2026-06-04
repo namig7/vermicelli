@@ -1,5 +1,6 @@
 # 1) Builder Stage
-FROM python:3.10-slim AS builder
+ARG PYTHON_VERSION=3.14.5
+FROM python:${PYTHON_VERSION}-slim AS builder
 
 # Workdir inside the builder image
 WORKDIR /app
@@ -14,12 +15,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends gcc \
     && rm -rf /var/lib/apt/lists/*
 
 # 2) Final Stage
-FROM python:3.10-slim
+FROM python:${PYTHON_VERSION}-slim
 
 WORKDIR /app
 
 # Copy installed Python libraries from the builder stage
-COPY --from=builder /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
+COPY --from=builder /usr/local /usr/local
 
 # Now copy the rest of your application code (including main.py)
 COPY . .
